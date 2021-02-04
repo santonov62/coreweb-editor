@@ -2,11 +2,6 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="Description" content="Put your description here.">
-  <base href="/">
-
   <style>
     html,
     body {
@@ -15,14 +10,42 @@
       font-family: sans-serif;
       background-color: #ededed;
     }
+
+    button {
+      background-color: #4CAF50; /* Green background */
+      border: 1px solid green; /* Green border */
+      color: white; /* White text */
+      padding: 10px 24px; /* Some padding */
+      cursor: pointer; /* Pointer/hand icon */
+      width: 100%; /* Set a width if needed */
+      display: block; /* Make the buttons appear below each other */
+    }
+
+    button:not(:last-child) {
+      border-bottom: none; /* Prevent double borders */
+    }
+
+    /* Add a background color on hover */
+    button:hover {
+      background-color: #3e8e41;
+    }
   </style>
   <title>coreweb-editor</title>
+  <script type="module">
+    import './src/CorewebEditor'
+  </script>
 </head>
 
 <body>
-  <coreweb-editor></coreweb-editor>
-
-  <script type="module" src="./src/coreweb-editor.js"></script>
+  <div>
+    <div style="float: left; margin: 15px">
+      <button onclick="document.getElementById('cweditor').addItem()">Add Item</button>
+      <button onclick="document.getElementById('cweditor').deleteItem()">Delete Item</button>
+      <button onclick="document.getElementById('cweditor').addColumn()">Add Column</button>
+      <button onclick="document.getElementById('cweditor').deleteColumn()">Delete Column</button>
+    </div>
+    <coreweb-editor id="cweditor"></coreweb-editor>
+  </div>
 </body>
 
 </html>
