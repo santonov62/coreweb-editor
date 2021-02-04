@@ -25,7 +25,7 @@ export default merge(baseConfig, {
   // any <script type="module"> inside will be bundled by rollup
   input: './index.html',
   output: {
-    entryFileNames: `coreweb-wc-editor${process.env.ROLLUP_WATCH ? '' : '.min'}.js`,
+    entryFileNames: `coreweb-editor${process.env.ROLLUP_WATCH ? '' : '.min'}.js`,
   },
 
   // alternatively, you can use your JS as entrypoint for rollup and
