@@ -1,0 +1,23 @@
+{
+  "scripts": {
+    "build": "rimraf dist && ROLLUP_WATCH=1 rollup -c rollup.config.js",
+    "start:build": "npm run build && web-dev-server --root-dir dist --app-index index.html --open --compatibility none",
+    "start": "web-dev-server"
+  },
+  "devDependencies": {
+    "@open-wc/building-rollup": "^1.9.4",
+    "deepmerge": "^4.2.2",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.38.4",
+    "@web/dev-server": "^0.1.5"
+  },
+  "name": "coreweb-wc-editor",
+  "version": "0.0.0",
+  "description": "Webcomponent coreweb-wc-editor following open-wc recommendations",
+  "author": "coreweb-wc-editor",
+  "license": "MIT",
+  "dependencies": {
+    "lit-html": "^1.3.0",
+    "lit-element": "^2.4.0"
+  }
+}
