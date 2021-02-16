@@ -20,7 +20,7 @@ export class CorewebEditor extends LitElement {
         min-height: 400px;
       }
 
-      .container div {
+      .container row-item {
         background: #3273dc;
         color: white;
         padding: 20px;
@@ -74,10 +74,10 @@ export class CorewebEditor extends LitElement {
       this.columnsCount--;
   }
 
-  #getItemTemlates() {
+  #getItemTemplates() {
     const itemTemplates = [];
     for (let i=0; i<this.itemsCount; i++) {
-      itemTemplates.push(html`<div data-fieldname="name">${i+1}</div>`);
+      itemTemplates.push(html`<row-item><div data-fieldname="name">${i+1}</div></row-item>`);
     }
     return itemTemplates;
   }
@@ -98,7 +98,7 @@ export class CorewebEditor extends LitElement {
   render() {
     return html`
       <div class="container" style="${this.#getColumnsTemplateStr()}">
-        ${this.#getItemTemlates()}
+        ${this.#getItemTemplates()}
       </div>
     `;
   }
