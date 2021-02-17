@@ -1,4 +1,5 @@
-import { LitElement, html, css } from 'lit-element';
+import { LitElement, css } from 'lit-element';
+import {html, render} from 'lit-html';
 
 export class CorewebEditor extends LitElement {
   static get properties() {
@@ -13,22 +14,23 @@ export class CorewebEditor extends LitElement {
         display: grid;
         position: relative;
         padding: 10px;
-        height: 100%;
+        // height: 100%;
         width: 100%;
         gap: 10px;
-        place-items: stretch;
-        min-height: 400px;
+        // place-items: stretch;
+        // min-height: 400px;
+        font-size: calc(10px + 2vmin);
       }
 
-      .container row-item {
+      .container cw-item {
         background: #3273dc;
         color: white;
         padding: 20px;
         font-size: 21px;
         border-radius: 5px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        // display: flex;
+        // justify-content: center;
+        // align-items: center;
       }
   `;
 
@@ -40,12 +42,15 @@ export class CorewebEditor extends LitElement {
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
-        font-size: calc(10px + 2vmin);
         color: #1a2b42;
         max-width: 960px;
         margin: 0 auto;
         text-align: center;
         background-color: var(--coreweb-editor-background-color);
+      }
+      .formNameContainer {
+        align-self: flex-start;
+        margin-top: 10px;
       }
     `, this.containerStyles];
   }
@@ -77,7 +82,7 @@ export class CorewebEditor extends LitElement {
   #getItemTemplates() {
     const itemTemplates = [];
     for (let i=0; i<this.itemsCount; i++) {
-      itemTemplates.push(html`<row-item><div data-fieldname="name">${i+1}</div></row-item>`);
+      itemTemplates.push(html`<cw-item><div>${i+1}</div></cw-item>`);
     }
     return itemTemplates;
   }
@@ -97,11 +102,18 @@ export class CorewebEditor extends LitElement {
 
   render() {
     return html`
-      <div class="container" style="${this.#getColumnsTemplateStr()}">
+      <div class="formNameContainer">
+        <label>Form name: </label>
+        <input id="formName" value="xxx" type="text" />
+        <button>Save</button>
+      </div>
+      <div id="container" class="container" style="${this.#getColumnsTemplateStr()}">
         ${this.#getItemTemplates()}
       </div>
+      <button @click="${(e) => this.addItem()}">+ Add item</button>
     `;
   }
 }
+
 
 customElements.define('coreweb-editor', CorewebEditor);
