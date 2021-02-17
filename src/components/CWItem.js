@@ -17,17 +17,20 @@ export class CWItem extends LitElement {
       :host {
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: flex-start;
         justify-content: flex-start;
         position: relative;
       }
       select {
-        align-self: flex-start;
+        margin: 10px 0 10px 0;
       }
       .destroyButton {
         position: absolute;
         right: 20px;
         top: 20px;
+      }
+      .component {
+        align-self: stretch
       }
       `
     ]
@@ -50,18 +53,20 @@ export class CWItem extends LitElement {
       .map(([key, value]) => html`<option value="${value}" ?selected=${componentType === key}>${value}</option>`);
 
     return html`
-        <slot></slot>
+<!--        <slot></slot>-->
         <button class="destroyButton" @click=${this.destroy}>X</button>
         <select @change=${this.onChangeType}>
           <option>???</option>
           ${componentOptions}
         </select>
+        <div class="component">
         ${componentType === TypesEnum.xtextfield ?
           html`<div>xtextfield widget</div>`
         : ''}
         ${componentType === TypesEnum.cwTextField ?
-          html`<cw-text-field />`
+          html`<cw-text-field label="cwTextField" />`
         : ''}
+        </div>
     `;
   }
 }

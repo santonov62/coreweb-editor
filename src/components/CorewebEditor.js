@@ -19,14 +19,14 @@ export class CorewebEditor extends LitElement {
         gap: 10px;
         // place-items: stretch;
         // min-height: 400px;
-        font-size: calc(10px + 2vmin);
+        // font-size: calc(10px + 2vmin);
       }
 
       .container cw-item {
         background: #3273dc;
         color: white;
         padding: 20px;
-        font-size: 21px;
+        // font-size: 21px;
         border-radius: 5px;
         // display: flex;
         // justify-content: center;
@@ -45,7 +45,7 @@ export class CorewebEditor extends LitElement {
         color: #1a2b42;
         max-width: 960px;
         margin: 0 auto;
-        text-align: center;
+        // text-align: center;
         background-color: var(--coreweb-editor-background-color);
       }
       .formNameContainer {
