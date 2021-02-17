@@ -3,9 +3,7 @@ import { LitElement, html, css } from 'lit-element';
 export class CorewebEditor extends LitElement {
   static get properties() {
     return {
-      title: {type: String},
-      itemsCount: {type: Number},
-      columnsCount: {type: Number}
+      title: {type: String}
     };
   }
 
@@ -30,7 +28,17 @@ export class CorewebEditor extends LitElement {
         justify-content: center;
         align-items: center;
       }
+
+      .container div:hover {
+        background: cornflowerblue;
+      }
+
+      .container div.selected {
+        background: blueviolet;
+      }
   `;
+
+  #templateChanges = [];
 
   static get styles() {
     return [css`
@@ -53,52 +61,106 @@ export class CorewebEditor extends LitElement {
   constructor() {
     super();
     this.title = 'My app';
-    this.itemsCount = 1;
-    this.columnsCount = 1;
+    this.templateAreas = [["x1x1"]];
   }
 
   #getColumnsTemplateStr() {
-    let res = 'grid-template-columns: 1fr';
-    for (let i=0; i<this.columnsCount-1; i++) {
-      res += ' 1fr';
-    }
-    return res;
+    return this.templateAreas[0].reduce((res) => res + ' 1fr', 'grid-template-columns: ');
+  }
+
+  #getRowTemplateStr() {
+    return this.templateAreas.reduce((res, row) => `${res}"${row.join(' ')}"`, 'grid-template-areas:');
   }
 
   addColumn() {
-    this.columnsCount++;
+    const cols = this.templateAreas[0].length+1;
+    this.templateAreas.forEach((ta, i)=>{
+      ta.push(`x${i+1}x${cols}`)
+    })
+    this.update();
   }
 
   deleteColumn() {
-    if (this.columnsCount > 0)
-      this.columnsCount--;
+    const cols = this.templateAreas[0].length;
+    if (cols > 1)
+      this.templateAreas.forEach((ta, i)=>{
+        ta.pop();
+      })
+    this.update();
   }
 
-  #getItemTemlates() {
-    const itemTemplates = [];
-    for (let i=0; i<this.itemsCount; i++) {
-      itemTemplates.push(html`<div data-fieldname="name">${i+1}</div>`);
-    }
-    return itemTemplates;
+  #getCellTemlates() {
+    return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
+      return html`<div draggable="true" ondrag="this.classList.add('selected')" ondragend="this.classList.remove('selected')"
+                       ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected} class="item" data-fieldname="name" tabindex="0" style="grid-area: ${cell}">${i+1}</div>`
+    })
   }
 
-  addItem() {
-    this.itemsCount++;
+  addRow() {
+    const rows = this.templateAreas.length+1;
+    let row = [];
+    this.templateAreas[0].forEach((ta, i) => {
+      row[i] = `x${rows}x${i+1}`;
+    })
+    this.templateAreas.push(row);
+    this.update();
   }
 
-  deleteItem() {
-    if (this.itemsCount > 0)
-      this.itemsCount--;
+  deleteRow() {
+    if (this.templateAreas.length > 1)
+      this.templateAreas.pop();
+    this.update();
+  }
+
+  undo() {
+
   }
 
   getHTMLTemplate() {
     return CorewebEditor.containerStyles + '\n' + this.shadowRoot.querySelector('.container').outerHTML;
   }
 
+
+  getSelection() {
+    return this.shadowRoot.querySelector('.container .selected');
+  }
+
+  toggleSelected(evt) {
+    const selection = this.getSelection();
+    if (!selection && selection !== evt.target) {
+      evt.target.classList.toggle('selected');
+    } else {
+      let [,row1,col1] = window.getComputedStyle(selection).gridRowStart.split('x');
+      let [,row2,col2] = window.getComputedStyle(evt.target).gridRowStart.split('x');
+      let rows = [];
+      let cols = [];
+      this.templateAreas.forEach((row,i)=>{
+        row.forEach((cell,j)=> {
+          let [, r, c] = cell.split('x');
+          if ((row1 == r && col1 == c) || (row2 == r && col2 == c)) {
+            rows.push(i+1);
+            cols.push(j+1);
+          }
+        })
+      })
+      let points = {rowMin: Math.min(...rows), rowMax: Math.max(...rows), colMin: Math.min(...cols), colMax: Math.max(...cols)};
+
+      const len = points.colMax-points.colMin+1;
+      let fillArray = new Array(len).fill(`x${row1}x${col1}`);
+      for (let i=0; i<=points.rowMax-points.rowMin; i++)
+        this.templateAreas[points.rowMin-1+i].splice(points.colMin-1, len, ...fillArray);
+      this.getSelection().classList.remove('selected');
+      this.update();
+      console.log('----------', this.templateAreas);
+    }
+
+
+  }
+
   render() {
     return html`
-      <div class="container" style="${this.#getColumnsTemplateStr()}">
-        ${this.#getItemTemlates()}
+      <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}" @click="${this.toggleSelected}">
+        ${this.#getCellTemlates()}
       </div>
     `;
   }

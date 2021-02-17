@@ -39,10 +39,11 @@
 <body>
   <div>
     <div style="float: left; margin: 15px">
-      <button onclick="document.getElementById('cweditor').addItem()">Add Item</button>
-      <button onclick="document.getElementById('cweditor').deleteItem()">Delete Item</button>
+      <button onclick="document.getElementById('cweditor').addRow()">Add Row</button>
+      <button onclick="document.getElementById('cweditor').deleteRow()">Delete Row</button>
       <button onclick="document.getElementById('cweditor').addColumn()">Add Column</button>
       <button onclick="document.getElementById('cweditor').deleteColumn()">Delete Column</button>
+      <button onclick="document.getElementById('cweditor').undo()">Undo</button>
     </div>
     <coreweb-editor id="cweditor"></coreweb-editor>
   </div>
