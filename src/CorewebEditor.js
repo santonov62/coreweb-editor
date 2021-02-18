@@ -73,6 +73,7 @@ export class CorewebEditor extends LitElement {
   }
 
   addColumn() {
+    this.saveState();
     const cols = this.templateAreas[0].length+1;
     this.templateAreas.forEach((ta, i)=>{
       ta.push(`x${i+1}x${cols}`)
@@ -82,21 +83,24 @@ export class CorewebEditor extends LitElement {
 
   deleteColumn() {
     const cols = this.templateAreas[0].length;
-    if (cols > 1)
-      this.templateAreas.forEach((ta, i)=>{
+    if (cols > 1) {
+      this.saveState();
+      this.templateAreas.forEach((ta, i) => {
         ta.pop();
       })
-    this.update();
+      this.update();
+    }
   }
 
   #getCellTemlates() {
     return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
-      return html`<div draggable="true" ondrag="this.classList.add('selected')" ondragend="this.classList.remove('selected')"
-                       ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected} class="item" data-fieldname="name" tabindex="0" style="grid-area: ${cell}">${i+1}</div>`
+      return html`<div draggable="true" ondrag="this.classList.add('selected')" ondragend="this.classList.remove('selected')" ondragover="event.preventDefault();
+event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="item" data-fieldname="name" tabindex="0" style="grid-area: ${cell}">${i+1}</div>`
     })
   }
 
   addRow() {
+    this.saveState();
     const rows = this.templateAreas.length+1;
     let row = [];
     this.templateAreas[0].forEach((ta, i) => {
@@ -107,13 +111,22 @@ export class CorewebEditor extends LitElement {
   }
 
   deleteRow() {
-    if (this.templateAreas.length > 1)
+    if (this.templateAreas.length > 1) {
+      this.saveState();
       this.templateAreas.pop();
-    this.update();
+      this.update();
+    }
+  }
+
+  saveState(state = JSON.parse(JSON.stringify(this.templateAreas))) {
+    this.#templateChanges.push(state);
   }
 
   undo() {
-
+    if (this.#templateChanges.length > 0) {
+      this.templateAreas = this.#templateChanges.pop();
+      this.update();
+    }
   }
 
   getHTMLTemplate() {
@@ -130,6 +143,7 @@ export class CorewebEditor extends LitElement {
     if (!selection && selection !== evt.target) {
       evt.target.classList.toggle('selected');
     } else {
+      this.saveState();
       let [,row1,col1] = window.getComputedStyle(selection).gridRowStart.split('x');
       let [,row2,col2] = window.getComputedStyle(evt.target).gridRowStart.split('x');
       let rows = [];
