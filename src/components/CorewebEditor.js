@@ -20,7 +20,7 @@ export class CorewebEditor extends LitElement {
         // font-size: calc(10px + 2vmin);
       }
 
-      .container cw-item {
+      .container form-item {
         background: #3273dc;
         color: white;
         padding: 20px;
@@ -99,8 +99,8 @@ export class CorewebEditor extends LitElement {
 
   #getCellTemlates() {
     return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
-      return html`<cw-item draggable="true" ondrag="this.classList.add('selected')" ondragend="this.classList.remove('selected')" ondragover="event.preventDefault();
-event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="item" data-fieldname="name" tabindex="0" style="grid-area: ${cell}">${i+1}</cw-item>`
+      return html`<form-item draggable="true" ondrag="this.classList.add('selected')" ondragend="this.classList.remove('selected')" ondragover="event.preventDefault();
+event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="item" data-fieldname="name" tabindex="0" style="grid-area: ${cell}">${i+1}</form-item>`
     })
   }
 

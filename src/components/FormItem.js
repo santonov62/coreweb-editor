@@ -2,7 +2,7 @@ import { LitElement, html, css } from 'lit-element';
 
 export const TypesEnum = {xtextfield: "xtextfield", cwTextField: "cw-text-field"}
 
-export class CWItem extends LitElement {
+export class FormItem extends LitElement {
 
   static get properties() {
     return {
@@ -71,4 +71,4 @@ export class CWItem extends LitElement {
   }
 }
 
-customElements.define('cw-item', CWItem);
+customElements.define('form-item', FormItem);
