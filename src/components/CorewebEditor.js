@@ -99,8 +99,8 @@ export class CorewebEditor extends LitElement {
 
   #getCellTemlates() {
     return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
-      return html`<div draggable="true" ondrag="this.classList.add('selected')" ondragend="this.classList.remove('selected')" ondragover="event.preventDefault();
-event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="item" data-fieldname="name" tabindex="0" style="grid-area: ${cell}">${i+1}</div>`
+      return html`<cw-item draggable="true" ondrag="this.classList.add('selected')" ondragend="this.classList.remove('selected')" ondragover="event.preventDefault();
+event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="item" data-fieldname="name" tabindex="0" style="grid-area: ${cell}">${i+1}</cw-item>`
     })
   }
 

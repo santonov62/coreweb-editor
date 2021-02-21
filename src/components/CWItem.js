@@ -54,7 +54,7 @@ export class CWItem extends LitElement {
 
     return html`
 <!--        <slot></slot>-->
-        <button class="destroyButton" @click=${this.destroy}>X</button>
+<!--        <button class="destroyButton" @click=${this.destroy}>X</button>-->
         <select @change=${this.onChangeType}>
           <option>???</option>
           ${componentOptions}

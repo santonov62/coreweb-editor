@@ -31,7 +31,8 @@
     }
   </style>
   <title>coreweb-editor</title>
-  <script src="http://localhost:4444/coreweb-components.js"></script>
+<!--  <script src="http://localhost:4444/coreweb-components.js"></script>-->
+  <link rel="preload" href="http://localhost:4444/coreweb-components.js" as="script">
   <script type="module">
     import './src/coreweb-editor'
   </script>
@@ -48,6 +49,9 @@
     </div>
     <coreweb-editor id="cweditor"></coreweb-editor>
   </div>
+
+<script src="http://localhost:4444/coreweb-components.js"></script>
+
 </body>
 
 </html>
