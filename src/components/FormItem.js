@@ -69,6 +69,10 @@ export class FormItem extends LitElement {
         </div>
     `;
   }
+  getItemTemplate() {
+    const template = this.shadowRoot.querySelector('.component').innerHTML;
+    return template;
+  }
 }
 
 customElements.define('form-item', FormItem);

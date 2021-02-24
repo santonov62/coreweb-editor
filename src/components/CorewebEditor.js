@@ -48,7 +48,7 @@ export class CorewebEditor extends LitElement {
         min-height: 100vh;
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: flex-start;
         justify-content: flex-start;
         color: #1a2b42;
         max-width: 960px;
@@ -178,14 +178,23 @@ event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="it
 
   render() {
     return html`
-      <div class="formNameContainer">
-        <label>Form name: </label>
-        <input id="formName" value="xxx" type="text" />
-        <button>Save</button>
-      </div>
-      <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}" @click="${this.toggleSelected}">
-        ${this.#getCellTemlates()}
-      </div>
+      <div>
+          <div style="float: left; margin: 15px">
+            <button @click="${this.addRow}">Add Row</button>
+            <button @click="${this.deleteRow}">Delete Row</button>
+            <button @click="${this.addColumn}">Add Column</button>
+            <button @click="${this.deleteColumn}">Delete Column</button>
+            <button @click="${this.undo}">Undo</button>
+          </div>
+          <div class="formNameContainer">
+            <label>Form name: </label>
+            <input id="formName" value="xxx" type="text" />
+            <button>Save</button>
+          </div>
+          <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}" @click="${this.toggleSelected}">
+            ${this.#getCellTemlates()}
+          </div>
+        </div>
     `;
   }
 }

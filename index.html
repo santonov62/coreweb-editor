@@ -31,7 +31,6 @@
     }
   </style>
   <title>coreweb-editor</title>
-<!--  <script src="http://localhost:4444/coreweb-components.js"></script>-->
   <link rel="preload" href="http://localhost:4444/coreweb-components.js" as="script">
   <script type="module">
     import './src/coreweb-editor'
@@ -39,16 +38,17 @@
 </head>
 
 <body>
-  <div>
-    <div style="float: left; margin: 15px">
-      <button onclick="document.getElementById('cweditor').addRow()">Add Row</button>
-      <button onclick="document.getElementById('cweditor').deleteRow()">Delete Row</button>
-      <button onclick="document.getElementById('cweditor').addColumn()">Add Column</button>
-      <button onclick="document.getElementById('cweditor').deleteColumn()">Delete Column</button>
-      <button onclick="document.getElementById('cweditor').undo()">Undo</button>
-    </div>
-    <coreweb-editor id="cweditor"></coreweb-editor>
-  </div>
+  <coreweb-editor></coreweb-editor>
+<!--  <div>-->
+<!--    <div style="float: left; margin: 15px">-->
+<!--      <button onclick="document.getElementById('cweditor').addRow()">Add Row</button>-->
+<!--      <button onclick="document.getElementById('cweditor').deleteRow()">Delete Row</button>-->
+<!--      <button onclick="document.getElementById('cweditor').addColumn()">Add Column</button>-->
+<!--      <button onclick="document.getElementById('cweditor').deleteColumn()">Delete Column</button>-->
+<!--      <button onclick="document.getElementById('cweditor').undo()">Undo</button>-->
+<!--    </div>-->
+<!--    <coreweb-editor id="cweditor"></coreweb-editor>-->
+<!--  </div>-->
 
 <script src="http://localhost:4444/coreweb-components.js"></script>
 
