@@ -7,7 +7,8 @@ export class FormItem extends LitElement {
   static get properties() {
     return {
       componentType: {type: String},
-      id: {type: Number}
+      id: {type: Number},
+      template: {type: String}
     }
   }
 

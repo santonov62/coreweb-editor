@@ -2,19 +2,18 @@
 export default ({
   url = '/',
   method = 'GET',
-  header = {},
+  headers,
   body
 }) => {
   const options = {
     method,
     credentials: "same-origin",
     redirect: 'manual',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-    },
   }
   if (body)
     options.body = body
+  if (headers)
+    options.headers = headers
 
   return fetch(url, options);
 }

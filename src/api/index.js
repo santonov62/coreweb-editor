@@ -1,4 +1,4 @@
-import saveDatabean from "./saveDatabean";
+import saveDatabean from "./webadmin/rulesui/saveDatabean";
 
 export async function saveForm(params) {
   const config = {
