@@ -1,5 +1,6 @@
 import { LitElement, css } from 'lit-element';
 import {html, render} from 'lit-html';
+import {saveFormTemplate} from "../api";
 
 export class CorewebEditor extends LitElement {
   static get properties() {
@@ -189,13 +190,26 @@ event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="it
           <div class="formNameContainer">
             <label>Form name: </label>
             <input id="formName" value="xxx" type="text" />
-            <button>Save</button>
+            <button @click="${this.save}">Save</button>
           </div>
           <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}" @click="${this.toggleSelected}">
             ${this.#getCellTemlates()}
           </div>
         </div>
     `;
+  }
+
+  async save() {
+    const template = this.getFormTemplate();
+    await saveFormTemplate(template)
+  }
+
+  getFormTemplate() {
+    return `<div data-container-id="Fields">
+              <h1 class="login-page-form-header">1111111111</h1>
+              <div data-fieldname="textfield1"></div>
+              <div data-fieldname="textfield2"></div>
+            </div>`;
   }
 }
 

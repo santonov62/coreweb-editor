@@ -3,13 +3,18 @@ export default ({
   url = '/',
   method = 'GET',
   header = {},
-  body = {}
+  body
 }) => {
-  return fetch(url, {
+  const options = {
     method,
+    credentials: "same-origin",
+    redirect: 'manual',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
     },
-    body
-  });
+  }
+  if (body)
+    options.body = body
+
+  return fetch(url, options);
 }
