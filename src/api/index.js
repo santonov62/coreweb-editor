@@ -47,7 +47,7 @@ export async function saveFormTemplate({template}) {
   return saveDatabean(config)
 }
 
-export async function getLayoutTemplate({id}) {
+export async function loadLayoutTemplate({id}) {
   if (!id)
     throw Error(`id required!`);
   const beans = await getBeansMethod({rootId: id});

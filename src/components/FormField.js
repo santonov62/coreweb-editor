@@ -8,7 +8,6 @@ export class FormField extends LitElement {
     return {
       componentType: {type: String},
       id: {type: Number},
-      template: {type: String}
     }
   }
 
@@ -27,8 +26,8 @@ export class FormField extends LitElement {
       }
       .destroyButton {
         position: absolute;
-        right: 20px;
-        top: 20px;
+        right: 10px;
+        top: 10px;
       }
       .component {
         align-self: stretch
@@ -50,12 +49,11 @@ export class FormField extends LitElement {
   }
   render() {
     const {componentType} = this;
-    const componentOptions = Object.entries(TypesEnum)
-      .map(([key, value]) => html`<option value="${value}" ?selected=${componentType === key}>${value}</option>`);
+    const componentOptions = Object.entries(TypesEnum).map(([key, value]) => html`
+      <option value="${value}" ?selected=${componentType === key}>${value}</option>`);
 
     return html`
-<!--        <slot></slot>-->
-<!--        <button class="destroyButton" @click=${this.destroy}>X</button>-->
+        <a href="#" class="destroyButton" @click=${this.destroy}>X</a>
         <select @change=${this.onChangeType}>
           <option>???</option>
           ${componentOptions}
@@ -70,9 +68,8 @@ export class FormField extends LitElement {
         </div>
     `;
   }
-  getItemTemplate() {
-    const template = this.shadowRoot.querySelector('.component').innerHTML;
-    return template;
+  save() {
+
   }
 }
 

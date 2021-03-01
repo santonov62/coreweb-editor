@@ -1,37 +1,21 @@
 import { LitElement, css } from 'lit-element';
 import {html, render} from 'lit-html';
 import {unsafeHTML} from 'lit-html/directives/unsafe-html.js';
-import {saveFormTemplate, getLayoutTemplate} from "../api";
+import {saveFormTemplate, loadLayoutTemplate} from "../api";
 
 export class CorewebEditor extends LitElement {
   static get properties() {
     return {
-      title: {type: String},
-      formTemplate: {type: String},
+      isLoading: {type: Boolean}
     };
   }
 
   static containerStyles = css`.container {
         display: grid;
-        position: relative;
-        padding: 10px;
-        // height: 100%;
-        width: 100%;
+        // position: relative;
+        // padding: 10px;
+        // width: 100%;
         gap: 10px;
-        // place-items: stretch;
-        // min-height: 400px;
-        // font-size: calc(10px + 2vmin);
-      }
-
-      .container form-field {
-        background: #3273dc;
-        color: white;
-        padding: 20px;
-        // font-size: 21px;
-        border-radius: 5px;
-        // display: flex;
-        // justify-content: center;
-        // align-items: center;
       }
 
       .container div:hover {
@@ -56,25 +40,31 @@ export class CorewebEditor extends LitElement {
         color: #1a2b42;
         max-width: 960px;
         margin: 0 auto;
-        // text-align: center;
-        background-color: var(--coreweb-editor-background-color);
       }
       .form-name-container {
         align-self: flex-start;
         margin-top: 10px;
+      }
+      .isLoading {
+        margin: 10px;
+      }
+      .container {
+      padding: 10px;
+        align-self: stretch
+      }
+      .container form-field {
+        background: #3273dc;
+        color: white;
+        padding: 20px;
+        border-radius: 5px;
       }
     `, this.containerStyles];
   }
 
   constructor() {
     super();
-    this.title = 'My app';
     this.templateAreas = [["x1x1"]];
-    getLayoutTemplate({id:28512109})
-      .then(layoutTemplate => {
-        this.formTemplate = layoutTemplate.content;
-        console.log(layoutTemplate);
-      });
+    this.loadTemplate({id:28512109});
   }
 
   #getColumnsTemplateStr() {
@@ -105,22 +95,35 @@ export class CorewebEditor extends LitElement {
     }
   }
 
-  #getCellTemlates() {
-    return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
-      return html`<form-field draggable="true" ondrag="this.classList.add('selected')" ondragend="this.classList.remove('selected')" ondragover="event.preventDefault();
-event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="item" data-fieldname="name" tabindex="0" style="grid-area: ${cell}">${i+1}</form-field>`
-    })
-  }
+  // #getCellTemlates() {
+  //   return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
+  //       return html`<form-field draggable="true"
+  //                             ondrag="this.classList.add('selected')"
+  //                             ondragend="this.classList.remove('selected')"
+  //                             ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'move'"
+  //                             @drop="${this.toggleSelected}"
+  //                             class="item"
+  //                             data-fieldname="name${i}"
+  //                             tabindex="0"
+  //                             style="grid-area: ${cell}">${i+1}
+  //       </form-field>`
+  //   })
+  // }
+  //
+  // addRow() {
+  //   this.saveState();
+  //   const rows = this.templateAreas.length+1;
+  //   let row = [];
+  //   this.templateAreas[0].forEach((ta, i) => {
+  //     row[i] = `x${rows}x${i+1}`;
+  //   })
+  //   this.templateAreas.push(row);
+  //   this.update();
+  // }
 
   addRow() {
-    this.saveState();
-    const rows = this.templateAreas.length+1;
-    let row = [];
-    this.templateAreas[0].forEach((ta, i) => {
-      row[i] = `x${rows}x${i+1}`;
-    })
-    this.templateAreas.push(row);
-    this.update();
+    const fieldTemplateContent = `<form-field data-fieldname="${Date.now()}"></form-field>`;
+    this.#appendHtml(fieldTemplateContent);
   }
 
   deleteRow() {
@@ -151,85 +154,98 @@ event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="it
     return this.shadowRoot.querySelector('.container .selected');
   }
 
-  toggleSelected(evt) {
-    const selection = this.getSelection();
-    if (!selection && selection !== evt.target) {
-      evt.target.classList.toggle('selected');
-    } else {
-      this.saveState();
-      let [,row1,col1] = window.getComputedStyle(selection).gridRowStart.split('x');
-      let [,row2,col2] = window.getComputedStyle(evt.target).gridRowStart.split('x');
-      let rows = [];
-      let cols = [];
-      this.templateAreas.forEach((row,i)=>{
-        row.forEach((cell,j)=> {
-          let [, r, c] = cell.split('x');
-          if ((row1 == r && col1 == c) || (row2 == r && col2 == c)) {
-            rows.push(i+1);
-            cols.push(j+1);
-          }
-        })
-      })
-      let points = {rowMin: Math.min(...rows), rowMax: Math.max(...rows), colMin: Math.min(...cols), colMax: Math.max(...cols)};
-
-      const len = points.colMax-points.colMin+1;
-      let fillArray = new Array(len).fill(`x${row1}x${col1}`);
-      for (let i=0; i<=points.rowMax-points.rowMin; i++)
-        this.templateAreas[points.rowMin-1+i].splice(points.colMin-1, len, ...fillArray);
-      this.getSelection().classList.remove('selected');
-      this.update();
-      console.log('----------', this.templateAreas);
-    }
-
-
-  }
+  // toggleSelected(evt) {
+  //   const selection = this.getSelection();
+  //   if (!selection && selection !== evt.target) {
+  //     evt.target.classList.toggle('selected');
+  //   } else {
+  //     this.saveState();
+  //     let [,row1,col1] = window.getComputedStyle(selection).gridRowStart.split('x');
+  //     let [,row2,col2] = window.getComputedStyle(evt.target).gridRowStart.split('x');
+  //     let rows = [];
+  //     let cols = [];
+  //     this.templateAreas.forEach((row,i)=>{
+  //       row.forEach((cell,j)=> {
+  //         let [, r, c] = cell.split('x');
+  //         if ((row1 == r && col1 == c) || (row2 == r && col2 == c)) {
+  //           rows.push(i+1);
+  //           cols.push(j+1);
+  //         }
+  //       })
+  //     })
+  //     let points = {rowMin: Math.min(...rows), rowMax: Math.max(...rows), colMin: Math.min(...cols), colMax: Math.max(...cols)};
+  //
+  //     const len = points.colMax-points.colMin+1;
+  //     let fillArray = new Array(len).fill(`x${row1}x${col1}`);
+  //     for (let i=0; i<=points.rowMax-points.rowMin; i++)
+  //       this.templateAreas[points.rowMin-1+i].splice(points.colMin-1, len, ...fillArray);
+  //     this.getSelection().classList.remove('selected');
+  //     this.update();
+  //     console.log('----------', this.templateAreas);
+  //   }
+  //
+  //
+  // }
 
   render() {
-    const {formTemplate} = this;
+    const {isLoading} = this;
     return html`
-      <div>
-          <div style="float: left; margin: 15px">
+          <div style="margin: 15px">
             <button @click="${this.addRow}">Add Row</button>
             <button @click="${this.deleteRow}">Delete Row</button>
             <button @click="${this.addColumn}">Add Column</button>
             <button @click="${this.deleteColumn}">Delete Column</button>
             <button @click="${this.undo}">Undo</button>
           </div>
+
           <div class="form-name-container">
-            <label>Form name: </label>
+            <label for="formName">Form name: </label>
             <input id="formName" value="xxx" type="text" />
             <button @click="${this.saveFormTemplate}">Save</button>
           </div>
-          <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}" @click="${this.toggleSelected}">
-            ${unsafeHTML(formTemplate)}
-            ${this.#getCellTemlates()}
+
+          <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
+            ${isLoading ?
+              html`<div class="isLoading">Loading...</div>` : ''}
           </div>
-        </div>
     `;
   }
 
   async saveFormTemplate() {
-    const template = this.getFormTemplate();
+    const template = this.makeFormTemplate();
     await saveFormTemplate({template});
   }
 
-  getFormTemplate() {
-    return `<div data-container-id="Fields">
-              <h1 class="login-page-form-header">1111111111</h1>
-              <div data-fieldname="textfield1"></div>
-              <div data-fieldname="textfield2"></div>
-            </div>`;
+  makeFormTemplate() {
+    return `<div data-container-id="Fields">${this.container.innerHTML}</div>` +
+           `<style>${CorewebEditor.containerStyles}</style>`;
   }
 
-  // set formTemplate(html) {
-  //   const oldVal = this._formTemplate;
-  //   html = html.trim(); // Never return a text node of whitespace as the result
-  //   this._formTemplate = html.trim();
-  //   this.requestUpdate('formTemplate', oldVal);
-  // }
-  // get formTemplate() {
-  //   return this._formTemplate;
-  // }
+  get container() {
+    return this.shadowRoot.querySelector('.container')
+  }
+
+  appendLayoutTemplate(layoutTemplateContent) {
+    const template = document.createElement('template');
+    template.innerHTML = layoutTemplateContent.trim();
+    this.#appendHtml(template.content.firstChild.innerHTML);
+  }
+
+  #appendHtml(html) {
+    this.container.insertAdjacentHTML('beforeend', html);
+  }
+
+  async loadTemplate({id}) {
+    try {
+      this.isLoading = true;
+      const layoutTemplate = await loadLayoutTemplate({id});
+      const isLayoutTemplate = true;
+      this.appendLayoutTemplate(layoutTemplate.content, isLayoutTemplate);
+      console.log(`Load layoutTemplate: `, layoutTemplate);
+    } finally {
+      this.isLoading = false;
+    }
+  }
 }
 
 customElements.define('coreweb-editor', CorewebEditor);
