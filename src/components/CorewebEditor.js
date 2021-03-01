@@ -1,5 +1,6 @@
 import { LitElement, css } from 'lit-element';
 import {html, render} from 'lit-html';
+import {unsafeHTML} from 'lit-html/directives/unsafe-html.js';
 import {saveFormTemplate, getLayoutTemplate} from "../api";
 
 export class CorewebEditor extends LitElement {
@@ -72,6 +73,7 @@ export class CorewebEditor extends LitElement {
     getLayoutTemplate({id:28512109})
       .then(layoutTemplate => {
         this.formTemplate = layoutTemplate.content;
+        console.log(layoutTemplate);
       });
   }
 
@@ -183,6 +185,7 @@ event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="it
   }
 
   render() {
+    const {formTemplate} = this;
     return html`
       <div>
           <div style="float: left; margin: 15px">
@@ -198,6 +201,7 @@ event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="it
             <button @click="${this.saveFormTemplate}">Save</button>
           </div>
           <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}" @click="${this.toggleSelected}">
+            ${unsafeHTML(formTemplate)}
             ${this.#getCellTemlates()}
           </div>
         </div>
@@ -217,17 +221,15 @@ event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="it
             </div>`;
   }
 
-  set formTemplate(html) {
-    let oldVal = html;
-    // function htmlToElement(html) {
-    let template = document.createElement('template');
-    html = html.trim(); // Never return a text node of whitespace as the result
-    template.innerHTML = html;
-    return template.content.firstChild;
-    // }
-    this._formTemplate = ``;
-    this.requestUpdate('prop', oldVal);
-  }
+  // set formTemplate(html) {
+  //   const oldVal = this._formTemplate;
+  //   html = html.trim(); // Never return a text node of whitespace as the result
+  //   this._formTemplate = html.trim();
+  //   this.requestUpdate('formTemplate', oldVal);
+  // }
+  // get formTemplate() {
+  //   return this._formTemplate;
+  // }
 }
 
 customElements.define('coreweb-editor', CorewebEditor);
