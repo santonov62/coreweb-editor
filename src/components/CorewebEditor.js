@@ -22,7 +22,7 @@ export class CorewebEditor extends LitElement {
         // font-size: calc(10px + 2vmin);
       }
 
-      .container form-item {
+      .container form-field {
         background: #3273dc;
         color: white;
         padding: 20px;
@@ -58,7 +58,7 @@ export class CorewebEditor extends LitElement {
         // text-align: center;
         background-color: var(--coreweb-editor-background-color);
       }
-      .formNameContainer {
+      .form-name-container {
         align-self: flex-start;
         margin-top: 10px;
       }
@@ -72,7 +72,6 @@ export class CorewebEditor extends LitElement {
     getLayoutTemplate({id:28512109})
       .then(layoutTemplate => {
         this.formTemplate = layoutTemplate.content;
-        console.log(layoutTemplate);
       });
   }
 
@@ -106,8 +105,8 @@ export class CorewebEditor extends LitElement {
 
   #getCellTemlates() {
     return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
-      return html`<form-item draggable="true" ondrag="this.classList.add('selected')" ondragend="this.classList.remove('selected')" ondragover="event.preventDefault();
-event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="item" data-fieldname="name" tabindex="0" style="grid-area: ${cell}">${i+1}</form-item>`
+      return html`<form-field draggable="true" ondrag="this.classList.add('selected')" ondragend="this.classList.remove('selected')" ondragover="event.preventDefault();
+event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="item" data-fieldname="name" tabindex="0" style="grid-area: ${cell}">${i+1}</form-field>`
     })
   }
 
@@ -193,10 +192,10 @@ event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="it
             <button @click="${this.deleteColumn}">Delete Column</button>
             <button @click="${this.undo}">Undo</button>
           </div>
-          <div class="formNameContainer">
+          <div class="form-name-container">
             <label>Form name: </label>
             <input id="formName" value="xxx" type="text" />
-            <button @click="${this.save}">Save</button>
+            <button @click="${this.saveFormTemplate}">Save</button>
           </div>
           <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}" @click="${this.toggleSelected}">
             ${this.#getCellTemlates()}
@@ -205,9 +204,9 @@ event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="it
     `;
   }
 
-  async save() {
+  async saveFormTemplate() {
     const template = this.getFormTemplate();
-    await saveFormTemplate(template)
+    await saveFormTemplate({template});
   }
 
   getFormTemplate() {
@@ -216,6 +215,18 @@ event.dataTransfer.dropEffect = 'move'" @drop="${this.toggleSelected}" class="it
               <div data-fieldname="textfield1"></div>
               <div data-fieldname="textfield2"></div>
             </div>`;
+  }
+
+  set formTemplate(html) {
+    let oldVal = html;
+    // function htmlToElement(html) {
+    let template = document.createElement('template');
+    html = html.trim(); // Never return a text node of whitespace as the result
+    template.innerHTML = html;
+    return template.content.firstChild;
+    // }
+    this._formTemplate = ``;
+    this.requestUpdate('prop', oldVal);
   }
 }
 

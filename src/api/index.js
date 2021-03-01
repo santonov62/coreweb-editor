@@ -31,7 +31,7 @@ export async function saveForm(params) {
   return saveDatabean(config);
 }
 
-export async function saveFormTemplate(template) {
+export async function saveFormTemplate({template}) {
   const config = {
     formFile: 'crm-objecttypes.xml',
     formName: 'layoutTemplate',
