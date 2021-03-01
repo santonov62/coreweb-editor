@@ -26,7 +26,8 @@ export default merge(baseConfig, {
   input: './index.html',
   output: {
     entryFileNames: `coreweb-editor${process.env.ROLLUP_WATCH ? '' : '.min'}.js`,
-    format: 'iife'
+    format: 'iife',
+    sourcemap: 'inline'
   }
 
   // alternatively, you can use your JS as entrypoint for rollup and

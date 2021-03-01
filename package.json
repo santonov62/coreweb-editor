@@ -1,7 +1,8 @@
 {
   "scripts": {
-    "build": "rimraf dist && ROLLUP_WATCH=1 rollup -c rollup.config.js",
-    "start:build": "npm run build && web-dev-server --root-dir dist --compatibility none -p 5555",
+    "build-dev": "rimraf dist && ROLLUP_WATCH=1 rollup -c rollup.dev.config.js",
+    "build": "rimraf dist && rollup -c rollup.config.js",
+    "start:build": "npm run build-dev && web-dev-server --root-dir dist --compatibility none -p 5555",
     "start": "web-dev-server -p 3005"
   },
   "devDependencies": {

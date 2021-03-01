@@ -5,15 +5,17 @@ import {WEBADMIN_URL} from "../../../config";
 
 
 export default function(data) {
-  data = {
-    rootId: 28511575
-  }
+  // data = {
+  //   rootId: 28511575
+  // }
   const queryParams = buildQueryParams(data);
   const url = `${WEBADMIN_URL}/rulesui/MethodAction/getBeansMethod?${queryParams}`;
 
   return request({
     url
-  });
+  })
+    .then(res => res.json())
+    .then(json => json.data);
 }
 
 function buildQueryParams(data) {
@@ -21,7 +23,7 @@ function buildQueryParams(data) {
     return ``;
 
   const params = [];
-  for (const[key, value] of data.entries()) {
+  for (const[key, value] of Object.entries(data)) {
     params.push(`${key}=${value}`);
   }
   return params.join('&');

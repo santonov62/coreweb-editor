@@ -1,11 +1,12 @@
 import { LitElement, css } from 'lit-element';
 import {html, render} from 'lit-html';
-import {saveFormTemplate} from "../api";
+import {saveFormTemplate, getLayoutTemplate} from "../api";
 
 export class CorewebEditor extends LitElement {
   static get properties() {
     return {
-      title: {type: String}
+      title: {type: String},
+      formTemplate: {type: String},
     };
   }
 
@@ -68,6 +69,11 @@ export class CorewebEditor extends LitElement {
     super();
     this.title = 'My app';
     this.templateAreas = [["x1x1"]];
+    getLayoutTemplate({id:28512109})
+      .then(layoutTemplate => {
+        this.formTemplate = layoutTemplate.content;
+        console.log(layoutTemplate);
+      });
   }
 
   #getColumnsTemplateStr() {
