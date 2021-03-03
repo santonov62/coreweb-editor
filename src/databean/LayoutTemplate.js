@@ -1,7 +1,9 @@
 import {Databean} from './Databean';
 
-//         "(databean)beantype": "crm.config.common.LayoutTemplate",
-export class LayoutTemplate extends Databean{
+export class LayoutTemplate extends Databean {
+
+  static BEAN_TYPE = 'crm.config.common.LayoutTemplate';
+
   constructor(data) {
     super(data);
   }

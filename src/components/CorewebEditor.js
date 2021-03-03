@@ -12,9 +12,6 @@ export class CorewebEditor extends LitElement {
 
   static containerStyles = css`.container {
         display: grid;
-        // position: relative;
-        // padding: 10px;
-        // width: 100%;
         gap: 10px;
       }
 

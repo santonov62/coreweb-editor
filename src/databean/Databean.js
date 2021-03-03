@@ -1,5 +1,6 @@
 export class Databean {
-  constructor({id, rootId, code, validFromDate, validToDate, beanType, createdWhen, createdByLastName, values}) {
+  constructor({id, rootId, code, validFromDate, validToDate, beanType, createdWhen,
+                createdByLastName, createdByFirstName, values}) {
     this.id = id;
     this.rootId = rootId;
     this.code = code;
@@ -7,6 +8,7 @@ export class Databean {
     this.validFromDate = validFromDate;
     this.validToDate = validToDate;
     this.createdWhen = createdWhen;
+    this.createdByFirstName = createdByFirstName;
     this.createdByLastName = createdByLastName;
     this.values = values;
   }

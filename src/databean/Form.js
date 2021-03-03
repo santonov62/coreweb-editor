@@ -1,9 +1,11 @@
 import {Databean} from './Databean';
 
 export class Form extends Databean{
-  constructor({values, ...data}) {
+
+  static BEAN_TYPE = 'crm.config.common.Form';
+
+  constructor(data) {
     super(data);
-    this.values = values;
   }
   get name() {
     return this.values.name

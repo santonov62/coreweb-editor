@@ -1,6 +1,5 @@
 import { LitElement, html, css } from 'lit-element';
-
-export const TypesEnum = {xtextfield: "xtextfield", cwTextField: "cw-text-field"}
+import FieldDataTypeEnum from "../FieldDataTypeEnum";
 
 export class FormField extends LitElement {
 
@@ -49,8 +48,8 @@ export class FormField extends LitElement {
   }
   render() {
     const {componentType} = this;
-    const componentOptions = Object.entries(TypesEnum).map(([key, value]) => html`
-      <option value="${value}" ?selected=${componentType === key}>${value}</option>`);
+    const componentOptions = Object.entries(FieldDataTypeEnum).map(([key, value]) => html`
+      <option value="${value}" ?selected=${componentType === value}>${value}</option>`);
 
     return html`
         <a href="#" class="destroyButton" @click=${this.destroy}>X</a>
@@ -59,17 +58,23 @@ export class FormField extends LitElement {
           ${componentOptions}
         </select>
         <div class="component">
-        ${componentType === TypesEnum.xtextfield ?
-          html`<div>xtextfield widget</div>`
-        : ''}
-        ${componentType === TypesEnum.cwTextField ?
-          html`<cw-text-field label="cwTextField" />`
-        : ''}
+            ${renderFieldComponent(componentType)}
         </div>
     `;
   }
   save() {
 
+  }
+}
+
+function renderFieldComponent(componentType) {
+  switch (componentType) {
+    case FieldDataTypeEnum.textfield:
+      return html`<div>xtextfield widget</div>`;
+    case FieldDataTypeEnum.$textfield:
+      return html`<cw-text-field label="cwTextField" />`;
+    default:
+      return html`???`;
   }
 }
 

@@ -51,10 +51,15 @@ export async function saveFormTemplate({template}) {
 export async function loadLayoutTemplate({id}) {
   if (!id)
     throw Error(`id required!`);
-  const beans = await getBeansMethod({rootId: id});
+
+  const config = {
+    type: LayoutTemplate.BEAN_TYPE,
+    rootId: id
+  }
+  const beans = await getBeansMethod(config);
   const layoutTemplate = beans && new LayoutTemplate(beans[0]);
   if (!layoutTemplate)
-    throw Error(`There is no bean exist.`);
+    throw Error(`There is no layout template bean.`);
 
   return layoutTemplate.template;
 }
