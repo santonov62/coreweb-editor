@@ -238,10 +238,9 @@ export class CorewebEditor extends LitElement {
   async loadTemplate({id}) {
     try {
       this.isLoading = true;
-      const layoutTemplate = await loadLayoutTemplate({id});
-      const isLayoutTemplate = true;
-      this.appendLayoutTemplate(layoutTemplate.content, isLayoutTemplate);
-      console.log(`Load layoutTemplate: `, layoutTemplate);
+      const layoutTemplateBean = await loadLayoutTemplate({id});
+      this.appendLayoutTemplate(layoutTemplateBean.content);
+      console.log(`Load layoutTemplateBean: `, layoutTemplateBean);
     } finally {
       this.isLoading = false;
     }

@@ -1,5 +1,6 @@
 import saveDatabean from "./webadmin/rulesui/saveDatabean";
 import getBeansMethod from "./webadmin/rulesui/methodAction/getBeansMethod";
+import {LayoutTemplate} from "../databean";
 
 export async function saveForm(params) {
   const config = {
@@ -51,9 +52,9 @@ export async function loadLayoutTemplate({id}) {
   if (!id)
     throw Error(`id required!`);
   const beans = await getBeansMethod({rootId: id});
-  const layoutTemplate = beans && beans[0];
+  const layoutTemplate = beans && new LayoutTemplate(beans[0]);
   if (!layoutTemplate)
     throw Error(`There is no bean exist.`);
 
-  return layoutTemplate.values.template;
+  return layoutTemplate.template;
 }
