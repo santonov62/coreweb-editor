@@ -1,2 +1,2 @@
 import './components/CorewebEditor.js';
-import './components/FormField.js';
+import './components/formItem/FormField.js';

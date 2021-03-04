@@ -1,5 +1,5 @@
 import { LitElement, html, css } from 'lit-element';
-import FieldDataTypeEnum from "../FieldDataTypeEnum";
+import FieldDataTypeEnum from "../../FieldDataTypeEnum";
 
 export class FormField extends LitElement {
 

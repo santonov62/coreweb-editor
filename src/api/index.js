@@ -1,6 +1,6 @@
 import saveDatabean from "./webadmin/rulesui/saveDatabean";
 import getBeansMethod from "./webadmin/rulesui/methodAction/getBeansMethod";
-import {LayoutTemplate} from "../databean";
+import {LayoutTemplate, Form} from "../databean";
 
 export async function saveForm(params) {
   const config = {
@@ -62,4 +62,13 @@ export async function loadLayoutTemplate({id}) {
     throw Error(`There is no layout template bean.`);
 
   return layoutTemplate.template;
+}
+
+export async function getForms() {
+  const config = {
+    type: Form.BEAN_TYPE,
+  };
+  const beans = await getBeansMethod(config);
+
+  return beans.map(bean => new Form(bean));
 }

@@ -1,9 +1,9 @@
-import request from "../../makeRequest";
 import {WEBADMIN_URL} from "../../config";
+import request from "../../makeRequest";
 import {makeFormUrlencoded} from '../../helper';
 
-export default function saveDatabean(data) {
-  const url = `${WEBADMIN_URL}/rulesui/SaveDatabeans`;
+export default function ({beanType, ...data}) {
+  const url = `${WEBADMIN_URL}/rulesui/save/${beanType}`;
   const options = {
     url,
     method: 'POST',
