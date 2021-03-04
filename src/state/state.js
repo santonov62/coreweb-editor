@@ -1,13 +1,11 @@
 import {makeAutoObservable, runInAction} from 'mobx';
 import {loadForms, loadFormDependencies} from "../api";
-import {Form, Field, LayoutTemplate} from "../model";
+import {Field, LayoutTemplate} from "../model";
 
 class State {
   isLoading = false;
   formsList= [];
   form = null;
-  fields = [];
-
 
   constructor() {
     makeAutoObservable(this);
@@ -33,13 +31,19 @@ class State {
 
     runInAction(() => {
       this.form = form;
-      this.fields = form.fields;
     });
   }
 
   clearActiveForm() {
     this.form = {};
-    this.fields = [];
+  }
+
+  removeField(formId) {
+    const fields = this.form.fields.filter(({id}) => formId !== id);
+    this.form = {
+      ...this.form,
+      fields
+    }
   }
 }
 

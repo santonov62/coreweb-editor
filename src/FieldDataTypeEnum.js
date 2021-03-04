@@ -1,6 +1,6 @@
 const FieldDataTypeEnum = {
-  textfield: "xtextfield",
-  $textfield: "cw-text-field",
+  textfield: "textfield",
+  cwTextField: "$textfield",
 }
 Object.freeze(FieldDataTypeEnum);
 

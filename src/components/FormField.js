@@ -1,12 +1,16 @@
 import { LitElement, html, css } from 'lit-element';
-import FieldDataTypeEnum from "../../FieldDataTypeEnum";
+import FieldDataTypeEnum from "../FieldDataTypeEnum";
+import {state} from '../state/state';
 
 export class FormField extends LitElement {
 
   static get properties() {
     return {
-      componentType: {type: String},
       id: {type: Number},
+      dataType: {type: String},
+      fieldName: {type: String},
+      label: {type: String},
+      placeholder: {type: String},
     }
   }
 
@@ -37,29 +41,25 @@ export class FormField extends LitElement {
 
   constructor() {
     super();
-    this.componentType = '';
+    this.dataType = '';
   }
   onChangeType(e) {
-    this.componentType = e.target.value;
-  }
-  destroy(e) {
-    const node = e.path[2];
-    !!node && node.remove();
+    this.dataType = e.target.value;
   }
   render() {
-    const {componentType} = this;
-    const componentOptions = Object.entries(FieldDataTypeEnum).map(([key, value]) => html`
-      <option value="${value}" ?selected=${componentType === value}>${value}</option>`);
+    const {fieldName, label, dataType, placeholder, id} = this;
 
     return html`
-        <a href="#" class="destroyButton" @click=${this.destroy}>X</a>
+        <a href="#" class="destroyButton" @click=${() => state.removeField(id)}>X</a>
         <select @change=${this.onChangeType}>
           <option>???</option>
-          ${componentOptions}
-        </select>
-        <div class="component">
-            ${renderFieldComponent(componentType)}
+          ${Object.values(FieldDataTypeEnum).map(value => html`
+                <option value="${value}" ?selected=${dataType === value}>${value}</option>`)}
+          </select>
+          <div class="component">
+${renderFieldComponent(dataType)}
         </div>
+        <div>${JSON.stringify({dataType, label, fieldName, placeholder})}</div>
     `;
   }
   save() {
@@ -67,11 +67,11 @@ export class FormField extends LitElement {
   }
 }
 
-function renderFieldComponent(componentType) {
-  switch (componentType) {
+function renderFieldComponent(dataType) {
+  switch (dataType) {
     case FieldDataTypeEnum.textfield:
       return html`<div>xtextfield widget</div>`;
-    case FieldDataTypeEnum.$textfield:
+    case FieldDataTypeEnum.cwTextField:
       return html`<cw-text-field label="cwTextField" />`;
     default:
       return html`???`;

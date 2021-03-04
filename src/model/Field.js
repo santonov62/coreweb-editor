@@ -3,7 +3,8 @@ import {Model} from "./Model";
 
 export class Field extends Model {
 
-  static #DESCRIPTION_KEY = "(databean)description";
+  static #DESCRIPTION_FIELD = "(databean)description";
+  static #LABEL_FIELD = "(databean)name";
   static BEAN_TYPE = "crm.config.widget.Field";
 
   get dataType() {
@@ -25,9 +26,15 @@ export class Field extends Model {
     this.databean.values.placeholder = value;
   }
   get description() {
-    return this.databean.values[Field.#DESCRIPTION_KEY];
+    return this.databean.values[Field.#DESCRIPTION_FIELD];
   }
   set description(value) {
-    this.databean.values[Field.#DESCRIPTION_KEY] = value;
+    this.databean.values[Field.#DESCRIPTION_FIELD] = value;
+  }
+  get label() {
+    return this.databean.values[Field.#LABEL_FIELD];
+  }
+  set label(value) {
+    this.databean.values[Field.#LABEL_FIELD] = value;
   }
 }

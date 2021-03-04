@@ -1,6 +1,6 @@
 import { LitElement, css } from 'lit-element';
 import {html} from 'lit-html';
-import {saveFormTemplate, loadLayoutTemplate} from "../api";
+import {saveFormTemplate} from "../api";
 import {MobxLitElement} from "@adobe/lit-mobx";
 import {state} from '../state/state';
 
@@ -190,7 +190,7 @@ export class CorewebEditor extends MobxLitElement {
   // }
 
   render() {
-    const {isLoading, state: {formsList, fields}} = this;
+    const {isLoading, state: {formsList, form}} = this;
     return html`
           <div style="margin: 15px">
             <button @click="${this.addRow}">Add Row</button>
@@ -211,7 +211,10 @@ export class CorewebEditor extends MobxLitElement {
           </div>
 
           <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
-            ${fields.map(({fieldName}) => html`<form-field data-fieldname=${fieldName}></form-field>`)}
+            ${form?.fields?.map(({fieldName, dataType, placeholder, label, id}) =>
+              html`<form-field data-fieldname=${fieldName} datatype=${dataType}
+                               fieldName=${fieldName} placeholder=${placeholder}
+                               label=${label} id=${id}></form-field>`)}
           </div>
           ${isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
     `;
@@ -241,16 +244,16 @@ export class CorewebEditor extends MobxLitElement {
     this.container.insertAdjacentHTML('beforeend', html);
   }
 
-  async loadFormTemplate(formId) {
-    try {
-      this.isLoading = true;
-      const layoutTemplateBean = await loadLayoutTemplate({formId});
-      this.appendLayoutTemplate(layoutTemplateBean.content);
-      console.log(`Load layoutTemplateBean: `, layoutTemplateBean);
-    } finally {
-      this.isLoading = false;
-    }
-  }
+  // async loadFormTemplate(formId) {
+  //   try {
+  //     this.isLoading = true;
+  //     const layoutTemplateBean = await loadLayoutTemplate({formId});
+  //     this.appendLayoutTemplate(layoutTemplateBean.content);
+  //     console.log(`Load layoutTemplateBean: `, layoutTemplateBean);
+  //   } finally {
+  //     this.isLoading = false;
+  //   }
+  // }
 
   async onFormSelect(e) {
     this.isLoading = true;

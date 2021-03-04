@@ -1,5 +1,4 @@
 import saveDatabean from "./webadmin/rulesui/saveDatabean";
-import getBeansMethod from "./webadmin/rulesui/methodAction/getBeansMethod";
 import getBeans2Method from "./webadmin/rulesui/methodAction/getBeans2Method";
 import {LayoutTemplate, Form, Field} from "../model";
 
@@ -34,35 +33,35 @@ export async function saveFormTemplate({template}) {
     condition_standardObject: 28511575,
     condition____nav2: 'layoutTemplate',
     rootId: 28512109,
-    id: 28526561,
+    // id: 28526561,
     action_template: template
   }
   return saveDatabean(config)
 }
 
-export async function loadLayoutTemplate({id, formId}) {
-
-  const config = {
-    type: LayoutTemplate.BEAN_TYPE
-  }
-  if (id)
-    config.rootId = id;
-  else if (formId)
-    config.code = formId;
-
-  const beans = await getBeansMethod(config);
-  const layoutTemplate = beans && new LayoutTemplate(beans[0]);
-  if (!layoutTemplate)
-    throw Error(`There is no layout template bean.`);
-
-  return layoutTemplate.template;
-}
+// export async function loadLayoutTemplate({id, formId}) {
+//
+//   const config = {
+//     type: LayoutTemplate.BEAN_TYPE
+//   }
+//   if (id)
+//     config.rootId = id;
+//   else if (formId)
+//     config.code = formId;
+//
+//   const beans = await getBeansMethod(config);
+//   const layoutTemplate = beans && new LayoutTemplate(beans[0]);
+//   if (!layoutTemplate)
+//     throw Error(`There is no layout template bean.`);
+//
+//   return layoutTemplate.template;
+// }
 
 export async function loadForms() {
   const config = {
-    type: Form.BEAN_TYPE,
+    beanType: Form.BEAN_TYPE,
   };
-  const beans = await getBeansMethod(config);
+  const beans = await getBeans2Method(config);
 
   return beans.map(bean => new Form(bean));
 }
