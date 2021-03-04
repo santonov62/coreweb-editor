@@ -1,6 +1,7 @@
 import merge from 'deepmerge';
 // use createSpaConfig for bundling a Single Page App
 import { createSpaConfig } from '@open-wc/building-rollup';
+import injectProcessEnv from 'rollup-plugin-inject-process-env';
 
 // use createBasicConfig to do regular JS to JS bundling
 // import { createBasicConfig } from '@open-wc/building-rollup';
@@ -28,7 +29,12 @@ export default merge(baseConfig, {
     entryFileNames: `coreweb-editor${process.env.ROLLUP_WATCH ? '' : '.min'}.js`,
     format: 'iife',
     sourcemap: 'inline'
-  }
+  },
+  plugins: [
+    injectProcessEnv({
+      ENV: 'development',
+    }),
+  ]
 
   // alternatively, you can use your JS as entrypoint for rollup and
   // optionally set a HTML template manually

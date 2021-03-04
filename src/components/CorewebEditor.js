@@ -1,9 +1,13 @@
 import { LitElement, css } from 'lit-element';
-import {html, render} from 'lit-html';
-import {unsafeHTML} from 'lit-html/directives/unsafe-html.js';
+import {html} from 'lit-html';
 import {saveFormTemplate, loadLayoutTemplate} from "../api";
+import {MobxLitElement} from "@adobe/lit-mobx";
+import {form} from '../state'
 
-export class CorewebEditor extends LitElement {
+export class CorewebEditor extends MobxLitElement {
+
+  form = form;
+
   static get properties() {
     return {
       isLoading: {type: Boolean}
@@ -61,7 +65,8 @@ export class CorewebEditor extends LitElement {
   constructor() {
     super();
     this.templateAreas = [["x1x1"]];
-    this.loadTemplate({id:28512109});
+    // this.loadTemplate({id:28512109});
+    this.form.load();
   }
 
   #getColumnsTemplateStr() {
@@ -197,7 +202,11 @@ export class CorewebEditor extends LitElement {
 
           <div class="form-name-container">
             <label for="formName">Form name: </label>
-            <input id="formName" value="xxx" type="text" />
+            <select @change=${this.onFormSelect}>
+              <option value="">New form --></option>
+              ${this.form.values.map(({name}) => html`<option>${name}</option>`)}
+            </select>
+            <input id="formName" value="" type="text" />
             <button @click="${this.saveFormTemplate}">Save</button>
           </div>
 
@@ -241,6 +250,10 @@ export class CorewebEditor extends LitElement {
     } finally {
       this.isLoading = false;
     }
+  }
+
+  onFormSelect(e) {
+    const value = e.target.value;
   }
 }
 

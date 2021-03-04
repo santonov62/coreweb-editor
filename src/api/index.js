@@ -16,15 +16,6 @@ export async function saveForm(params) {
     rootId: 28511575,
     id: 28512111,
     // databeanName:
-    // name_ch11:
-    //   name_de:
-    //     name_en:
-    //       name_fr:
-    //         name_it:
-    //           name_la:
-    //             name_nz:
-    //               name_Zr:
-    //                 name_ru:
     action_name: 'coreweb_components',
     action_type: 'crm.object.cwcomponents',
     action_transient: 0
@@ -64,7 +55,7 @@ export async function loadLayoutTemplate({id}) {
   return layoutTemplate.template;
 }
 
-export async function getForms() {
+export async function loadForms() {
   const config = {
     type: Form.BEAN_TYPE,
   };
