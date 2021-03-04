@@ -1,27 +1,14 @@
 import request from '../../../makeRequest';
 import {WEBADMIN_URL} from "../../../config";
+import {buildQueryParams} from '../../../helper';
 
-export default function(data) {
-  data = {
-    isStandard: 0,
-    beanType: 'crm.config.common.Form',
-    ___AppName: 'webadmin',
-  }
+export default async function(data) {
   const queryParams = buildQueryParams(data);
   const url = `${WEBADMIN_URL}/rulesui/MethodAction/getBeans2Method?${queryParams}`;
 
-  return request({
+  const json = await request({
     url
-  });
-}
+  }).then(res => res.json());
 
-function buildQueryParams(data) {
-  if (!data || Object.keys(data).length === 0)
-    return ``;
-
-  const params = [];
-  for (const[key, value] of data.entries()) {
-    params.push(`${key}=${value}`);
-  }
-  return params.join('&');
+  return json && json.data;
 }

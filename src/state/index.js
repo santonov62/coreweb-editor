@@ -1,3 +1,3 @@
-import {Form} from './form';
+import {State} from './state';
 
-export const form = new Form();
+export const form = new State();

@@ -1,6 +1,7 @@
 import saveDatabean from "./webadmin/rulesui/saveDatabean";
 import getBeansMethod from "./webadmin/rulesui/methodAction/getBeansMethod";
-import {LayoutTemplate, Form} from "../databean";
+import getBeans2Method from "./webadmin/rulesui/methodAction/getBeans2Method";
+import {LayoutTemplate, Form, Field} from "../model";
 
 export async function saveForm(params) {
   const config = {
@@ -39,14 +40,16 @@ export async function saveFormTemplate({template}) {
   return saveDatabean(config)
 }
 
-export async function loadLayoutTemplate({id}) {
-  if (!id)
-    throw Error(`id required!`);
+export async function loadLayoutTemplate({id, formId}) {
 
   const config = {
-    type: LayoutTemplate.BEAN_TYPE,
-    rootId: id
+    type: LayoutTemplate.BEAN_TYPE
   }
+  if (id)
+    config.rootId = id;
+  else if (formId)
+    config.code = formId;
+
   const beans = await getBeansMethod(config);
   const layoutTemplate = beans && new LayoutTemplate(beans[0]);
   if (!layoutTemplate)
@@ -62,4 +65,20 @@ export async function loadForms() {
   const beans = await getBeansMethod(config);
 
   return beans.map(bean => new Form(bean));
+}
+
+export async function loadFormDependencies({formId}) {
+  const config = {
+    standardObject: formId
+  }
+  const beans = await getBeans2Method(config);
+
+  return beans.map(bean => {
+    const {beanType} = bean;
+    if (beanType === LayoutTemplate.BEAN_TYPE)
+      return new LayoutTemplate(bean);
+    if (beanType === Field.BEAN_TYPE)
+      return new Field(bean)
+    return bean;
+  })
 }

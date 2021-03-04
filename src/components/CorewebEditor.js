@@ -2,11 +2,11 @@ import { LitElement, css } from 'lit-element';
 import {html} from 'lit-html';
 import {saveFormTemplate, loadLayoutTemplate} from "../api";
 import {MobxLitElement} from "@adobe/lit-mobx";
-import {form} from '../state'
+import {state} from '../state/state';
 
 export class CorewebEditor extends MobxLitElement {
 
-  form = form;
+  state = state;
 
   static get properties() {
     return {
@@ -66,7 +66,7 @@ export class CorewebEditor extends MobxLitElement {
     super();
     this.templateAreas = [["x1x1"]];
     // this.loadTemplate({id:28512109});
-    this.form.load();
+    this.state.loadAllForms();
   }
 
   #getColumnsTemplateStr() {
@@ -190,7 +190,7 @@ export class CorewebEditor extends MobxLitElement {
   // }
 
   render() {
-    const {isLoading} = this;
+    const {isLoading, state: {formsList, fields}} = this;
     return html`
           <div style="margin: 15px">
             <button @click="${this.addRow}">Add Row</button>
@@ -204,16 +204,16 @@ export class CorewebEditor extends MobxLitElement {
             <label for="formName">Form name: </label>
             <select @change=${this.onFormSelect}>
               <option value="">New form --></option>
-              ${this.form.values.map(({name}) => html`<option>${name}</option>`)}
+              ${formsList.map(({id, name}) => html`<option value=${id}>${name}</option>`)}
             </select>
             <input id="formName" value="" type="text" />
             <button @click="${this.saveFormTemplate}">Save</button>
           </div>
 
           <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
-            ${isLoading ?
-              html`<div class="isLoading">Loading...</div>` : ''}
+            ${fields.map(({fieldName}) => html`<form-field data-fieldname=${fieldName}></form-field>`)}
           </div>
+          ${isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
     `;
   }
 
@@ -241,10 +241,10 @@ export class CorewebEditor extends MobxLitElement {
     this.container.insertAdjacentHTML('beforeend', html);
   }
 
-  async loadTemplate({id}) {
+  async loadFormTemplate(formId) {
     try {
       this.isLoading = true;
-      const layoutTemplateBean = await loadLayoutTemplate({id});
+      const layoutTemplateBean = await loadLayoutTemplate({formId});
       this.appendLayoutTemplate(layoutTemplateBean.content);
       console.log(`Load layoutTemplateBean: `, layoutTemplateBean);
     } finally {
@@ -252,8 +252,12 @@ export class CorewebEditor extends MobxLitElement {
     }
   }
 
-  onFormSelect(e) {
-    const value = e.target.value;
+  async onFormSelect(e) {
+    this.isLoading = true;
+    const formId = e.target.value;
+    this.state.clearActiveForm();
+    await this.state.setActiveForm(formId);
+    this.isLoading = false;
   }
 }
 

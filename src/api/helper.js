@@ -9,10 +9,13 @@ export function makeFormUrlencoded(data) {
   return formData;
 }
 
-export function makeFormData(data) {
-  const formData  = new FormData();
-  for(const [key, value] of Object.entries(data)) {
-    formData.append(key, value);
+export function buildQueryParams(data) {
+  if (!data || Object.keys(data).length === 0)
+    return ``;
+
+  const params = [];
+  for (const[key, value] of Object.entries(data)) {
+    params.push(`${key}=${value}`);
   }
-  return formData;
+  return params.join('&');
 }
