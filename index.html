@@ -32,13 +32,14 @@
   </style>
   <title>coreweb-editor</title>
   <link rel="preload" href="http://localhost:4444/coreweb-components.js" as="script">
+  <script>window.process = { env: { NODE_ENV: 'development' } }</script>
   <script type="module">
     import './src/coreweb-editor'
   </script>
 </head>
 
 <body>
-  <coreweb-editor></coreweb-editor>
+<coreweb-editor></coreweb-editor>
 <!--  <div>-->
 <!--    <div style="float: left; margin: 15px">-->
 <!--      <button onclick="document.getElementById('cweditor').addRow()">Add Row</button>-->

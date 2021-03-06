@@ -5,7 +5,7 @@ import {Field, LayoutTemplate} from "../model";
 class State {
   isLoading = false;
   formsList = [];
-  form = null;
+  form = {fields:[]};
 
   constructor() {
     makeAutoObservable(this);
@@ -38,8 +38,17 @@ class State {
     this.form = {};
   }
 
-  removeField(formId) {
-    const fields = this.form.fields.filter(({id}) => formId !== id);
+  removeField(fieldId) {
+    const fields = this.form.fields.filter(({id}) => fieldId !== id);
+    this.form = {
+      ...this.form,
+      fields
+    }
+  }
+
+  addField({id = Date.now(), fieldName = '', dataType = ''}) {
+    const {fields} = this.form;
+    fields.push({id, fieldName, dataType});
     this.form = {
       ...this.form,
       fields

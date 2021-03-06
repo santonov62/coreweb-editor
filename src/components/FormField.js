@@ -41,7 +41,6 @@ export class FormField extends LitElement {
 
   constructor() {
     super();
-    this.dataType = '';
   }
 
   onChangeType(e) {
@@ -67,6 +66,19 @@ export class FormField extends LitElement {
 
   save() {
 
+  }
+
+  set dataType(newValue) {
+    const prevValue = this._dataType;
+    this._dataType = newValue;
+    if (!this.fieldName && prevValue !== newValue)
+      this.fieldName = `${this._dataType}${Date.now()}`;
+
+    this.requestUpdate('dataType', prevValue);
+  }
+
+  get dataType() {
+    return this._dataType;
   }
 }
 

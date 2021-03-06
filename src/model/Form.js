@@ -7,10 +7,8 @@ export class Form extends Model {
   layoutTemplate = null;
   fields = [];
 
-  get name() {
-    return this.databean.values.name
-  }
-  set name(value) {
-    this.databean.values.name = value;
+  constructor(data) {
+    super(data);
+    this.name = data.values.name;
   }
 }

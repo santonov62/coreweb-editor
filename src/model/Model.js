@@ -1,14 +1,16 @@
 export class Model {
   constructor(data) {
-    this.databean = data;
+    this.id = data.rootId;
+    this.type = data.beanType;
+    this.raw = data;
   }
   get beanType() {
-    return this.databean.beanType;
+    return this.raw.beanType;
   }
-  get type() {
-    return this.databean.beanType;
-  }
-  get id() {
-    return this.databean.rootId;
-  }
+  // get type() {
+  //   return this.databean.beanType;
+  // }
+  // get id() {
+  //   return this.rootId;
+  // }
 }

@@ -128,6 +128,10 @@ export class CorewebEditor extends MobxLitElement {
     this.#appendHtml(fieldTemplateContent);
   }
 
+  addField() {
+    this.state.addField({});
+  }
+
   deleteRow() {
     if (this.templateAreas.length > 1) {
       this.saveState();
@@ -193,7 +197,7 @@ export class CorewebEditor extends MobxLitElement {
     const {isLoading, state: {formsList, form}} = this;
     return html`
           <div style="margin: 15px">
-            <button @click="${this.addRow}">Add Row</button>
+            <button @click="${this.addField}">Add Row</button>
             <button @click="${this.deleteRow}">Delete Row</button>
             <button @click="${this.addColumn}">Add Column</button>
             <button @click="${this.deleteColumn}">Delete Column</button>
@@ -218,6 +222,9 @@ export class CorewebEditor extends MobxLitElement {
           </div>
           ${isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
     `;
+  }
+
+  saveForm() {
   }
 
   async saveFormTemplate() {
