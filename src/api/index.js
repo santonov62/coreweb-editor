@@ -1,13 +1,14 @@
 import saveDatabean from "./webadmin/rulesui/saveDatabean";
 import getBeans2Method from "./webadmin/rulesui/methodAction/getBeans2Method";
-import {LayoutTemplate, Form, Field} from "../model";
+import {Field, Form, LayoutTemplate} from "../model";
+import deleteBeans from "./webadmin/rulesui/deleteDatabeans";
 
 export async function saveForm(params) {
   const config = {
     formFile: 'crm-objecttypes.xml',
     formName: 'notStandardForms',
     // trees:
-    beanType: 'crm.config.common.Form',
+    beanType: Form.BEAN_TYPE,
     // pageInoffsetdex: 0,
     // orderBy: 'name',
     // orderIndex: 'ASC',
@@ -28,7 +29,7 @@ export async function saveFormTemplate({template}) {
     formFile: 'crm-objecttypes.xml',
     formName: 'layoutTemplate',
     trees: 'standardObject',
-    beanType: 'crm.config.common.LayoutTemplate',
+    beanType: LayoutTemplate.BEAN_TYPE,
     condition_isStandard: 0,
     condition_standardObject: 28511575,
     condition____nav2: 'layoutTemplate',
@@ -37,6 +38,46 @@ export async function saveFormTemplate({template}) {
     action_template: template
   }
   return saveDatabean(config)
+}
+
+export async function saveFormFields({formId, fields = []}) {
+  const config = {
+    formFile: "crm-customer-fields.xml",
+    formName: "notStandardFields",
+    beanType: Field.BEAN_TYPE,
+    // condition____nav1: nonstandard
+    condition_standardObject: formId,
+
+    // // databeanChecked:
+    // rootId: 28511777,
+    // id: 28532557,
+    // // databeanName: "textfieldName1",
+    // name_en: "textfieldName1",
+    // //         databeanDescription:
+    // action_placeholder: "textfield1",
+    // action_fieldName: "textfield1",
+    // action_dataType: "textfield",
+  };
+  fields.forEach(({id, label, fieldName, dataType, placeholder}) => {
+    config.rootId = id;
+    config.databeanName = label;
+    config.action_placeholder = placeholder;
+    config.action_fieldName = fieldName;
+    config.action_dataType = dataType;
+  });
+
+  return saveDatabean(config);
+}
+
+export function deleteFormFields(ids = []){
+  const config = {
+    formFile:'crm-customer-fields.xml',
+    formName:'notStandardFields',
+    // id:28533625,
+  };
+  ids.forEach(id => config.id = id);
+
+  return deleteBeans(config);
 }
 
 // export async function loadLayoutTemplate({id, formId}) {
@@ -77,7 +118,8 @@ export async function loadFormDependencies({formId}) {
     if (beanType === LayoutTemplate.BEAN_TYPE)
       return new LayoutTemplate(bean);
     if (beanType === Field.BEAN_TYPE)
-      return new Field(bean)
+      return new Field(bean);
+
     return bean;
   })
 }

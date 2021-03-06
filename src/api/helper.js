@@ -14,7 +14,7 @@ export function buildQueryParams(data) {
     return ``;
 
   const params = [];
-  for (const[key, value] of Object.entries(data)) {
+  for (const [key, value] of Object.entries(data)) {
     params.push(`${key}=${value}`);
   }
   return params.join('&');

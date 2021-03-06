@@ -1,10 +1,10 @@
 import {makeAutoObservable, runInAction} from 'mobx';
-import {loadForms, loadFormDependencies} from "../api";
+import {loadFormDependencies, loadForms} from "../api";
 import {Field, LayoutTemplate} from "../model";
 
 class State {
   isLoading = false;
-  formsList= [];
+  formsList = [];
   form = null;
 
   constructor() {
@@ -47,9 +47,9 @@ class State {
   }
 }
 
-function sortFormComparator(a, b) {
-  const name1 = a.name.toLowerCase();
-  const name2 = b.name.toLowerCase();
+export function sortFormComparator(form, formNext) {
+  const name1 = form.name.toLowerCase();
+  const name2 = formNext.name.toLowerCase();
   if (name1 > name2)
     return 1
   if (name1 < name2)
@@ -57,5 +57,5 @@ function sortFormComparator(a, b) {
   return 0;
 }
 
-export const state = new State();
 
+export const state = new State();
