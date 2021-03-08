@@ -1,8 +1,8 @@
 import { LitElement, css } from 'lit-element';
 import {html} from 'lit-html';
-import {saveFormTemplate} from "../api";
+import {saveFormFields, saveFormTemplate} from "../api";
 import {MobxLitElement} from "@adobe/lit-mobx";
-import {state} from '../state/state';
+import {state} from '../state/State';
 
 export class CorewebEditor extends MobxLitElement {
 
@@ -50,7 +50,7 @@ export class CorewebEditor extends MobxLitElement {
         margin: 10px;
       }
       .container {
-      padding: 10px;
+      padding: 20px;
         align-self: stretch
       }
       .container form-field {
@@ -129,7 +129,7 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   addField() {
-    this.state.addField({});
+    this.state.addFormField({});
   }
 
   deleteRow() {
@@ -211,7 +211,7 @@ export class CorewebEditor extends MobxLitElement {
               ${formsList.map(({id, name}) => html`<option value=${id}>${name}</option>`)}
             </select>
             <input id="formName" value="" type="text" />
-            <button @click="${this.saveFormTemplate}">Save</button>
+            <button @click="${this.saveForm}">Save</button>
           </div>
 
           <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
@@ -225,6 +225,14 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   saveForm() {
+    const fields = this.state.form.fields.slice();
+    const formId = this.state.form.id;
+    const params = {
+      fields,
+      formId
+    }
+    console.log(params);
+    // saveFormFields({formId, fields});
   }
 
   async saveFormTemplate() {

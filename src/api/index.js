@@ -1,14 +1,15 @@
 import saveDatabean from "./webadmin/rulesui/saveDatabean";
 import getBeans2Method from "./webadmin/rulesui/methodAction/getBeans2Method";
-import {Field, Form, LayoutTemplate} from "../model";
+// import {Field, Form, LayoutTemplate} from "../state";
 import deleteBeans from "./webadmin/rulesui/deleteDatabeans";
+import databeanTypesEnum from "./DatbeanTypeEnum";
 
 export async function saveForm(params) {
   const config = {
     formFile: 'crm-objecttypes.xml',
     formName: 'notStandardForms',
     // trees:
-    beanType: Form.BEAN_TYPE,
+    beanType: databeanTypesEnum.Form,
     // pageInoffsetdex: 0,
     // orderBy: 'name',
     // orderIndex: 'ASC',
@@ -29,7 +30,7 @@ export async function saveFormTemplate({template}) {
     formFile: 'crm-objecttypes.xml',
     formName: 'layoutTemplate',
     trees: 'standardObject',
-    beanType: LayoutTemplate.BEAN_TYPE,
+    beanType: databeanTypesEnum.LayoutTemplate,
     condition_isStandard: 0,
     condition_standardObject: 28511575,
     condition____nav2: 'layoutTemplate',
@@ -44,7 +45,7 @@ export async function saveFormFields({formId, fields = []}) {
   const config = {
     formFile: "crm-customer-fields.xml",
     formName: "notStandardFields",
-    beanType: Field.BEAN_TYPE,
+    beanType: databeanTypesEnum.Field,
     // condition____nav1: nonstandard
     condition_standardObject: formId,
 
@@ -98,28 +99,16 @@ export function deleteFormFields(ids = []){
 //   return layoutTemplate.template;
 // }
 
-export async function loadForms() {
+export async function getForms() {
   const config = {
-    beanType: Form.BEAN_TYPE,
+    beanType: databeanTypesEnum.Form,
   };
-  const beans = await getBeans2Method(config);
-
-  return beans.map(bean => new Form(bean));
+  return getBeans2Method(config);
 }
 
-export async function loadFormDependencies({formId}) {
+export async function getFormDependencies({formId}) {
   const config = {
     standardObject: formId
   }
-  const beans = await getBeans2Method(config);
-
-  return beans.map(bean => {
-    const {beanType} = bean;
-    if (beanType === LayoutTemplate.BEAN_TYPE)
-      return new LayoutTemplate(bean);
-    if (beanType === Field.BEAN_TYPE)
-      return new Field(bean);
-
-    return bean;
-  })
+  return await getBeans2Method(config);
 }
