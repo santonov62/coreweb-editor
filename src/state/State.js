@@ -34,13 +34,14 @@ export class State {
     const form = forms.find(({id}) => id === Number.parseInt(formId));
     runInAction(() => {
       this.form = form;
-      this.form.loadFormDependencies();
+      // if (!form.fields)
+        this.form.loadDependencies();
     });
   }
 
 }
 
-export function sortFormComparator(form, formNext) {
+function sortFormComparator(form, formNext) {
   const name1 = form.name.toLowerCase();
   const name2 = formNext.name.toLowerCase();
   if (name1 > name2)

@@ -7,7 +7,7 @@ import databeanTypesEnum from "../api/DatbeanTypeEnum";
 export class Form {
 
   layoutTemplate
-  fields = []
+  fields
   name
   id
   type
@@ -24,6 +24,9 @@ export class Form {
     const fields = this.fields;
     const index = fields.findIndex(field => id === field.id);
     const field = fields[index];
+    if (!field.fieldName)
+      field.fieldName = field.id;
+
     field.dataType = dataType;
     fields.splice(index, 1, field);
   }
@@ -38,7 +41,7 @@ export class Form {
     this.fields.push(field);
   }
 
-  async loadFormDependencies() {
+  async loadDependencies() {
     this.isLoading = true;
     const beans = await getFormDependencies({formId: this.id});
     const items = beans.map(bean => {
@@ -56,7 +59,7 @@ export class Form {
     });
   }
 
-  async saveForm() {
+  async save() {
     this.isLoading = true;
     const fields = this.fields.slice();
     const formId = this.id;
@@ -66,6 +69,7 @@ export class Form {
     }
     console.log(params);
     await saveFormFields({formId, fields});
+    await this.loadDependencies();
     runInAction(() => this.isLoading = false);
   }
 

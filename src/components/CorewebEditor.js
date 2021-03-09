@@ -6,8 +6,6 @@ import {state} from '../state';
 
 export class CorewebEditor extends MobxLitElement {
 
-  state = state;
-
   static get properties() {
     return {
     };
@@ -64,7 +62,7 @@ export class CorewebEditor extends MobxLitElement {
   constructor() {
     super();
     this.templateAreas = [["x1x1"]];
-    this.state.loadAllForms();
+    state.loadAllForms();
   }
 
   #getColumnsTemplateStr() {
@@ -122,7 +120,7 @@ export class CorewebEditor extends MobxLitElement {
   // }
 
   addField() {
-    this.state.form.addField({});
+    state.form.addField({});
   }
 
   deleteRow() {
@@ -187,7 +185,7 @@ export class CorewebEditor extends MobxLitElement {
   // }
 
   render() {
-    const {state: {isLoading, formsList, form}} = this;
+    const {isLoading, formsList, form} = state;
     return html`
           <div style="margin: 15px">
             <button @click="${this.addField}">Add Row</button>
@@ -206,7 +204,7 @@ export class CorewebEditor extends MobxLitElement {
               ${formsList.map(({id, name}) => html`<option value=${id}>${name}</option>`)}
             </select>
             <input id="formName" value="" type="text" />
-            <button @click="${() => this.state.form.saveForm()}">Save</button>
+            <button @click="${() => state.form.save()}">Save</button>
           </div>
 
           ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
@@ -235,7 +233,7 @@ export class CorewebEditor extends MobxLitElement {
 
   onFormSelect(e) {
     const formId = e.target.value;
-    formId && this.state.setActiveForm(formId);
+    formId && state.setActiveForm(formId);
   }
 }
 

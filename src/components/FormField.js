@@ -1,9 +1,8 @@
 import {LitElement, html, css} from 'lit-element';
 import FieldDataTypeEnum from "../FieldDataTypeEnum";
 import {state} from '../state';
-export class FormField extends LitElement {
 
-  state = state;
+export class FormField extends LitElement {
 
   static get properties() {
     return {
@@ -65,23 +64,6 @@ export class FormField extends LitElement {
       </div>
       <div>${JSON.stringify({dataType, label, fieldName, placeholder})}</div>
     `;
-  }
-
-  save() {
-
-  }
-
-  set dataType(newValue) {
-    const prevValue = this._dataType;
-    this._dataType = newValue;
-    if (!this.fieldName && prevValue !== newValue)
-      this.fieldName = `${this._dataType}${Date.now()}`;
-
-    this.requestUpdate('dataType', prevValue);
-  }
-
-  get dataType() {
-    return this._dataType;
   }
 }
 
