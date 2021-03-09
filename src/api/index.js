@@ -1,30 +1,8 @@
 import saveDatabean from "./webadmin/rulesui/saveDatabean";
 import getBeans2Method from "./webadmin/rulesui/methodAction/getBeans2Method";
-// import {Field, Form, LayoutTemplate} from "../state";
 import deleteBeans from "./webadmin/rulesui/deleteDatabeans";
 import databeanTypesEnum from "./DatbeanTypeEnum";
 import {makeFormUrlencoded} from "./helper";
-
-export async function saveForm(params) {
-  const config = {
-    formFile: 'crm-objecttypes.xml',
-    formName: 'notStandardForms',
-    // trees:
-    beanType: databeanTypesEnum.Form,
-    // pageInoffsetdex: 0,
-    // orderBy: 'name',
-    // orderIndex: 'ASC',
-    // condition_isStandard: 0,
-    // databeanChecked:
-    rootId: 28511575,
-    id: 28512111,
-    // databeanName:
-    action_name: 'coreweb_components',
-    action_type: 'crm.object.cwcomponents',
-    action_transient: 0
-  };
-  return saveDatabean(config);
-}
 
 export async function saveFormTemplate({template}) {
   const config = {
@@ -40,6 +18,25 @@ export async function saveFormTemplate({template}) {
     action_template: template
   }
   return saveDatabean(config)
+}
+
+export function saveForm({instanceId, rootId, name}) {
+
+  const config = {
+    formFile: 'crm-objecttypes.xml',
+    formName: 'allObjects',
+    // trees:
+    beanType: databeanTypesEnum.Form,
+    // pageInoffsetdex: 0
+    // orderBy: name
+    // orderIndex: ASC
+    // databeanChecked:
+    rootId,
+    id: instanceId,
+    action_name: name,
+    action_isStandard: 0
+  }
+  return saveDatabean(config);
 }
 
 export async function saveFormFields({formId, fields = []}) {
@@ -66,10 +63,10 @@ export async function saveFormFields({formId, fields = []}) {
   return saveDatabean(body);
 }
 
-export function deleteFormFields(ids = []){
+export function deleteFormFields(ids = []) {
   const config = {
-    formFile:'crm-customer-fields.xml',
-    formName:'notStandardFields',
+    formFile: 'crm-customer-fields.xml',
+    formName: 'notStandardFields',
     // id:28533625,
   };
   ids.forEach(id => config.id = id);
@@ -95,11 +92,18 @@ export function deleteFormFields(ids = []){
 //   return layoutTemplate.template;
 // }
 
-export async function getForms() {
+export function getForms({name} = {}) {
   const config = {
-    beanType: databeanTypesEnum.Form,
+    beanType: databeanTypesEnum.Form
   };
+  if (name)
+    config.name = name;
+
   return getBeans2Method(config);
+}
+
+export async function getForm({name}) {
+  return (await getForms({name}))[0];
 }
 
 export async function getFormDependencies({formId}) {

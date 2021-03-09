@@ -1,21 +1,23 @@
 import {makeAutoObservable, runInAction} from "mobx";
-import {deleteFormFields, getFormDependencies, saveFormFields} from "../api";
+import {deleteFormFields, getForm, getFormDependencies, saveForm, saveFormFields} from "../api";
 import {LayoutTemplate} from "./LayoutTemplate";
 import {Field} from "./Field";
 import databeanTypesEnum from "../api/DatbeanTypeEnum";
 
 export class Form {
 
+  isLoading = false
+  fieldsForDelete
   layoutTemplate
-  fields
+  fields = []
   name
   id
   type
-  isLoading = false
-  fieldsForDelete
 
   constructor(data = {}) {
-    makeAutoObservable(this, { deletedFields: false });
+    makeAutoObservable(this, {
+      deletedFields: false
+    });
     this.name = data.name;
     this.id = data.id;
     this.type = data.type;
@@ -35,7 +37,7 @@ export class Form {
   removeField(fieldId) {
     const index = this.fields.findIndex(({id}) => id === fieldId);
     const deletedFields = this.fields.splice(index, 1);
-    this.fieldsForDelete = deletedFields.filter(({ databean }) => !!databean.instanceId)
+    this.fieldsForDelete = deletedFields.filter(({databean}) => databean && !!databean.instanceId)
       .concat(this.fieldsForDelete);
   }
 
@@ -66,15 +68,28 @@ export class Form {
   async save() {
     this.isLoading = true;
     const fields = this.fields.slice();
-    const formId = this.id;
+    // const formId = this.id;
     const forDelete = this.fieldsForDelete;
+    const isNewForm = !this.databean || !this.databean.rootId;
 
-    if (forDelete)
-      await deleteFormFields(forDelete.map(({ databean }) => databean.instanceId));
-    await saveFormFields({formId, fields});
+    if (isNewForm) {
+      const name = this.name;
+      await saveForm({name});
+      const databean = await getForm({name});
+      this.fromDatabean(databean);
+    } else {
+      if (forDelete)
+        await deleteFormFields(forDelete.map(({databean}) => databean.instanceId));
+    }
+
+    await saveFormFields({formId: this.id, fields});
     await this.loadDependencies();
 
     runInAction(() => this.isLoading = false);
+  }
+
+  setName(name) {
+    this.name = name;
   }
 
   fromDatabean(databean) {

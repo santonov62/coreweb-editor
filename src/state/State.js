@@ -29,6 +29,10 @@ export class State {
     return formsList;
   }
 
+  resetForm() {
+    this.form = new Form();
+  }
+
   async setActiveForm(formId) {
     const forms = await this.loadAllForms();
     const form = forms.find(({id}) => id === Number.parseInt(formId));

@@ -203,7 +203,7 @@ export class CorewebEditor extends MobxLitElement {
               <option value="">New form --></option>
               ${formsList.map(({id, name}) => html`<option value=${id}>${name}</option>`)}
             </select>
-            <input id="formName" value="" type="text" />
+            <input id="formName" value="" type="text" @change=${this.onFromNameChange} ?hidden=${!!form.databean} />
             <button @click="${() => state.form.save()}">Save</button>
           </div>
 
@@ -231,9 +231,14 @@ export class CorewebEditor extends MobxLitElement {
     return this.shadowRoot.querySelector('.container')
   }
 
+  onFromNameChange(e) {
+    const name = e.target.value;
+    state.form.setName(name);
+  }
+
   onFormSelect(e) {
     const formId = e.target.value;
-    formId && state.setActiveForm(formId);
+    formId ? state.setActiveForm(formId) : state.resetForm();
   }
 }
 
