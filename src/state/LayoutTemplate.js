@@ -1,5 +1,5 @@
 
-export class LayoutTemplate{
+export class LayoutTemplate {
 
   constructor(data = {}) {
     this.id = data.id;

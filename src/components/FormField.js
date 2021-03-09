@@ -1,6 +1,6 @@
 import {LitElement, html, css} from 'lit-element';
 import FieldDataTypeEnum from "../FieldDataTypeEnum";
-import {state} from '../state/State';
+import {state} from '../state';
 export class FormField extends LitElement {
 
   state = state;
@@ -47,14 +47,14 @@ export class FormField extends LitElement {
 
   onChangeType(e) {
     const value = e.target.value;
-    state.setFormField({id: this.id, dataType: value});
+    state.form.updateField({id: this.id, dataType: value});
   }
 
   render() {
     const {fieldName, label, dataType, placeholder, id} = this;
 
     return html`
-      <a href="#" class="destroyButton" @click=${() => state.removeFormField(id)}>X</a>
+      <a href="#" class="destroyButton" @click=${() => state.form.removeField(id)}>X</a>
       <select @change=${this.onChangeType}>
         <option>???</option>
         ${Object.values(FieldDataTypeEnum).map(value => html`

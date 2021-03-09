@@ -3,6 +3,7 @@ import getBeans2Method from "./webadmin/rulesui/methodAction/getBeans2Method";
 // import {Field, Form, LayoutTemplate} from "../state";
 import deleteBeans from "./webadmin/rulesui/deleteDatabeans";
 import databeanTypesEnum from "./DatbeanTypeEnum";
+import {makeFormUrlencoded} from "./helper";
 
 export async function saveForm(params) {
   const config = {
@@ -42,32 +43,27 @@ export async function saveFormTemplate({template}) {
 }
 
 export async function saveFormFields({formId, fields = []}) {
+  let body = ``;
   const config = {
     formFile: "crm-customer-fields.xml",
     formName: "notStandardFields",
     beanType: databeanTypesEnum.Field,
-    // condition____nav1: nonstandard
+    condition____nav1: "nonstandard",
     condition_standardObject: formId,
-
-    // // databeanChecked:
-    // rootId: 28511777,
-    // id: 28532557,
-    // // databeanName: "textfieldName1",
-    // name_en: "textfieldName1",
-    // //         databeanDescription:
-    // action_placeholder: "textfield1",
-    // action_fieldName: "textfield1",
-    // action_dataType: "textfield",
   };
-  fields.forEach(({id, label, fieldName, dataType, placeholder}) => {
-    config.rootId = id;
+  body += makeFormUrlencoded(config);
+  fields.forEach(({id, label, fieldName, dataType, placeholder, databean = {}}) => {
+    const config = {};
+    config.id = databean.instanceId;
+    config.rootId = databean.rootId;
     config.databeanName = label;
     config.action_placeholder = placeholder;
     config.action_fieldName = fieldName;
     config.action_dataType = dataType;
+    body += `&${makeFormUrlencoded(config)}`;
   });
-
-  return saveDatabean(config);
+  console.log(body);
+  return saveDatabean(body);
 }
 
 export function deleteFormFields(ids = []){

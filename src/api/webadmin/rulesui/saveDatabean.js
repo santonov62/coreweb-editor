@@ -10,7 +10,7 @@ export default function saveDatabean(data) {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
     },
-    body: makeFormUrlencoded(data)
+    body: typeof data === 'object' ? makeFormUrlencoded(data) : data,
   }
 
   return request(options);

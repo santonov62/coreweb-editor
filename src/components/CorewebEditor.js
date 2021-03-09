@@ -2,7 +2,7 @@ import { LitElement, css } from 'lit-element';
 import {html} from 'lit-html';
 import {saveFormFields, saveFormTemplate} from "../api";
 import {MobxLitElement} from "@adobe/lit-mobx";
-import {state} from '../state/State';
+import {state} from '../state';
 
 export class CorewebEditor extends MobxLitElement {
 
@@ -10,7 +10,6 @@ export class CorewebEditor extends MobxLitElement {
 
   static get properties() {
     return {
-      isLoading: {type: Boolean}
     };
   }
 
@@ -65,7 +64,6 @@ export class CorewebEditor extends MobxLitElement {
   constructor() {
     super();
     this.templateAreas = [["x1x1"]];
-    // this.loadTemplate({id:28512109});
     this.state.loadAllForms();
   }
 
@@ -123,13 +121,8 @@ export class CorewebEditor extends MobxLitElement {
   //   this.update();
   // }
 
-  addRow() {
-    const fieldTemplateContent = `<form-field data-fieldname="${Date.now()}"></form-field>`;
-    this.#appendHtml(fieldTemplateContent);
-  }
-
   addField() {
-    this.state.addFormField({});
+    this.state.form.addField({});
   }
 
   deleteRow() {
@@ -194,7 +187,7 @@ export class CorewebEditor extends MobxLitElement {
   // }
 
   render() {
-    const {isLoading, state: {formsList, form}} = this;
+    const {state: {isLoading, formsList, form}} = this;
     return html`
           <div style="margin: 15px">
             <button @click="${this.addField}">Add Row</button>
@@ -204,6 +197,8 @@ export class CorewebEditor extends MobxLitElement {
             <button @click="${this.undo}">Undo</button>
           </div>
 
+          ${isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
+
           <div class="form-name-container">
             <label for="formName">Form name: </label>
             <select @change=${this.onFormSelect}>
@@ -211,28 +206,17 @@ export class CorewebEditor extends MobxLitElement {
               ${formsList.map(({id, name}) => html`<option value=${id}>${name}</option>`)}
             </select>
             <input id="formName" value="" type="text" />
-            <button @click="${this.saveForm}">Save</button>
+            <button @click="${() => this.state.form.saveForm()}">Save</button>
           </div>
 
+          ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
           <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
             ${form?.fields?.map(({fieldName, dataType, placeholder, label, id}) =>
               html`<form-field data-fieldname=${fieldName} datatype=${dataType}
                                fieldName=${fieldName} placeholder=${placeholder}
                                label=${label} id=${id}></form-field>`)}
           </div>
-          ${isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
     `;
-  }
-
-  saveForm() {
-    const fields = this.state.form.fields.slice();
-    const formId = this.state.form.id;
-    const params = {
-      fields,
-      formId
-    }
-    console.log(params);
-    // saveFormFields({formId, fields});
   }
 
   async saveFormTemplate() {
@@ -249,33 +233,9 @@ export class CorewebEditor extends MobxLitElement {
     return this.shadowRoot.querySelector('.container')
   }
 
-  appendLayoutTemplate(layoutTemplateContent) {
-    const template = document.createElement('template');
-    template.innerHTML = layoutTemplateContent.trim();
-    this.#appendHtml(template.content.firstChild.innerHTML);
-  }
-
-  #appendHtml(html) {
-    this.container.insertAdjacentHTML('beforeend', html);
-  }
-
-  // async loadFormTemplate(formId) {
-  //   try {
-  //     this.isLoading = true;
-  //     const layoutTemplateBean = await loadLayoutTemplate({formId});
-  //     this.appendLayoutTemplate(layoutTemplateBean.content);
-  //     console.log(`Load layoutTemplateBean: `, layoutTemplateBean);
-  //   } finally {
-  //     this.isLoading = false;
-  //   }
-  // }
-
-  async onFormSelect(e) {
-    this.isLoading = true;
+  onFormSelect(e) {
     const formId = e.target.value;
-    this.state.clearActiveForm();
-    await this.state.setActiveForm(formId);
-    this.isLoading = false;
+    formId && this.state.setActiveForm(formId);
   }
 }
 

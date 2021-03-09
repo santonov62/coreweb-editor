@@ -1,22 +1,31 @@
 import {makeAutoObservable, runInAction} from "mobx";
-import {getFormDependencies} from "../api";
+import {getFormDependencies, saveFormFields} from "../api";
 import {LayoutTemplate} from "./LayoutTemplate";
 import {Field} from "./Field";
 import databeanTypesEnum from "../api/DatbeanTypeEnum";
 
 export class Form {
 
-  layoutTemplate;
-  fields = [];
+  layoutTemplate
+  fields = []
   name
   id
   type
+  isLoading = false
 
   constructor(data = {}) {
     makeAutoObservable(this);
     this.name = data.name;
     this.id = data.id;
     this.type = data.type;
+  }
+
+  updateField({id, dataType}) {
+    const fields = this.fields;
+    const index = fields.findIndex(field => id === field.id);
+    const field = fields[index];
+    field.dataType = dataType;
+    fields.splice(index, 1, field);
   }
 
   removeField(fieldId) {
@@ -30,6 +39,7 @@ export class Form {
   }
 
   async loadFormDependencies() {
+    this.isLoading = true;
     const beans = await getFormDependencies({formId: this.id});
     const items = beans.map(bean => {
       const {beanType} = bean;
@@ -42,7 +52,21 @@ export class Form {
     runInAction(() => {
       this.layoutTemplate = items.find(({type}) => type === databeanTypesEnum.LayoutTemplate);
       this.fields = items.filter(({type}) => type === databeanTypesEnum.Field);
+      this.isLoading = false;
     });
+  }
+
+  async saveForm() {
+    this.isLoading = true;
+    const fields = this.fields.slice();
+    const formId = this.id;
+    const params = {
+      fields,
+      formId
+    }
+    console.log(params);
+    await saveFormFields({formId, fields});
+    runInAction(() => this.isLoading = false);
   }
 
   fromDatabean(databean) {
