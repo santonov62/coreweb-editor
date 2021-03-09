@@ -1,5 +1,5 @@
 import {makeAutoObservable, runInAction} from "mobx";
-import {getFormDependencies, saveFormFields} from "../api";
+import {deleteFormFields, getFormDependencies, saveFormFields} from "../api";
 import {LayoutTemplate} from "./LayoutTemplate";
 import {Field} from "./Field";
 import databeanTypesEnum from "../api/DatbeanTypeEnum";
@@ -12,9 +12,10 @@ export class Form {
   id
   type
   isLoading = false
+  fieldsForDelete
 
   constructor(data = {}) {
-    makeAutoObservable(this);
+    makeAutoObservable(this, { deletedFields: false });
     this.name = data.name;
     this.id = data.id;
     this.type = data.type;
@@ -33,7 +34,9 @@ export class Form {
 
   removeField(fieldId) {
     const index = this.fields.findIndex(({id}) => id === fieldId);
-    this.fields.splice(index, 1);
+    const deletedFields = this.fields.splice(index, 1);
+    this.fieldsForDelete = deletedFields.filter(({ databean }) => !!databean.instanceId)
+      .concat(this.fieldsForDelete);
   }
 
   addField({id = Date.now(), fieldName = '', dataType = ''}) {
@@ -55,6 +58,7 @@ export class Form {
     runInAction(() => {
       this.layoutTemplate = items.find(({type}) => type === databeanTypesEnum.LayoutTemplate);
       this.fields = items.filter(({type}) => type === databeanTypesEnum.Field);
+      this.fieldsForDelete = [];
       this.isLoading = false;
     });
   }
@@ -63,13 +67,13 @@ export class Form {
     this.isLoading = true;
     const fields = this.fields.slice();
     const formId = this.id;
-    const params = {
-      fields,
-      formId
-    }
-    console.log(params);
+    const forDelete = this.fieldsForDelete;
+
+    if (forDelete)
+      await deleteFormFields(forDelete.map(({ databean }) => databean.instanceId));
     await saveFormFields({formId, fields});
     await this.loadDependencies();
+
     runInAction(() => this.isLoading = false);
   }
 
