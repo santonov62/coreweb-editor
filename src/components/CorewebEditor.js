@@ -38,6 +38,7 @@ export class CorewebEditor extends MobxLitElement {
         color: #1a2b42;
         max-width: 960px;
         margin: 0 auto;
+        margin-right: 30px;
       }
       .form-name-container {
         align-self: flex-start;
@@ -45,6 +46,8 @@ export class CorewebEditor extends MobxLitElement {
       }
       .isLoading {
         margin: 10px;
+        text-align: center;
+        width: 100%;
       }
       .container {
       padding: 20px;
@@ -213,6 +216,9 @@ export class CorewebEditor extends MobxLitElement {
               html`<form-field data-fieldname=${fieldName} datatype=${dataType}
                                fieldName=${fieldName} placeholder=${placeholder}
                                label=${label} id=${id}></form-field>`)}
+          </div>
+          <div style="text-align: center; width: 100%">
+            <button @click="${this.addField}">+ Add field</button>
           </div>
     `;
   }

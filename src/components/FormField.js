@@ -10,8 +10,7 @@ export class FormField extends LitElement {
       dataType: {type: String},
       fieldName: {type: String},
       label: {type: String},
-      placeholder: {type: String},
-      field: {type: Object}
+      placeholder: {type: String}
     }
   }
 
@@ -28,7 +27,7 @@ export class FormField extends LitElement {
       select {
         margin: 10px 0 10px 0;
       }
-      .destroyButton {
+      .controls {
         position: absolute;
         right: 10px;
         top: 10px;
@@ -51,9 +50,13 @@ export class FormField extends LitElement {
 
   render() {
     const {fieldName, label, dataType, placeholder, id} = this;
+    const editUrl = `${location.origin}/webadmin/rulesui2.crm-customer-fields.ct?formName=notStandardFields&filter_(databean)rootId=${id}`;
 
     return html`
-      <a href="#" class="destroyButton" @click=${() => state.form.removeField(id)}>X</a>
+      <div class="controls">
+        <a href=${editUrl} class="destroyButton" target="_blank">open</a> |
+        <a href="#" class="destroyButton" @click=${() => state.form.removeField(id)}>delete</a>
+      </div>
       <select @change=${this.onChangeType}>
         <option>???</option>
         ${Object.values(FieldDataTypeEnum).map(value => html`

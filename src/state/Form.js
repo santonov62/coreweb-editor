@@ -16,7 +16,8 @@ export class Form {
 
   constructor(data = {}) {
     makeAutoObservable(this, {
-      deletedFields: false
+      deletedFields: false,
+      isNew: false,
     });
     this.name = data.name;
     this.id = data.id;
@@ -37,7 +38,8 @@ export class Form {
   removeField(fieldId) {
     const index = this.fields.findIndex(({id}) => id === fieldId);
     const deletedFields = this.fields.splice(index, 1);
-    this.fieldsForDelete = deletedFields.filter(({databean}) => databean && !!databean.instanceId)
+    this.fieldsForDelete = deletedFields
+      .filter(({databean}) => databean && !!databean.instanceId)
       .concat(this.fieldsForDelete);
   }
 
@@ -68,17 +70,15 @@ export class Form {
   async save() {
     this.isLoading = true;
     const fields = this.fields.slice();
-    // const formId = this.id;
     const forDelete = this.fieldsForDelete;
-    const isNewForm = !this.databean || !this.databean.rootId;
 
-    if (isNewForm) {
+    if (this.isNew()) {
       const name = this.name;
       await saveForm({name});
       const databean = await getForm({name});
       this.fromDatabean(databean);
     } else {
-      if (forDelete)
+      if (forDelete && forDelete.length > 0)
         await deleteFormFields(forDelete.map(({databean}) => databean.instanceId));
     }
 
@@ -90,6 +90,10 @@ export class Form {
 
   setName(name) {
     this.name = name;
+  }
+
+  isNew() {
+    return !this.databean || !this.databean.rootId;
   }
 
   fromDatabean(databean) {

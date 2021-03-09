@@ -59,7 +59,6 @@ export async function saveFormFields({formId, fields = []}) {
     config.action_dataType = dataType;
     body += `&${makeFormUrlencoded(config)}`;
   });
-  console.log(body);
   return saveDatabean(body);
 }
 

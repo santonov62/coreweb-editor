@@ -14,6 +14,10 @@ export class Field {
     this.id = data.id;
   }
 
+  isNew() {
+    return !this.databean || !this.databean.rootId;
+  }
+
   fromDatabean(databean) {
     this.id = databean.rootId;
     this.type = databean.type;
