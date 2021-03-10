@@ -62,6 +62,7 @@ export class FormField extends LitElement {
         ${Object.values(FieldDataTypeEnum).map(value => html`
           <option value="${value}" ?selected=${dataType === value}>${value}</option>`)}
       </select>
+      <h2>${dataType}</h2>
       <div class="component">
         ${renderFieldComponent(dataType)}
       </div>
