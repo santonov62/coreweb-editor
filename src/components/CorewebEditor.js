@@ -1,8 +1,8 @@
 import { LitElement, css } from 'lit-element';
 import {html} from 'lit-html';
-import {saveFormFields, saveFormTemplate} from "../api";
 import {MobxLitElement} from "@adobe/lit-mobx";
 import {state} from '../state';
+import FieldDataTypeEnum from "../FieldDataTypeEnum";
 
 export class CorewebEditor extends MobxLitElement {
 
@@ -212,10 +212,21 @@ export class CorewebEditor extends MobxLitElement {
           <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
             ${form?.fields?.map(({id}) => html`<form-field id=${id}></form-field>`)}
           </div>
-          <div style="text-align: center; width: 100%">
-            <button @click="${this.addField}">+ Add field</button>
+          <div style="width: 100%">
+            Add field:
+            <select id="addField" @change=${this.onAddField}>
+              <option value="new">???</option>
+              ${Object.values(FieldDataTypeEnum).map(value => html`
+                <option value="${value}">${value}</option>`)}
+            </select>
           </div>
     `;
+  }
+
+  onAddField(e) {
+    const dataType = e.target.value;
+    state.form.addField({dataType});
+    this.shadowRoot.getElementById('addField').value = 'new';
   }
 
   saveForm() {
