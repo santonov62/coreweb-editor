@@ -5,13 +5,30 @@ export class Field {
   static #DESCRIPTION_FIELD = "(databean)description";
   static #LABEL_FIELD = "(databean)name";
 
+  dataType
+  fieldName
+  placeholder
+  description
+  label
+  id
+
   constructor(data = {}) {
-    this.dataType = data.dataType;
-    this.fieldName = data.fieldName;
-    this.placeholder = data.placeholder;
-    this.description = data.description;
-    this.label = data.label;
-    this.id = data.id;
+    makeAutoObservable(this, {
+      isNew: false
+    });
+    this.dataType = data.dataType || '';
+    this.fieldName = data.fieldName || '';
+    this.placeholder = data.placeholder || '';
+    this.description = data.description || '';
+    this.label = data.label || '';
+    this.id = data.id || '';
+  }
+
+  update({dataType}) {
+    if (!this.fieldName && dataType)
+      this.fieldName = this.id;
+
+    this.dataType = dataType;
   }
 
   isNew() {

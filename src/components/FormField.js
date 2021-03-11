@@ -1,16 +1,20 @@
 import {LitElement, html, css} from 'lit-element';
 import FieldDataTypeEnum from "../FieldDataTypeEnum";
 import {state} from '../state';
+import {MobxLitElement} from "@adobe/lit-mobx";
+import {Field} from "../state/Field";
 
-export class FormField extends LitElement {
+export class FormField extends MobxLitElement {
+
+  field = new Field()
 
   static get properties() {
     return {
       id: {type: Number},
-      dataType: {type: String},
-      fieldName: {type: String},
-      label: {type: String},
-      placeholder: {type: String}
+      // dataType: {type: String},
+      // fieldName: {type: String},
+      // label: {type: String},
+      // placeholder: {type: String}
     }
   }
 
@@ -43,13 +47,29 @@ export class FormField extends LitElement {
     super();
   }
 
+  set id(value) {
+    const oldValue = this._id;
+    this._id = value;
+    this.field = state.form.fields.find(({id}) => id === value);
+    this.requestUpdate('id', oldValue);
+  }
+
+  get id() {
+    return this._id;
+  }
+
+  // onChangeType(e) {
+  //   const value = e.target.value;
+  //   state.form.updateField({id: this.id, dataType: value});
+  // }
+
   onChangeType(e) {
-    const value = e.target.value;
-    state.form.updateField({id: this.id, dataType: value});
+    const dataType = e.target.value;
+    this.field.update({dataType});
   }
 
   render() {
-    const {fieldName, label, dataType, placeholder, id} = this;
+    const {fieldName, label, dataType, placeholder, id} = this.field;
     const editUrl = `${location.origin}/webadmin/rulesui2.crm-customer-fields.ct?formName=notStandardFields&filter_(databean)rootId=${id}`;
 
     return html`

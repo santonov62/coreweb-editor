@@ -210,10 +210,7 @@ export class CorewebEditor extends MobxLitElement {
 
           ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
           <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
-            ${form?.fields?.map(({fieldName, dataType, placeholder, label, id}) =>
-              html`<form-field data-fieldname=${fieldName} datatype=${dataType}
-                               fieldName=${fieldName} placeholder=${placeholder}
-                               label=${label} id=${id}></form-field>`)}
+            ${form?.fields?.map(({id}) => html`<form-field id=${id}></form-field>`)}
           </div>
           <div style="text-align: center; width: 100%">
             <button @click="${this.addField}">+ Add field</button>
