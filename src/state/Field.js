@@ -25,7 +25,7 @@ export class Field {
   }
 
   update({dataType}) {
-    if (!this.fieldName && dataType)
+    if (!this.fieldName)
       this.fieldName = this.id;
 
     this.dataType = dataType;

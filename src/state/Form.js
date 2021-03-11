@@ -25,14 +25,12 @@ export class Form {
   }
 
   // updateField({id, dataType}) {
-  //   const fields = this.fields;
-  //   const index = fields.findIndex(field => id === field.id);
+  //   const index = this.fields.findIndex(field => id === field.id);
   //   const field = fields[index];
   //   if (!field.fieldName)
   //     field.fieldName = field.id;
   //
   //   field.dataType = dataType;
-  //   fields.splice(index, 1, field);
   // }
 
   removeField(fieldId) {
