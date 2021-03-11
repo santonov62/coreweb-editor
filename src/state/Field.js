@@ -16,18 +16,15 @@ export class Field {
     makeAutoObservable(this, {
       isNew: false
     });
+    this.id = data.id || '';
     this.dataType = data.dataType || '';
-    this.fieldName = data.fieldName || '';
+    this.fieldName = data.fieldName || data.id;
     this.placeholder = data.placeholder || '';
     this.description = data.description || '';
     this.label = data.label || '';
-    this.id = data.id || '';
   }
 
   update({dataType}) {
-    if (!this.fieldName)
-      this.fieldName = this.id;
-
     this.dataType = dataType;
   }
 

@@ -27,8 +27,6 @@ export class Form {
   // updateField({id, dataType}) {
   //   const index = this.fields.findIndex(field => id === field.id);
   //   const field = fields[index];
-  //   if (!field.fieldName)
-  //     field.fieldName = field.id;
   //
   //   field.dataType = dataType;
   // }

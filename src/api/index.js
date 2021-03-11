@@ -48,8 +48,7 @@ export async function saveFormFields({formId, fields = []}) {
     condition____nav1: "nonstandard",
     condition_standardObject: formId,
   };
-  body += makeFormUrlencoded(config);
-  fields.forEach(({id, label, fieldName, dataType, placeholder, databean = {}}) => {
+  const listConfig = fields.map(({id, label, fieldName, dataType, placeholder, databean = {}}) => {
     const config = {};
     config.id = databean.instanceId;
     config.rootId = databean.rootId;
@@ -57,9 +56,9 @@ export async function saveFormFields({formId, fields = []}) {
     config.action_placeholder = placeholder;
     config.action_fieldName = fieldName;
     config.action_dataType = dataType;
-    body += `&${makeFormUrlencoded(config)}`;
+    return config;
   });
-  return saveDatabeans(body);
+  return saveDatabeans(config, listConfig);
 }
 
 export function deleteFormFields(ids = []) {
@@ -68,9 +67,9 @@ export function deleteFormFields(ids = []) {
     formName: 'notStandardFields',
     // id:28533625,
   };
-  ids.forEach(id => config.id = id);
+  const listConfig = ids.map(id => ({id}));
 
-  return deleteBeans(config);
+  return deleteBeans(config, listConfig);
 }
 
 export function getLayoutTemplate({id, formId}) {
