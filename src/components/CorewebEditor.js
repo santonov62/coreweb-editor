@@ -15,14 +15,6 @@ export class CorewebEditor extends MobxLitElement {
         display: grid;
         gap: 10px;
       }
-
-      .container div:hover {
-        background: cornflowerblue;
-      }
-
-      .container div.selected {
-        background: blueviolet;
-      }
   `;
 
   #templateChanges = [];
@@ -58,6 +50,12 @@ export class CorewebEditor extends MobxLitElement {
         color: white;
         padding: 20px;
         border-radius: 5px;
+      }
+      .container div:hover {
+        background: cornflowerblue;
+      }
+      .container div.selected {
+        background: blueviolet;
       }
     `, this.containerStyles];
   }
@@ -207,7 +205,7 @@ export class CorewebEditor extends MobxLitElement {
               ${formsList.map(({id, name}) => html`<option value=${id}>${name}</option>`)}
             </select>
             <input id="formName" value="" type="text" @change=${this.onFromNameChange} ?hidden=${!!form.databean} />
-            <button @click="${() => state.form.save()}">Save</button>
+            <button @click="${this.saveForm}">Save</button>
           </div>
 
           ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
@@ -223,14 +221,22 @@ export class CorewebEditor extends MobxLitElement {
     `;
   }
 
-  async saveFormTemplate() {
-    const template = this.makeFormTemplate();
-    await saveFormTemplate({template});
+  saveForm() {
+    const form = state.form;
+    const content = this.makeTemplateContent();
+    console.log('saveForm', content)
+    form.setTemplateContent(content);
+    form.save();
   }
 
-  makeFormTemplate() {
-    return `<div data-container-id="Fields">${this.container.innerHTML}</div>` +
-           `<style>${CorewebEditor.containerStyles}</style>`;
+  makeTemplateContent() {
+    let content = `<div data-container-id="Fields">`;
+    state.form.fields.forEach(field => {
+      content += `<div data-fieldname="${field.fieldName}"></div>`;
+    });
+    content += `</div>`;
+    content += `<style>${CorewebEditor.containerStyles}</style>`;
+    return content;
   }
 
   get container() {

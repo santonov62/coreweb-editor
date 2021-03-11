@@ -2,7 +2,7 @@ import request from "../../makeRequest";
 import {WEBADMIN_URL} from "../../config";
 import {makeFormUrlencoded} from '../../helper';
 
-export default function saveDatabean(data) {
+export default function saveDatabeans(data) {
   const url = `${WEBADMIN_URL}/rulesui/SaveDatabeans`;
   const options = {
     url,

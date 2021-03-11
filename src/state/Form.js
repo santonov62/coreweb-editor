@@ -1,14 +1,14 @@
 import {makeAutoObservable, runInAction} from "mobx";
-import {deleteFormFields, getForm, getFormDependencies, saveForm, saveFormFields} from "../api";
+import {deleteFormFields, getForm, getLayoutTemplate, getFormDependencies, saveForm, saveFormFields, saveFormTemplate} from "../api";
 import {LayoutTemplate} from "./LayoutTemplate";
 import {Field} from "./Field";
-import databeanTypesEnum from "../api/DatbeanTypeEnum";
+import databeanTypesEnum from "../api/DatabeanTypesEnum";
 
 export class Form {
 
   isLoading = false
   fieldsForDelete
-  layoutTemplate
+  layoutTemplate = new LayoutTemplate()
   fields = []
   name
   id
@@ -75,14 +75,19 @@ export class Form {
     if (this.isNew()) {
       const name = this.name;
       await saveForm({name});
-      const databean = await getForm({name});
-      this.fromDatabean(databean);
+      const formDatabean = await getForm({name});
+      this.fromDatabean(formDatabean);
     } else {
       if (forDelete && forDelete.length > 0)
         await deleteFormFields(forDelete.map(({databean}) => databean.instanceId));
     }
 
-    await saveFormFields({formId: this.id, fields});
+    const formId = this.id;
+    const {content, databean: {rootId = '', instanceId: id = ''} = {}} = this.layoutTemplate;
+    await Promise.all([
+      saveFormTemplate({ content, formId, rootId, id }),
+      saveFormFields({formId, fields})
+    ]);
     await this.loadDependencies();
 
     runInAction(() => this.isLoading = false);
@@ -94,6 +99,10 @@ export class Form {
 
   isNew() {
     return !this.databean || !this.databean.rootId;
+  }
+
+  setTemplateContent(content) {
+    this.layoutTemplate.content = content;
   }
 
   fromDatabean(databean) {

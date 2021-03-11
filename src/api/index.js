@@ -1,23 +1,23 @@
-import saveDatabean from "./webadmin/rulesui/saveDatabean";
+import saveDatabeans from "./webadmin/rulesui/saveDatabeans";
 import getBeans2Method from "./webadmin/rulesui/methodAction/getBeans2Method";
 import deleteBeans from "./webadmin/rulesui/deleteDatabeans";
-import databeanTypesEnum from "./DatbeanTypeEnum";
+import databeanTypesEnum from "./DatabeanTypesEnum";
 import {makeFormUrlencoded} from "./helper";
 
-export async function saveFormTemplate({template}) {
+export async function saveFormTemplate({content, formId, rootId, id}) {
   const config = {
     formFile: 'crm-objecttypes.xml',
     formName: 'layoutTemplate',
     trees: 'standardObject',
     beanType: databeanTypesEnum.LayoutTemplate,
     condition_isStandard: 0,
-    condition_standardObject: 28511575,
+    condition_standardObject: formId,
     condition____nav2: 'layoutTemplate',
-    rootId: 28512109,
-    // id: 28526561,
-    action_template: template
+    rootId: rootId,
+    id: id,
+    action_template: content
   }
-  return saveDatabean(config)
+  return saveDatabeans(config);
 }
 
 export function saveForm({instanceId, rootId, name}) {
@@ -36,7 +36,7 @@ export function saveForm({instanceId, rootId, name}) {
     action_name: name,
     action_isStandard: 0
   }
-  return saveDatabean(config);
+  return saveDatabeans(config);
 }
 
 export async function saveFormFields({formId, fields = []}) {
@@ -59,7 +59,7 @@ export async function saveFormFields({formId, fields = []}) {
     config.action_dataType = dataType;
     body += `&${makeFormUrlencoded(config)}`;
   });
-  return saveDatabean(body);
+  return saveDatabeans(body);
 }
 
 export function deleteFormFields(ids = []) {
@@ -73,23 +73,23 @@ export function deleteFormFields(ids = []) {
   return deleteBeans(config);
 }
 
-// export async function loadLayoutTemplate({id, formId}) {
-//
-//   const config = {
-//     type: LayoutTemplate.BEAN_TYPE
-//   }
-//   if (id)
-//     config.rootId = id;
-//   else if (formId)
-//     config.code = formId;
-//
-//   const beans = await getBeansMethod(config);
-//   const layoutTemplate = beans && new LayoutTemplate(beans[0]);
-//   if (!layoutTemplate)
-//     throw Error(`There is no layout template bean.`);
-//
-//   return layoutTemplate.template;
-// }
+export function getLayoutTemplate({id, formId}) {
+
+  const config = {
+    beanType: databeanTypesEnum.LayoutTemplate,
+  }
+  if (id)
+    config.rootId = id;
+  else if (formId)
+    config.standardObject = formId;
+
+  return getBeans2Method(config)[0];
+  // const layoutTemplate = beans && new LayoutTemplate(beans[0]);
+  // if (!layoutTemplate)
+  //   throw Error(`There is no layout template bean.`);
+  //
+  // return layoutTemplate.template;
+}
 
 export function getForms({name} = {}) {
   const config = {
