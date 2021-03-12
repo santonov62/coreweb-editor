@@ -29,8 +29,7 @@ export class CorewebEditor extends MobxLitElement {
         justify-content: flex-start;
         color: #1a2b42;
         max-width: 960px;
-        margin: 0 auto;
-        margin-right: 30px;
+        margin: 0px 30px 0px 0px;
       }
       .form-name-container {
         align-self: flex-start;
