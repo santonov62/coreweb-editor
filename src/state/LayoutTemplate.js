@@ -10,8 +10,8 @@ export class LayoutTemplate {
   fromDatabean(databean) {
     this.id = databean.rootId;
     this.type = databean.type;
-    this.template = databean.values.template;
-    this.content = databean.values.template.content;
+    this.template = databean.values?.template;
+    this.content = databean.values?.template?.content;
     this.databean = databean;
     return this;
   }

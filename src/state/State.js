@@ -5,11 +5,10 @@ import {Form} from "./Form";
 export class State {
   isLoading = false;
   formsList = [];
-  form
+  form = new Form()
 
-  constructor({formState}) {
+  constructor() {
     makeAutoObservable(this);
-    this.form = formState;
   }
 
   async loadAllForms() {

@@ -1,4 +1,4 @@
-import {makeAutoObservable, runInAction} from "mobx";
+import {makeAutoObservable, observable, runInAction} from "mobx";
 import {deleteFormFields, getForm, getLayoutTemplate, getFormDependencies, saveForm, saveFormFields, saveFormTemplate} from "../api";
 import {LayoutTemplate} from "./LayoutTemplate";
 import {Field} from "./Field";
@@ -46,6 +46,7 @@ export class Form {
 
   async loadDependencies() {
     this.isLoading = true;
+    this.fields = [];
     const beans = await getFormDependencies({formId: this.id});
     const items = beans.map(bean => {
       const {beanType} = bean;
@@ -64,29 +65,37 @@ export class Form {
   }
 
   async save() {
-    this.isLoading = true;
-    const fields = this.fields.slice();
-    const forDelete = this.fieldsForDelete;
+    try {
+      this.isLoading = true;
+      const fields = this.fields.slice();
+      const forDelete = this.fieldsForDelete;
 
-    if (this.isNew()) {
-      const name = this.name;
-      await saveForm({name});
-      const formDatabean = await getForm({name});
-      this.fromDatabean(formDatabean);
-    } else {
-      if (forDelete && forDelete.length > 0)
-        await deleteFormFields(forDelete.map(({databean}) => databean.instanceId));
+      if (!this.name)
+        throw Error(`Form name required`);
+      // if (this.isNew() && state?.formsList.find(({name}) => name === this.name))
+      //   throw Error(`From name already exists`);
+
+      if (this.isNew()) {
+        const name = this.name;
+        await saveForm({name});
+        const formDatabean = await getForm({name});
+        this.fromDatabean(formDatabean);
+      } else {
+        if (forDelete && forDelete.length > 0)
+          await deleteFormFields(forDelete.map(({databean}) => databean.instanceId));
+      }
+
+      const formId = this.id;
+      const {content, databean: {rootId = '', instanceId: id = ''} = {}} = this.layoutTemplate;
+      await Promise.all([
+        saveFormTemplate({content, formId, rootId, id}),
+        saveFormFields({formId, fields})
+      ]);
+      await this.loadDependencies();
+
+    } finally {
+      runInAction(() => this.isLoading = false);
     }
-
-    const formId = this.id;
-    const {content, databean: {rootId = '', instanceId: id = ''} = {}} = this.layoutTemplate;
-    await Promise.all([
-      saveFormTemplate({ content, formId, rootId, id }),
-      saveFormFields({formId, fields})
-    ]);
-    await this.loadDependencies();
-
-    runInAction(() => this.isLoading = false);
   }
 
   setName(name) {
