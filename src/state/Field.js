@@ -24,8 +24,11 @@ export class Field {
     this.label = data.label || '';
   }
 
-  update({dataType}) {
-    this.dataType = dataType;
+  update(props = {}) {
+    for (const [key, value] of Object.entries(props)) {
+      if (!!value)
+        this[key] = value;
+    }
   }
 
   isNew() {

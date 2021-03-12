@@ -1,8 +1,8 @@
 import {LitElement, html, css} from 'lit-element';
-import FieldDataTypeEnum from "../FieldDataTypeEnum";
-import {state} from '../state';
+import FieldDataTypeEnum from "../../FieldDataTypeEnum";
+import {state} from '../../state';
 import {MobxLitElement} from "@adobe/lit-mobx";
-import {Field} from "../state/Field";
+import {Field} from "../../state/Field";
 
 export class FormField extends MobxLitElement {
 
@@ -11,6 +11,7 @@ export class FormField extends MobxLitElement {
   static get properties() {
     return {
       id: {type: Number},
+      isEditEnabled: {type: Boolean},
       // dataType: {type: String},
       // fieldName: {type: String},
       // label: {type: String},
@@ -45,6 +46,9 @@ export class FormField extends MobxLitElement {
 
   constructor() {
     super();
+    this.isEditEnabled = false;
+    // this.addEventListener('focus', (event) =>  this.isEditEnabled = true );
+    this.addEventListener('blur', (event) =>  this.isEditEnabled = false );
   }
 
   set id(value) {
@@ -58,30 +62,18 @@ export class FormField extends MobxLitElement {
     return this._id;
   }
 
-  // onChangeType(e) {
-  //   const value = e.target.value;
-  //   state.form.updateField({id: this.id, dataType: value});
-  // }
-
-  onChangeType(e) {
-    const dataType = e.target.value;
-    this.field.update({dataType});
-  }
-
   render() {
+    const {isEditEnabled} = this;
     const {fieldName, label, dataType, placeholder, id} = this.field;
     const editUrl = `${location.origin}/webadmin/rulesui2.crm-customer-fields.ct?formName=notStandardFields&filter_(databean)rootId=${id}`;
 
     return html`
+      ${isEditEnabled ? html`<edit-field id=${id}></edit-field>` : ''}
       <div class="controls">
-        <a href=${editUrl} class="destroyButton" target="_blank">open</a> |
-        <a href="#" class="destroyButton" @click=${() => state.form.removeField(id)}>delete</a>
+        <button @click=${() => this.isEditEnabled = !this.isEditEnabled}>edit</button> |
+        <a href=${editUrl} target="_blank">open</a> |
+        <button href="#" @click=${() => state.form.removeField(id)}>delete</button>
       </div>
-      <select @change=${this.onChangeType}>
-        <option>???</option>
-        ${Object.values(FieldDataTypeEnum).map(value => html`
-          <option value="${value}" ?selected=${dataType === value}>${value}</option>`)}
-      </select>
       <h2>${dataType}</h2>
       <div class="component">
         ${renderFieldComponent(dataType)}
