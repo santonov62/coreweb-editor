@@ -186,6 +186,8 @@ export class CorewebEditor extends MobxLitElement {
 
   render() {
     const {isLoading, formsList, form} = state;
+    const fields = Array.from(form.fields.values());
+    console.log(fields)
     return html`
           <div style="margin: 15px">
             <button @click="${this.addField}">Add Row</button>
@@ -209,7 +211,7 @@ export class CorewebEditor extends MobxLitElement {
 
           ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
           <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
-            ${form?.fields?.map(({id}, index) => html`<form-field tabindex=${index} id=${id}></form-field>`)}
+            ${fields.map(({id}, index) => html`<form-field tabindex=${index} id=${id}></form-field>`)}
           </div>
           <div style="width: 100%">
             Add field:

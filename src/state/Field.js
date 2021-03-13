@@ -1,4 +1,5 @@
 import {makeAutoObservable} from "mobx";
+import {FieldLayoutDefinition} from "./FieldLayoutDefinition";
 
 export class Field {
 
@@ -11,6 +12,7 @@ export class Field {
   description
   label
   id
+  layoutDefinition = new FieldLayoutDefinition();
 
   constructor(data = {}) {
     makeAutoObservable(this, {
@@ -18,10 +20,11 @@ export class Field {
     });
     this.id = data.id || '';
     this.dataType = data.dataType || '';
-    this.fieldName = data.fieldName || data.id;
-    this.placeholder = data.placeholder || '';
-    this.description = data.description || '';
-    this.label = data.label || '';
+    this.fieldName = data.fieldName || data.id?.toString();
+    this.placeholder = data.placeholder || this.fieldName;
+    this.description = data.description || this.fieldName;
+    this.label = data.label || this.fieldName;
+    this.layoutDefinition.fieldId = data.id;
   }
 
   update(props = {}) {
@@ -43,6 +46,7 @@ export class Field {
     this.placeholder = databean.values.placeholder;
     this.description = databean.values[Field.#DESCRIPTION_FIELD];
     this.label = databean.values[Field.#LABEL_FIELD];
+    this.layoutDefinition.fieldId = databean.rootId;
     this.databean = databean;
     return this;
   }

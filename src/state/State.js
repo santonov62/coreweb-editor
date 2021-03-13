@@ -5,10 +5,11 @@ import {Form} from "./Form";
 export class State {
   isLoading = false;
   formsList = [];
-  form = new Form()
+  form
 
   constructor() {
     makeAutoObservable(this);
+    this.form = new Form({state: this});
   }
 
   async loadAllForms() {
@@ -17,19 +18,19 @@ export class State {
 
     this.isLoading = true;
     const beans = await getForms();
-    const formsList = beans.map(bean => new Form().fromDatabean(bean));
+    const formsList = beans.map(bean => new Form({state: this}).fromDatabean(bean));
 
     runInAction(() => {
       this.formsList = formsList.sort(sortFormComparator);
       this.isLoading = false;
     });
 
-    console.log(formsList);
+    console.log(`loadAllForms ->`, formsList);
     return formsList;
   }
 
   resetForm() {
-    this.form = new Form();
+    this.form = new Form({state: this});
   }
 
   async setActiveForm(formId) {
