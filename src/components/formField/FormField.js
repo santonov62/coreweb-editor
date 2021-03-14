@@ -48,7 +48,7 @@ export class FormField extends MobxLitElement {
     super();
     this.isEditEnabled = false;
     // this.addEventListener('focus', (event) =>  this.isEditEnabled = true );
-    this.addEventListener('blur', (event) =>  this.isEditEnabled = false );
+    // this.addEventListener('blur', (event) =>  this.isEditEnabled = false );
   }
 
   set id(value) {
@@ -65,20 +65,22 @@ export class FormField extends MobxLitElement {
   render() {
     const {isEditEnabled} = this;
     const {fieldName, label, dataType, placeholder, id} = this.field;
+    const {access} = this.field.layoutDefinition;
     const editUrl = `${location.origin}/webadmin/rulesui2.crm-customer-fields.ct?formName=notStandardFields&filter_(databean)rootId=${id}`;
 
     return html`
       ${isEditEnabled ? html`<edit-field id=${id}></edit-field>` : ''}
       <div class="controls">
+        <a href=${editUrl} target="_blank">Field</a> |
         <button @click=${() => this.isEditEnabled = !this.isEditEnabled}>edit</button> |
-        <a href=${editUrl} target="_blank">open</a> |
         <button href="#" @click=${() => state.form.removeField(id)}>delete</button>
       </div>
       <h2>${dataType}</h2>
       <div class="component">
         ${renderFieldComponent(dataType)}
       </div>
-      <div>${JSON.stringify({dataType, label, fieldName, placeholder})}</div>
+      <div>Field: ${JSON.stringify({dataType, label, fieldName, placeholder})}</div>
+      <div>FieldLayoutDefinition: ${JSON.stringify({access})}</div>
     `;
   }
 }

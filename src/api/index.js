@@ -2,7 +2,6 @@ import saveDatabeans from "./webadmin/rulesui/saveDatabeans";
 import getBeans2Method from "./webadmin/rulesui/methodAction/getBeans2Method";
 import deleteBeans from "./webadmin/rulesui/deleteDatabeans";
 import databeanTypesEnum from "./DatabeanTypesEnum";
-import {makeFormUrlencoded} from "./helper";
 
 export async function saveFormTemplate({content, formId, rootId, id}) {
   const config = {
@@ -20,27 +19,7 @@ export async function saveFormTemplate({content, formId, rootId, id}) {
   return saveDatabeans(config);
 }
 
-export function saveForm({instanceId, id, name}) {
-
-  const config = {
-    formFile: 'crm-objecttypes.xml',
-    formName: 'allObjects',
-    // trees:
-    beanType: databeanTypesEnum.Form,
-    // pageInoffsetdex: 0
-    // orderBy: name
-    // orderIndex: ASC
-    // databeanChecked:
-    rootId: id,
-    id: instanceId,
-    action_name: name,
-    action_isStandard: 0
-  }
-  return saveDatabeans(config);
-}
-
 export async function saveFormFields({formId, fields = []}) {
-  let body = ``;
   const config = {
     formFile: "crm-customer-fields.xml",
     formName: "notStandardFields",
@@ -73,7 +52,6 @@ export function deleteFormFields(ids = []) {
   const config = {
     formFile: 'crm-customer-fields.xml',
     formName: 'notStandardFields',
-    // id:28533625,
   };
   const listConfig = ids.map(id => ({id}));
 
@@ -101,6 +79,25 @@ export function getForms({name} = {}) {
     config.name = name;
 
   return getBeans2Method(config);
+}
+
+export function saveForm({instanceId, id, name}) {
+
+  const config = {
+    formFile: 'crm-objecttypes.xml',
+    formName: 'allObjects',
+    // trees:
+    beanType: databeanTypesEnum.Form,
+    // pageInoffsetdex: 0
+    // orderBy: name
+    // orderIndex: ASC
+    // databeanChecked:
+    rootId: id,
+    id: instanceId,
+    action_name: name,
+    action_isStandard: 0
+  }
+  return saveDatabeans(config);
 }
 
 export async function getForm({name}) {

@@ -1,8 +1,18 @@
 import databeanTypesEnum from "../api/DatabeanTypesEnum";
+import {makeAutoObservable} from "mobx";
 
 export class FieldLayoutDefinition {
 
+  id
+  name
+  access
+  order
+  layoutId
+  fieldId
+  layoutContainerId
+
   constructor(data = {}) {
+    makeAutoObservable(this);
     this.name = data.name;
     this.type = databeanTypesEnum.FieldLayoutDefinition;
     this.id = data.id;
@@ -12,6 +22,13 @@ export class FieldLayoutDefinition {
     this.layoutId = data.layoutId;
     this.order = data.order;
     this.fieldId = data.fieldId;
+  }
+
+  update(props = {}) {
+    for (const [key, value] of Object.entries(props)) {
+      if (!!value)
+        this[key] = value;
+    }
   }
 
   fromDatabean(databean) {
