@@ -20,7 +20,7 @@ export async function saveFormTemplate({content, formId, rootId, id}) {
   return saveDatabeans(config);
 }
 
-export function saveForm({instanceId, rootId, name}) {
+export function saveForm({instanceId, id, name}) {
 
   const config = {
     formFile: 'crm-objecttypes.xml',
@@ -31,7 +31,7 @@ export function saveForm({instanceId, rootId, name}) {
     // orderBy: name
     // orderIndex: ASC
     // databeanChecked:
-    rootId,
+    rootId: id,
     id: instanceId,
     action_name: name,
     action_isStandard: 0

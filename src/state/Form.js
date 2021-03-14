@@ -52,10 +52,10 @@ export class Form {
     try {
       const form = this;
       form.fields = [];
-      const beans = await api.getFormDependencies({formId: form.id});
+      const formDefinitionsBeans = await api.getFormDependencies({formId: form.id});
 
       const fields = [];
-      for (const bean of beans) {
+      for (const bean of formDefinitionsBeans) {
         const {beanType} = bean;
         if (beanType === databeanTypesEnum.LayoutTemplate) form.layoutTemplate.fromDatabean(bean);
         if (beanType === databeanTypesEnum.Field) fields.push(new Field().fromDatabean(bean));
@@ -78,9 +78,6 @@ export class Form {
       });
 
       runInAction(() => {
-        // this.layout = layout;
-        // this.layoutTemplate = layoutTemplate;
-        // this.layoutContainer = layoutContainer;
         this.fields = fields;
         this.fieldsForDelete = [];
       });
@@ -95,17 +92,15 @@ export class Form {
     const form = this;
     try {
       this.isLoading = true;
+      const {state} = form;
 
       if (!form.name)
         throw Error(`Form name required`);
-      // if (this.isNew() && state?.formsList.find(({name}) => name === this.name))
-      //   throw Error(`From name already exists`);
+      if (this.isNew() && state?.formsList.find(({name}) => name === form.name))
+        throw Error(`From name already exists`);
 
       if (form.isNew()) {
-        const name = form.name;
-        await api.saveForm({name});
-        const formDatabean = await api.getForm({name});
-        form.fromDatabean(formDatabean);
+        await form.saveUpdate(form);
       }
 
       const layoutsPromises = [];
@@ -132,6 +127,14 @@ export class Form {
     } finally {
       runInAction(() => form.isLoading = false);
     }
+  }
+
+  async saveUpdate() {
+    const form = this;
+    const name = form.name;
+    await api.saveForm({name, id: form.id});
+    const formDatabean = await api.getForm({name});
+    form.fromDatabean(formDatabean);
   }
 
   async saveUpdateFormFields() {
