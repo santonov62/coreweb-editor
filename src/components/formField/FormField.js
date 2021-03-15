@@ -3,6 +3,7 @@ import FieldDataTypeEnum from "../../FieldDataTypeEnum";
 import {state} from '../../state';
 import {MobxLitElement} from "@adobe/lit-mobx";
 import {Field} from "../../state/Field";
+import {XWidget} from '../XWidget';
 
 export class FormField extends MobxLitElement {
 
@@ -83,6 +84,7 @@ export class FormField extends MobxLitElement {
       </div>
       <div>Field: ${JSON.stringify({dataType, label, fieldName, placeholder})}</div>
       <div>FieldLayoutDefinition: ${JSON.stringify({access})}</div>
+      ${new XWidget(field)}
     `;
   }
 }
