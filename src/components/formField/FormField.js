@@ -64,20 +64,22 @@ export class FormField extends MobxLitElement {
 
   render() {
     const {isEditEnabled} = this;
-    const {fieldName, label, dataType, placeholder, id} = this.field;
-    const {access} = this.field.layoutDefinition;
+    const field = this.field
+    console.log('FormField render', field);
+    const {fieldName, label, dataType, placeholder, id} = field;
+    const {access} = field.layoutDefinition;
     const editUrl = `${location.origin}/webadmin/rulesui2.crm-customer-fields.ct?formName=notStandardFields&filter_(databean)rootId=${id}`;
 
     return html`
       ${isEditEnabled ? html`<edit-field id=${id}></edit-field>` : ''}
       <div class="controls">
         <a href=${editUrl} target="_blank">Field</a> |
-        <button @click=${() => this.isEditEnabled = !this.isEditEnabled}>edit</button> |
+        <button @click=${() => this.isEditEnabled = !isEditEnabled}>edit</button> |
         <button href="#" @click=${() => state.form.removeField(id)}>delete</button>
       </div>
       <h2>${dataType}</h2>
       <div class="component">
-        ${renderFieldComponent(dataType)}
+        ${renderFieldComponent(field)}
       </div>
       <div>Field: ${JSON.stringify({dataType, label, fieldName, placeholder})}</div>
       <div>FieldLayoutDefinition: ${JSON.stringify({access})}</div>
@@ -85,7 +87,7 @@ export class FormField extends MobxLitElement {
   }
 }
 
-function renderFieldComponent(dataType) {
+function renderFieldComponent({dataType}) {
   switch (dataType) {
     case FieldDataTypeEnum.textfield:
       return html`

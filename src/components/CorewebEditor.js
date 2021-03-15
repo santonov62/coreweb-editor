@@ -187,7 +187,7 @@ export class CorewebEditor extends MobxLitElement {
   render() {
     const {isLoading, formsList, form} = state;
     const fields = Array.from(form.fields.values());
-    console.log(fields)
+    console.log('CorewebEditor render -> fields', fields);
     return html`
           <div style="margin: 15px">
             <button @click="${this.addField}">Add Row</button>

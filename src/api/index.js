@@ -223,7 +223,7 @@ export async function getLayoutContainer({formId}) {
   return (await getBeans2Method(config))[0];
 }
 
-export function saveLayout({id = '', rootId = '', formId, name = 'default_layout'} = {}) {
+export function saveLayout({id = '', rootId = '', formId, name = 'coreweb_editor_layout'} = {}) {
   const config = {
     formFile: 'crm-customer-layout-definitions.xml',
     formName: 'layouts',
