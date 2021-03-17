@@ -51,7 +51,6 @@ export class Form {
     this.isLoading = true;
     try {
       const form = this;
-      form.fields = [];
       const formDefinitionsBeans = await api.getFormDependencies({formId: form.id});
 
       const fields = [];

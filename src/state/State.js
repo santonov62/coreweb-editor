@@ -3,8 +3,8 @@ import {getForms} from "../api";
 import {Form} from "./Form";
 
 export class State {
-  isLoading = false;
-  formsList = [];
+  isLoading = false
+  formsList = []
   form
 
   constructor() {

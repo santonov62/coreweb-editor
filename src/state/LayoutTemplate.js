@@ -1,7 +1,11 @@
+import {makeAutoObservable} from "mobx";
 
 export class LayoutTemplate {
 
+  content
+
   constructor(data = {}) {
+    makeAutoObservable(this);
     this.id = data.id;
     this.template = data.template;
     this.content = data.content;

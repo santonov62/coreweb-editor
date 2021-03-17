@@ -20,7 +20,7 @@ export class Field {
     });
     this.id = data.id || '';
     this.dataType = data.dataType || '';
-    this.fieldName = data.fieldName || data.id?.toString();
+    this.fieldName = data.fieldName || `fieldName${data.id}`;
     this.placeholder = data.placeholder || this.fieldName;
     this.description = data.description || this.fieldName;
     this.label = data.label || this.fieldName;

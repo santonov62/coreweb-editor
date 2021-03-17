@@ -51,17 +51,6 @@ export class FormField extends MobxLitElement {
     // this.addEventListener('blur', (event) =>  this.isEditEnabled = false );
   }
 
-  set id(value) {
-    const oldValue = this._id;
-    this._id = value;
-    this.field = state.form.fields.find(({id}) => id === value);
-    this.requestUpdate('id', oldValue);
-  }
-
-  get id() {
-    return this._id;
-  }
-
   render() {
     const {isEditEnabled} = this;
     const field = this.field
@@ -71,7 +60,7 @@ export class FormField extends MobxLitElement {
     const editUrl = `${location.origin}/webadmin/rulesui2.crm-customer-fields.ct?formName=notStandardFields&filter_(databean)rootId=${id}`;
 
     return html`
-      ${isEditEnabled ? html`<edit-field id=${id}></edit-field>` : ''}
+      ${isEditEnabled ? html`<edit-field .field=${field}></edit-field>` : ''}
       <div class="controls">
         <a href=${editUrl} target="_blank">Field</a> |
         <button @click=${() => this.isEditEnabled = !isEditEnabled}>edit</button> |

@@ -1,6 +1,5 @@
 import {html} from "lit-html";
 import {MobxLitElement} from "@adobe/lit-mobx";
-import {state} from "../../state";
 import FieldDataTypeEnum from "../../FieldDataTypeEnum";
 
 export class EditField extends MobxLitElement {
@@ -13,17 +12,6 @@ export class EditField extends MobxLitElement {
 
   constructor() {
     super();
-  }
-
-  set id(value) {
-    const oldValue = this._id;
-    this._id = value;
-    this.field = state.form.fields.find(({id}) => id === value);
-    this.requestUpdate('id', oldValue);
-  }
-
-  get id() {
-    return this._id;
   }
 
   render() {

@@ -3,11 +3,14 @@ import {html} from 'lit-html';
 import {MobxLitElement} from "@adobe/lit-mobx";
 import {state} from '../state';
 import FieldDataTypeEnum from "../FieldDataTypeEnum";
+import { styleMap } from 'lit-html/directives/style-map';
+import {autorun, reaction} from "mobx";
 
 export class CorewebEditor extends MobxLitElement {
 
   static get properties() {
     return {
+      gridMatrix: {type: String},
     };
   }
 
@@ -61,8 +64,27 @@ export class CorewebEditor extends MobxLitElement {
 
   constructor() {
     super();
+    const editor = this;
     this.templateAreas = [["x1x1"]];
+    this.gridMatrix = `'. . . .'`;
+    reaction(
+      () => state.form.layoutTemplate.content,
+      content => {
+        editor.gridMatrix = editor.#parseGridMatrix(content);
+      }
+    )
+
     state.loadAllForms();
+  }
+
+  #parseGridMatrix(content) {
+      const template = document.createElement('template');
+      template.innerHTML = content.toString();
+      const container = template.content.querySelector('[data-container-id]');
+      console.log(`layoutTemplate container`, container);
+      return container.style.gridTemplateAreas
+        .replaceAll('" ', '\'\n')
+        .replaceAll('"', '\'');
   }
 
   #getColumnsTemplateStr() {
@@ -184,9 +206,32 @@ export class CorewebEditor extends MobxLitElement {
   //
   // }
 
+  #getGridStyles() {
+    // return {
+    //   gridTemplateRows: 'auto',
+    //   gridTemplateColumns: '1fr 1fr 1fr 1fr',
+    //   gridTemplateAreas: this.gridMatrix.split('\n').map(line => `"${line}"`).join(" "),
+    //   display: 'grid',
+    //   gap: '10px',
+    // }
+    // let style = ``;
+    // style += `display: grid;`;
+    // style += `gap: 10px;`;
+    // style += `grid-template-rows: auto;`;
+    // style += `grid-template-columns: 1fr 1fr 1fr 1fr;`;
+    // style += `grid-template-areas: ${this.gridMatrix};`;
+    // return style;
+    return `display: grid;
+    gap: 10px;
+    grid-template-rows: auto;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-areas: ${this.gridMatrix};`
+  }
+
   render() {
     const {isLoading, formsList, form} = state;
-    const fields = Array.from(form.fields.values());
+    const {fields} = form;
+    // const fields = Array.from(form.fields.values());
     console.log('CorewebEditor render -> fields', fields);
     return html`
           <div style="margin: 15px">
@@ -199,6 +244,11 @@ export class CorewebEditor extends MobxLitElement {
 
           ${isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
 
+          <div id="gridMatrix">
+            <label>grid-template-areas:</label><br />
+            <textarea rows='6' cols="40" @change=${this.onGridMatrixChange}>${this.gridMatrix}</textarea>
+          </div>
+
           <div class="form-name-container">
             <label for="formName">Form name: </label>
             <select @change=${this.onFormSelect}>
@@ -210,8 +260,11 @@ export class CorewebEditor extends MobxLitElement {
           </div>
 
           ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
-          <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
-            ${fields.map(({id}, index) => html`<form-field tabindex=${index} id=${id}></form-field>`)}
+<!--          <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">-->
+
+          <div class="container" style="${this.#getGridStyles()}">
+            ${fields.map((field, index) => html`
+              <form-field tabindex=${index} .field=${field} style=${`grid-area: ${field.fieldName};`}></form-field>`)}
           </div>
           <div style="width: 100%">
             Add field:
@@ -222,6 +275,10 @@ export class CorewebEditor extends MobxLitElement {
             </select>
           </div>
     `;
+  }
+
+  onGridMatrixChange(e) {
+    this.gridMatrix = e.target.value;
   }
 
   onAddField(e) {
@@ -239,12 +296,11 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   makeTemplateContent() {
-    let content = `<div data-container-id="Fields">`;
+    let content = `<div data-container-id="Fields" style="${this.#getGridStyles()}">`;
     state.form.fields.forEach(field => {
-      content += `<div data-fieldname="${field.fieldName}"></div>`;
+      content += `<div data-fieldname="${field.fieldName}" style="grid-area: ${field.fieldName}"></div>`;
     });
     content += `</div>`;
-    content += `<style>${CorewebEditor.containerStyles}</style>`;
     return content;
   }
 
