@@ -23,6 +23,7 @@ export class FieldLayoutDefinition {
     this.layoutId = data.layoutId;
     this.order = data.order;
     this.fieldId = data.fieldId;
+    this.field = data.field;
   }
 
   update(props = {}) {

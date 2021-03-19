@@ -6,7 +6,8 @@ import {Field} from "../../state/Field";
 
 export class FormField extends MobxLitElement {
 
-  field = new Field()
+  field
+  layoutDefinition
 
   static get properties() {
     return {
@@ -28,6 +29,10 @@ export class FormField extends MobxLitElement {
         align-items: flex-start;
         justify-content: flex-start;
         position: relative;
+        background: #3273dc;
+        color: white;
+        padding: 20px;
+        border-radius: 5px;
       }
       select {
         margin: 10px 0 10px 0;
@@ -52,18 +57,19 @@ export class FormField extends MobxLitElement {
   }
 
   render() {
-    const {isEditEnabled} = this;
-    const field = this.field
+    const {isEditEnabled, field} = this;
     console.log('FormField render', field);
-    const {fieldName, label, dataType, placeholder, id} = field;
-    const {access} = field.layoutDefinition;
+    const {fieldName, label, dataType, placeholder, id, layoutDefinition} = field;
+    // const {access} = layoutDefinition;
     const editUrl = `${location.origin}/webadmin/rulesui2.crm-customer-fields.ct?formName=notStandardFields&filter_(databean)rootId=${id}`;
 
     return html`
-      ${isEditEnabled ? html`<edit-field .field=${field}></edit-field>` : ''}
+      ${isEditEnabled ? html`
+        <edit-field .field=${field}></edit-field>` : ''}
       <div class="controls">
         <a href=${editUrl} target="_blank">Field</a> |
-        <button @click=${() => this.isEditEnabled = !isEditEnabled}>edit</button> |
+        <button @click=${() => this.isEditEnabled = !isEditEnabled}>edit</button>
+        |
         <button href="#" @click=${() => state.form.removeField(id)}>delete</button>
       </div>
       <h2>${dataType}</h2>
@@ -71,7 +77,8 @@ export class FormField extends MobxLitElement {
         ${renderFieldComponent(field)}
       </div>
       <div>Field: ${JSON.stringify({dataType, label, fieldName, placeholder})}</div>
-      <div>FieldLayoutDefinition: ${JSON.stringify({access})}</div>
+      ${layoutDefinition ? html`
+        <div>FieldLayoutDefinition: ${JSON.stringify({access: layoutDefinition.access})}</div>` : ''}
     `;
   }
 }

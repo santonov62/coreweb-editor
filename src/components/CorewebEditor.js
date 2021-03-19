@@ -47,12 +47,6 @@ export class CorewebEditor extends MobxLitElement {
       padding: 20px;
         align-self: stretch
       }
-      .container form-field {
-        background: #3273dc;
-        color: white;
-        padding: 20px;
-        border-radius: 5px;
-      }
       .container div:hover {
         background: cornflowerblue;
       }
@@ -231,7 +225,6 @@ export class CorewebEditor extends MobxLitElement {
   render() {
     const {isLoading, formsList, form} = state;
     const {fields, fieldLayoutDefinitions} = form;
-    // const fields = Array.from(form.fields.values());
     console.log('CorewebEditor render -> fields', fields);
     console.log('CorewebEditor render -> fieldLayoutDefinitions', fieldLayoutDefinitions);
     return html`
@@ -261,12 +254,13 @@ export class CorewebEditor extends MobxLitElement {
           </div>
 
           ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
-<!--          <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">-->
-
           <div class="container" style="${this.#getGridStyles()}">
-            ${fieldLayoutDefinitions.map(({field}, index) => html`
-              <form-field tabindex=${index} .field=${field} style=${`grid-area: ${field.fieldName};`}></form-field>`)}
+            ${fieldLayoutDefinitions.map((layoutDefinition, index) => html`
+              <form-field tabindex=${index}
+                          .field=${layoutDefinition.field}
+                          style=${`grid-area: ${layoutDefinition.field.fieldName};`}></form-field>`)}
           </div>
+
           <div style="width: 100%">
             Add field:
             <select id="addField" @change=${this.onAddField}>
@@ -275,6 +269,8 @@ export class CorewebEditor extends MobxLitElement {
                 <option value="${value}">${value}</option>`)}
             </select>
           </div>
+          <br />
+          <available-fields />
     `;
   }
 

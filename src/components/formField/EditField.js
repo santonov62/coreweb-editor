@@ -4,6 +4,9 @@ import FieldDataTypeEnum from "../../FieldDataTypeEnum";
 
 export class EditField extends MobxLitElement {
 
+  field
+  layoutDefinition
+
   static get properties() {
     return {
       id: {type: Number}
@@ -15,9 +18,9 @@ export class EditField extends MobxLitElement {
   }
 
   render() {
-    const field = this.field;
+    const {field} = this;
     const {fieldName, label, dataType, placeholder, id, layoutDefinition} = field;
-    const {access} = layoutDefinition;
+    // const {access} = layoutDefinition;
     console.log('EditField render', field);
     return html`
       <div class="edit-field">
@@ -40,11 +43,13 @@ export class EditField extends MobxLitElement {
         <label for="label">label: </label>
         <input id="label" value=${label} @change=${(e) => field.update({label: e.target.value})}/>
 
-        <label for="access">access: </label>
-        <select id="access" @change=${(e) => layoutDefinition.update({access: e.target.value})}>
-          ${Object.values(AccessEnum).map(value => html`
-            <option value="${value}" ?selected=${access === value}>${value}</option>`)}
-        </select>
+        ${layoutDefinition ? html`
+          <label for="access">access: </label>
+          <select id="access" @change=${(e) => layoutDefinition.update({access: e.target.value})}>
+            ${Object.values(AccessEnum).map(value => html`
+            <option value="${value}" ?selected=${layoutDefinition.access === value}>${value}</option>`)}
+          </select>
+        ` : ''}
       </div>`;
   }
 

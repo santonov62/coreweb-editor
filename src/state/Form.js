@@ -44,8 +44,17 @@ export class Form {
   }
 
   addField({id = Date.now(), fieldName = '', dataType = ''}) {
+    const form = this;
     const field = new Field({id, fieldName, dataType});
-    this.fields.push(field);
+    const fieldLayoutDefinition = new FieldLayoutDefinition({
+      fieldId: field.id,
+      layoutId: form.layout.id,
+      layoutContainerId: form.layoutContainer.id,
+      order: form.fields.length
+    });
+    field.layoutDefinition = fieldLayoutDefinition;
+    fieldLayoutDefinition.field = field;
+    this.fieldLayoutDefinitions.push(fieldLayoutDefinition);
   }
 
   async loadDependencies() {
@@ -66,7 +75,9 @@ export class Form {
       const fieldLayoutDefinitionBeans = await api.getFieldLayoutDefinitions({layoutId: form.layout.id});
       const fieldLayoutDefinitions = fieldLayoutDefinitionBeans.map(bean => {
         const fieldLayoutDefinition = new FieldLayoutDefinition().fromDatabean(bean);
-        fieldLayoutDefinition.field = fields.find(field => field.id === fieldLayoutDefinition.fieldId);
+        const field = fields.find(field => field.id === fieldLayoutDefinition.fieldId);
+        field.layoutDefinition = fieldLayoutDefinition;
+        fieldLayoutDefinition.field = field;
         return fieldLayoutDefinition;
       });
       // for (const bean of fieldLayoutDefinitionBeans) {
@@ -152,16 +163,18 @@ export class Form {
   async saveUpdateFormFields() {
     const form = this;
     const formId = form.id;
+    const fieldsLayoutDefinitions = form.fieldLayoutDefinitions;
 
-    await api.saveFormFields({formId, fields: form.fields.slice()});
+    const fields = fieldsLayoutDefinitions.map(fieldLayoutDefinition => fieldLayoutDefinition.field);
+    await api.saveFormFields({formId, fields: fields.slice()});
 
     const fieldBeans = await api.getFromFields({formId});
-    form.fields.forEach(field => {
+    fields.forEach(field => {
       const fieldBean = fieldBeans.find(({values:{fieldName}}) => fieldName === field.fieldName);
       field.fromDatabean(fieldBean);
     })
 
-    const fieldsLayoutDefinitions = form.fields.map(field => ({...field.layoutDefinition}));
+    // const fieldsLayoutDefinitions = form.fields.map(field => ({...field.layoutDefinition}));
     await api.saveFieldLayoutDefinitions({
       formId,
       layoutId: form.layout.id,
