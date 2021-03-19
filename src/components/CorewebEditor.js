@@ -230,9 +230,10 @@ export class CorewebEditor extends MobxLitElement {
 
   render() {
     const {isLoading, formsList, form} = state;
-    const {fields} = form;
+    const {fields, fieldLayoutDefinitions} = form;
     // const fields = Array.from(form.fields.values());
     console.log('CorewebEditor render -> fields', fields);
+    console.log('CorewebEditor render -> fieldLayoutDefinitions', fieldLayoutDefinitions);
     return html`
           <div style="margin: 15px">
             <button @click="${this.addField}">Add Row</button>
@@ -263,7 +264,7 @@ export class CorewebEditor extends MobxLitElement {
 <!--          <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">-->
 
           <div class="container" style="${this.#getGridStyles()}">
-            ${fields.map((field, index) => html`
+            ${fieldLayoutDefinitions.map(({field}, index) => html`
               <form-field tabindex=${index} .field=${field} style=${`grid-area: ${field.fieldName};`}></form-field>`)}
           </div>
           <div style="width: 100%">

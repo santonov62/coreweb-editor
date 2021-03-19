@@ -15,6 +15,7 @@ export class Form {
   layoutContainer
   layoutTemplate
   fields = []
+  fieldLayoutDefinitions = []
   name
   id
   type
@@ -63,21 +64,33 @@ export class Form {
       }
 
       const fieldLayoutDefinitionBeans = await api.getFieldLayoutDefinitions({layoutId: form.layout.id});
-      fields.forEach((field, index) => {
-        const bean = fieldLayoutDefinitionBeans.find(({values: {target: fieldId}}) => fieldId === field.id);
-        if (bean)
-          field.layoutDefinition.fromDatabean(bean);
-        else
-          field.layoutDefinition = new FieldLayoutDefinition({
-            fieldId: field.id,
-            layoutId: form.layout.id,
-            layoutContainerId: form.layoutContainer.id,
-            order: index,
-          });
+      const fieldLayoutDefinitions = fieldLayoutDefinitionBeans.map(bean => {
+        const fieldLayoutDefinition = new FieldLayoutDefinition().fromDatabean(bean);
+        fieldLayoutDefinition.field = fields.find(field => field.id === fieldLayoutDefinition.fieldId);
+        return fieldLayoutDefinition;
       });
+      // for (const bean of fieldLayoutDefinitionBeans) {
+      //   const fieldLayoutDefinition = new FieldLayoutDefinition().fromDatabean(bean);
+      //   fieldLayoutDefinition.field = fields.find(field => field.id === fieldLayoutDefinition.fieldId);
+      //   fieldLayoutDefinitions.push(fieldLayoutDefinition);
+      // }
+
+      // fields.forEach((field, index) => {
+      //   const bean = fieldLayoutDefinitionBeans.find(({values: {target: fieldId}}) => fieldId === field.id);
+      //   if (bean)
+      //     field.layoutDefinition.fromDatabean(bean);
+      //   else
+      //     field.layoutDefinition = new FieldLayoutDefinition({
+      //       fieldId: field.id,
+      //       layoutId: form.layout.id,
+      //       layoutContainerId: form.layoutContainer.id,
+      //       order: index,
+      //     });
+      // });
 
       runInAction(() => {
         this.fields = fields;
+        this.fieldLayoutDefinitions = fieldLayoutDefinitions;
         this.fieldsForDelete = [];
       });
     } finally {

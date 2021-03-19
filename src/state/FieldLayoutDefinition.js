@@ -10,6 +10,7 @@ export class FieldLayoutDefinition {
   layoutId
   fieldId
   layoutContainerId
+  field
 
   constructor(data = {}) {
     makeAutoObservable(this);
