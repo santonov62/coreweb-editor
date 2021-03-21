@@ -85,7 +85,7 @@ function renderFieldComponent({dataType}) {
       return html`
         <cw-text-field label="cwTextField"/>`;
     default:
-      return html`???`;
+      return html`empty cell`;
   }
 }
 
