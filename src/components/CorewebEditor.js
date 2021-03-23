@@ -2,6 +2,7 @@ import { LitElement, css } from 'lit-element';
 import {html} from 'lit-html';
 import {MobxLitElement} from "@adobe/lit-mobx";
 import {state} from '../state';
+import { buttonStyles } from './styles';
 import FieldDataTypeEnum from "../FieldDataTypeEnum";
 
 export class CorewebEditor extends MobxLitElement {
@@ -86,17 +87,7 @@ export class CorewebEditor extends MobxLitElement {
       .left {
         left:0
       }
-      button {
-        background-color: #4CAF50;
-        border: 1px solid green;
-        color: white;
-        padding: 5px 10px;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #3e8e41;
-      }
-    `, this.containerStyles];
+    `, buttonStyles, this.containerStyles];
   }
 
   constructor() {
@@ -153,9 +144,9 @@ export class CorewebEditor extends MobxLitElement {
     return html`${this.hoverCell ? html`
             <div style="grid-area: ${this.hoverCell.area};" class="cellEditor" draggable="true">
               ${this.hoverCell.id ? html`
-                <button style="margin-right: 8px;">Edit</button>
+                <button style="margin-right: 8px;" @click="${this.onAddField}>Edit</button>
                 <button>Delete</button>`:
-                html`<button>Add</button>`
+                html`<button @click="${this.onAddField}">Add</button>`
               }
               ${this.hoverCell.isMultiCell ? html`<button style="margin-left: 8px;"
                    @click="${this.splitCell}">Split</button>`:''}
@@ -170,9 +161,22 @@ export class CorewebEditor extends MobxLitElement {
             </div>`:''}`
   }
 
+  #getDialogTemplate() {
+    return html`
+        <cw-dialog id="dialog" title="Add Field" @close="${this.onDialogClose}">
+            <div slot="body">
+              <input id="fieldValue" name="fieldValue" list="fieldOptions"/>
+              <datalist id="fieldOptions">
+                ${Object.values(FieldDataTypeEnum).map(value => html`
+                <option value="${value}">${value}</option>`)}
+              </datalist>
+            </div>
+        </cw-dialog>`
+  }
+
   onMouseOver(evt) {
     let node = evt.path[0];
-    if (node.classList.contains('cellEditor') || evt.path[1].classList.contains('cellEditor'))
+    if (node?.classList.contains('cellEditor') || evt.path[1]?.classList?.contains('cellEditor'))
       return;
     if (node.nodeName === 'FORM-FIELD') {
       this.hoverCell = {area:node.dataset['area'], direction:{}};
@@ -351,14 +355,22 @@ export class CorewebEditor extends MobxLitElement {
             ${this.#getCellTemlates()}
             ${this.#getHoverCellTemplate()}
           </div>
+
+          ${this.#getDialogTemplate()}
     `;
   }
 
-  // onAddField(e) {
-  //   const dataType = e.target.value;
-  //   state.form.addField({dataType});
-  //   this.shadowRoot.getElementById('addField').value = 'new';
-  // }
+  onAddField(e) {
+    //const dataType = e.target.value;
+    let dialog = this.shadowRoot.getElementById('dialog');
+    dialog.showModal();
+    let dataType = dialog.returnValue;
+  }
+
+  onDialogClose(e) {
+    const dataType = e.target.returnValue;
+    state.form.addField({dataType});
+  }
 
   saveForm() {
     const form = state.form;
