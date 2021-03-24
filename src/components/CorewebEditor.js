@@ -305,7 +305,7 @@ export class CorewebEditor extends MobxLitElement {
     this.templateAreas.forEach((row,i)=>{
       row.forEach((cell,j)=> {
         if (cell === area) {
-          this.templateAreas[i][j] = `x${i+1}x${j}`;
+          this.templateAreas[i][j] = `x${i+1}x${j+1}`;
         }
       })
     })
