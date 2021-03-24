@@ -125,8 +125,9 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   #getCellTemlates() {
+    const fields = state.form.fields;
     return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
-        return html`<form-field draggable="true"
+        return html`<form-field draggable="true" .field="${fields[cell]}"
                               ondrag="this.classList.add('selected')"
                               ondragend="this.classList.remove('selected')"
                               ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'move'"
@@ -143,7 +144,7 @@ export class CorewebEditor extends MobxLitElement {
   #getHoverCellTemplate() {
     return html`${this.hoverCell ? html`
             <div style="grid-area: ${this.hoverCell.area};" class="cellEditor" draggable="true">
-              ${this.hoverCell.id ? html`
+              ${this.hoverCell?.field?.dataType ? html`
                 <button style="margin-right: 8px;" @click="${this.onAddField}>Edit</button>
                 <button>Delete</button>`:
                 html`<button @click="${this.onAddField}">Add</button>`
@@ -187,7 +188,7 @@ export class CorewebEditor extends MobxLitElement {
       this.hoverCell.direction.right = lastIndex%this.templateAreas[0].length;
       this.hoverCell.direction.top = (startIndex/this.templateAreas[0].length)>>0;
       this.hoverCell.direction.down = (lastIndex/this.templateAreas[0].length)>>0;
-      this.hoverCell.fieldId = node.id;
+      this.hoverCell.dataType = node.field?.dataType;
       this.hoverCell.isMultiCell = startIndex !== lastIndex;
     } else
        this.hoverCell = null;
@@ -327,8 +328,6 @@ export class CorewebEditor extends MobxLitElement {
 
   render() {
     const {isLoading, formsList, form} = state;
-    const fields = Array.from(form.fields.values());
-    console.log(fields)
     return html`
           <div style="margin: 15px">
             <button @click="${this.addRow}">Add Row</button>
@@ -361,15 +360,17 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   onAddField(e) {
-    //const dataType = e.target.value;
     let dialog = this.shadowRoot.getElementById('dialog');
+    dialog.area = this.hoverCell.area;
     dialog.showModal();
-    let dataType = dialog.returnValue;
   }
 
   onDialogClose(e) {
-    const dataType = e.target.returnValue;
-    state.form.addField({dataType});
+    const dialog = e.target;
+    const dataType = dialog.returnValue;
+    state.form.addField({dataType}, dialog.area);
+    let formField = this.shadowRoot.querySelector(`form-field[data-area="${dialog.area}"]`);
+    formField.field = state.form.fields[dialog.area];
   }
 
   saveForm() {

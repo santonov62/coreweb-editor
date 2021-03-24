@@ -6,12 +6,13 @@ import {Field} from "../../state/Field";
 
 export class FormField extends MobxLitElement {
 
-  field = new Field()
+  //field = new Field()
 
   static get properties() {
     return {
       id: {type: Number},
       isEditEnabled: {type: Boolean},
+      field: {attribute: false}
       // dataType: {type: String},
       // fieldName: {type: String},
       // label: {type: String},
@@ -47,11 +48,14 @@ export class FormField extends MobxLitElement {
   constructor() {
     super();
     this.isEditEnabled = false;
+    this.field = new Field();
     // this.addEventListener('focus', (event) =>  this.isEditEnabled = true );
     // this.addEventListener('blur', (event) =>  this.isEditEnabled = false );
   }
 
   render() {
+    if (!this.field)
+      return;
     const {isEditEnabled} = this;
     const field = this.field
     console.log('FormField render', field);

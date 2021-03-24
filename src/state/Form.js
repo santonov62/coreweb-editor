@@ -1,4 +1,4 @@
-import {makeAutoObservable, observable, runInAction} from "mobx";
+import {makeAutoObservable, runInAction} from "mobx";
 import * as api from '../api';
 import {LayoutTemplate} from "./LayoutTemplate";
 import {Field} from "./Field";
@@ -14,7 +14,7 @@ export class Form {
   layout
   layoutContainer
   layoutTemplate
-  fields = []
+  fields = {}
   name
   id
   type
@@ -42,9 +42,8 @@ export class Form {
       .concat(this.fieldsForDelete);
   }
 
-  addField({id = Date.now(), fieldName = '', dataType = ''}) {
-    const field = new Field({id, fieldName, dataType});
-    this.fields.push(field);
+  addField({id = Date.now(), fieldName = '', dataType = ''}, area) {
+    this.fields[area] = new Field({id, fieldName, dataType});
   }
 
   async loadDependencies() {
@@ -53,7 +52,7 @@ export class Form {
       const form = this;
       const formDefinitionsBeans = await api.getFormDependencies({formId: form.id});
 
-      const fields = [];
+      const fields = {};
       for (const bean of formDefinitionsBeans) {
         const {beanType} = bean;
         if (beanType === databeanTypesEnum.LayoutTemplate) form.layoutTemplate.fromDatabean(bean);
