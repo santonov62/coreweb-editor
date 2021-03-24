@@ -34,12 +34,11 @@ export class Form {
     this.state = data.state;
   }
 
-  removeField(fieldId) {
-    const index = this.fields.findIndex(({id}) => id === fieldId);
-    const deletedFields = this.fields.splice(index, 1);
-    this.fieldsForDelete = deletedFields
-      .filter(({databean}) => databean && !!databean.instanceId)
-      .concat(this.fieldsForDelete);
+  removeField(area) {
+    const deletedField = this.fields[area];
+    delete this.fields[area];
+    if (!!deletedField?.databean?.instanceId)
+    this.fieldsForDelete.push(deletedField);
   }
 
   addField({id = Date.now(), fieldName = '', dataType = ''}, area) {

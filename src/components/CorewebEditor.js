@@ -144,9 +144,9 @@ export class CorewebEditor extends MobxLitElement {
   #getHoverCellTemplate() {
     return html`${this.hoverCell ? html`
             <div style="grid-area: ${this.hoverCell.area};" class="cellEditor" draggable="true">
-              ${this.hoverCell?.field?.dataType ? html`
-                <button style="margin-right: 8px;" @click="${this.onAddField}>Edit</button>
-                <button>Delete</button>`:
+              ${this.hoverCell?.dataType ? html`
+                <button style="margin-right: 8px;" @click="${this.onAddField}">Edit</button>
+                <button @click="${this.onDeleteField}">Delete</button>`:
                 html`<button @click="${this.onAddField}">Add</button>`
               }
               ${this.hoverCell.isMultiCell ? html`<button style="margin-left: 8px;"
@@ -365,12 +365,23 @@ export class CorewebEditor extends MobxLitElement {
     dialog.showModal();
   }
 
+  onDeleteField() {
+    let area = this.hoverCell.area;
+    state.form.removeField(area);
+    this.updateCellByArea(area);
+  }
+
   onDialogClose(e) {
     const dialog = e.target;
     const dataType = dialog.returnValue;
     state.form.addField({dataType}, dialog.area);
-    let formField = this.shadowRoot.querySelector(`form-field[data-area="${dialog.area}"]`);
-    formField.field = state.form.fields[dialog.area];
+    this.updateCellByArea(dialog.area);
+  }
+
+  updateCellByArea(area) {
+    let formField = this.shadowRoot.querySelector(`form-field[data-area="${area}"]`);
+    formField.field = state.form.fields[area];
+    this.hoverCell = null;
   }
 
   saveForm() {

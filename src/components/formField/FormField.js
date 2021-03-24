@@ -68,7 +68,6 @@ export class FormField extends MobxLitElement {
       <div class="controls">
         <a href=${editUrl} target="_blank">Field</a> |
         <button @click=${() => this.isEditEnabled = !isEditEnabled}>edit</button> |
-        <button href="#" @click=${() => state.form.removeField(id)}>delete</button>
       </div>
       <h2>${dataType}</h2>
       <div class="component">
