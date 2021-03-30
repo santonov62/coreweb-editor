@@ -256,9 +256,9 @@ export class CorewebEditor extends MobxLitElement {
           ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
           <div class="container" style="${this.#getGridStyles()}">
             ${fieldLayoutDefinitions.map((layoutDefinition, index) => html`
-              <form-field tabindex=${index}
-                          .field=${layoutDefinition.field}
-                          style=${`grid-area: ${layoutDefinition.field.fieldName};`}></form-field>`)}
+              <layout-field .layoutDefinition=${layoutDefinition}
+                            style=${`grid-area: ${layoutDefinition.field?.fieldName}`}></layout-field>
+              `)}
           </div>
 
           <div style="width: 100%">

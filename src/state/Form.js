@@ -36,11 +36,19 @@ export class Form {
   }
 
   removeField(fieldId) {
+    const form = this;
     const index = this.fields.findIndex(({id}) => id === fieldId);
-    const deletedFields = this.fields.splice(index, 1);
-    this.fieldsForDelete = deletedFields
-      .filter(({databean}) => databean && !!databean.instanceId)
-      .concat(this.fieldsForDelete);
+    const field = form.fields[index];
+    if (field.layoutDefinition) {
+      // form.fieldLayoutDefinitions = form.fieldLayoutDefinitions
+      //   .filter(layoutDefinition => layoutDefinition.id !== field.layoutDefinition.id);
+      field.layoutDefinition = null;
+    } else {
+      const deletedFields = this.fields.splice(index, 1);
+      this.fieldsForDelete = deletedFields
+        .filter(({databean}) => databean && !!databean.instanceId)
+        .concat(this.fieldsForDelete);
+    }
   }
 
   addField({id = Date.now(), fieldName = '', dataType = ''}) {
