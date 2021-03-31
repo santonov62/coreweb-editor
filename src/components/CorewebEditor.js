@@ -4,6 +4,8 @@ import {MobxLitElement} from "@adobe/lit-mobx";
 import {state} from '../state';
 import { buttonStyles } from './styles';
 import FieldDataTypeEnum from "../FieldDataTypeEnum";
+import {AccessEnum} from "./formField/EditField";
+import {Field} from "../state/Field";
 
 export class CorewebEditor extends MobxLitElement {
 
@@ -163,15 +165,30 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   #getDialogTemplate() {
+    let field = state.form.fields[this?.hoverCell?.area];
+    if (!field)
+      field = new Field();
     return html`
-        <cw-dialog id="dialog" title="Add Field" @close="${this.onDialogClose}">
-            <div slot="body">
-              <input id="fieldValue" name="fieldValue" list="fieldOptions"/>
+        <cw-dialog id="dialog" title="${field?.dataType ? 'Edit Field' : 'Add Field'}" @close="${this.onDialogClose}">
+              <label for="dataType">fieldType: </label>
+              <input id="dataType" name="dataType" list="fieldOptions" .value="${field?.dataType}" style="width: -webkit-fill-available"/>
               <datalist id="fieldOptions">
                 ${Object.values(FieldDataTypeEnum).map(value => html`
                 <option value="${value}">${value}</option>`)}
               </datalist>
-            </div>
+              <label for="fieldName">fieldName:</label>
+              <input id="fieldName" name="fieldName" .value="${field?.fieldName}" style="width: -webkit-fill-available"/>
+              <label for="placeholder">placeholder:</label>
+              <input id="placeholder" name="placeholder" .value="${field?.placeholder}" style="width: -webkit-fill-available"/>
+              <br/>
+              <label for="label">label:</label>
+              <input id="label" name="label" .value="${field?.label}" style="width: -webkit-fill-available"/>
+
+              <label for="access">access: </label>
+              <select id="access" name="access" style="width: -webkit-fill-available" .value="${field?.layoutDefinition?.access}">
+                ${Object.values(AccessEnum).map(value => html`
+            <option>${value}</option>`)}
+              </select>
         </cw-dialog>`
   }
 
@@ -294,6 +311,7 @@ export class CorewebEditor extends MobxLitElement {
     let fillArray = new Array(len).fill(`x${row1}x${col1}`);
     for (let i=0; i<=points.rowMax-points.rowMin; i++)
       this.templateAreas[points.rowMin-1+i].splice(points.colMin-1, len, ...fillArray);
+    //todo check templateAreas[i ---- != rowMin,colMin][all cols] for fields, and put it in ui nongrid fields list below grid
     //this.getSelection().classList.remove('selected');
     this.hoverCell = null;
     this.update(this.templateAreas);
@@ -374,8 +392,10 @@ export class CorewebEditor extends MobxLitElement {
   onDialogClose(e) {
     const dialog = e.target;
     const dataType = dialog.returnValue;
-    state.form.addField({dataType}, dialog.area);
-    this.updateCellByArea(dialog.area);
+    if (dataType) {
+      state.form.addField(dataType, dialog.area);
+      this.updateCellByArea(dialog.area);
+    }
   }
 
   updateCellByArea(area) {

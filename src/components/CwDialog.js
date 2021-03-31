@@ -59,8 +59,10 @@ class CWDialog extends LitElement {
 
       let form = document.createElement('form');
       form.setAttribute('method', 'dialog')
-      for (let node of slotChilds)
-        form.appendChild(node.cloneNode(true));
+      for (let node of slotChilds) {
+        let cloned = form.appendChild(node.cloneNode(true));
+        cloned.value = node.value;
+      }
       e.target.value = JSON.stringify(Object.fromEntries(new FormData(form)));
       return e.target.value;
     }
@@ -95,9 +97,8 @@ class CWDialog extends LitElement {
                 <fieldset>
                   <legend>${this.title}</legend>
                 <form method="dialog" style="margin-block-end: 0" id="cwform">
-                    <slot name="body"></slot>
+                    <slot></slot>
                     <menu>
-<!--                        <button type="reset">Reset</button>-->
                         <button type="submit" style="margin-right: 8px;" value="true" @click="${this.setFormValue}">Ok</button>
                         <button type="submit" value=''">Cancel</button>
                     </menu>

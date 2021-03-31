@@ -41,8 +41,8 @@ export class Form {
     this.fieldsForDelete.push(deletedField);
   }
 
-  addField({id = Date.now(), fieldName = '', dataType = ''}, area) {
-    this.fields[area] = new Field({id, fieldName, dataType});
+  addField(data = {id: Date.now(), fieldName: '', dataType: ''}, area) {
+    this.fields[area] = new Field(data);
   }
 
   async loadDependencies() {

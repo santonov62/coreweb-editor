@@ -25,6 +25,8 @@ export class Field {
     this.description = data.description || this.fieldName;
     this.label = data.label || this.fieldName;
     this.layoutDefinition.fieldId = data.id;
+    if (data.access)
+      this.layoutDefinition.access = data.access;
   }
 
   update(props = {}) {
