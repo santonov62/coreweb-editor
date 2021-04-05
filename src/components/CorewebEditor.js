@@ -1,9 +1,11 @@
 import { LitElement, css } from 'lit-element';
-import {html} from 'lit-html';
+import {html, nothing} from 'lit-html';
 import {MobxLitElement} from "@adobe/lit-mobx";
 import {state} from '../state';
 import { buttonStyles } from './styles';
 import FieldDataTypeEnum from "../FieldDataTypeEnum";
+import {reaction} from "mobx";
+import {FieldLayoutDefinition} from "../state/FieldLayoutDefinition";
 
 export class CorewebEditor extends MobxLitElement {
 
@@ -44,7 +46,6 @@ export class CorewebEditor extends MobxLitElement {
       .container {
         padding: 20px;
         align-self: stretch;
-        height: 100%;
       }
       .container form-field {
         background: #3273dc;
@@ -92,8 +93,26 @@ export class CorewebEditor extends MobxLitElement {
 
   constructor() {
     super();
+    const editor = this;
     this.templateAreas = [["x1x1"]];
+    reaction(
+      () => state.form.layoutTemplate.content,
+      content => {
+        if (content)
+          editor.templateAreas = editor.#parseAreas(content);
+      }
+    )
     state.loadAllForms();
+  }
+
+  #parseAreas(content) {
+    const template = document.createElement('template');
+    template.innerHTML = content.toString();
+    const container = template.content.querySelector('[data-container-id]');
+    console.log(`layoutTemplate container`, container);
+    return container.style.gridTemplateAreas
+      .split('" "')
+      .map(area => area.replaceAll('"', '').split(' '));
   }
 
   #getColumnsTemplateStr() {
@@ -101,7 +120,7 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   #getRowTemplateStr() {
-    return this.templateAreas.reduce((res, row) => `${res}"${row.join(' ')}"`, 'grid-template-areas:');
+    return this.templateAreas.reduce((res, row) => `${res}'${row.join(' ')}'`, 'grid-template-areas:');
   }
 
   addColumn() {
@@ -119,25 +138,45 @@ export class CorewebEditor extends MobxLitElement {
       this.saveState();
       this.templateAreas.forEach((ta, i) => {
         ta.pop();
-      })
+      });
+      this.#mergeLayoutsWithAreas();
       this.update();
     }
   }
 
+  // #getCellTemlates() {
+  //   const fields = state.form.fields;
+  //   return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
+  //       return html`<form-field draggable="true" .field="${fields[cell]}"
+  //                             ondrag="this.classList.add('selected')"
+  //                             ondragend="this.classList.remove('selected')"
+  //                             ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'move'"
+  //                             @drop="${this.prepareJoinCell}"
+  //                             class="item"
+  //                             data-fieldname="name${i}"
+  //                             tabindex="0"
+  //                             data-area="${cell}"
+  //                             style="grid-area: ${cell}">${i+1}>
+  //       </form-field>`
+  //   })
+  // }
+
   #getCellTemlates() {
-    const fields = state.form.fields;
+    const {fields, fieldLayoutDefinitions} = state.form;
     return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
-        return html`<form-field draggable="true" .field="${fields[cell]}"
-                              ondrag="this.classList.add('selected')"
-                              ondragend="this.classList.remove('selected')"
-                              ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'move'"
-                              @drop="${this.prepareJoinCell}"
-                              class="item"
-                              data-fieldname="name${i}"
-                              tabindex="0"
-                              data-area="${cell}"
-                              style="grid-area: ${cell}">${i+1}>
-        </form-field>`
+      let layoutDefinition = fieldLayoutDefinitions.get(cell) || state.form.newFieldLayoutDefinition(cell);
+
+      return html`<layout-definition-field draggable="true"
+                        .layoutDefinition=${layoutDefinition}
+                        ondrag="this.classList.add('selected')"
+                        ondragend="this.classList.remove('selected')"
+                        ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'move'"
+                        @drop="${this.prepareJoinCell}"
+                        class="item"
+                        tabindex="0"
+                        data-area="${cell}"
+                        style="grid-area: ${cell}">${i+1}>
+        </layout-definition-field>`
     })
   }
 
@@ -162,24 +201,40 @@ export class CorewebEditor extends MobxLitElement {
             </div>`:''}`
   }
 
+  // #getDialogTemplate() {
+  //   return html`
+  //       <cw-dialog id="dialog" title="Add Field" @close="${this.onDialogClose}">
+  //           <div slot="body">
+  //             <input id="fieldValue" name="fieldValue" list="fieldOptions"/>
+  //             <datalist id="fieldOptions">
+  //               ${Object.values(FieldDataTypeEnum).map(value => html`
+  //               <option value="${value}">${value}</option>`)}
+  //             </datalist>
+  //           </div>
+  //       </cw-dialog>`
+  // }
+
   #getDialogTemplate() {
+    if (!this.hoverCell)
+      return nothing;
+    const {layoutDefinition} = this.hoverCell;
+    const {field} = layoutDefinition;
     return html`
-        <cw-dialog id="dialog" title="Add Field" @close="${this.onDialogClose}">
-            <div slot="body">
-              <input id="fieldValue" name="fieldValue" list="fieldOptions"/>
-              <datalist id="fieldOptions">
-                ${Object.values(FieldDataTypeEnum).map(value => html`
-                <option value="${value}">${value}</option>`)}
-              </datalist>
-            </div>
-        </cw-dialog>`
+      <cw-dialog id="dialog" title="Add/Edit Field">
+        <div slot="body">
+          <add-field .layoutDefinition="${layoutDefinition}"></add-field>
+          ${field ?
+            html`<edit-field .field="${field}" .layoutDefinition="${layoutDefinition}"></edit-field>` : nothing
+          }
+        </div>
+      </cw-dialog>`
   }
 
   onMouseOver(evt) {
     let node = evt.path[0];
     if (node?.classList.contains('cellEditor') || evt.path[1]?.classList?.contains('cellEditor'))
       return;
-    if (node.nodeName === 'FORM-FIELD') {
+    if (node.nodeName === 'LAYOUT-DEFINITION-FIELD') {
       this.hoverCell = {area:node.dataset['area'], direction:{}};
       let flatAreas = this.templateAreas.flat();
       let startIndex = flatAreas.indexOf(this.hoverCell.area);
@@ -188,7 +243,8 @@ export class CorewebEditor extends MobxLitElement {
       this.hoverCell.direction.right = lastIndex%this.templateAreas[0].length;
       this.hoverCell.direction.top = (startIndex/this.templateAreas[0].length)>>0;
       this.hoverCell.direction.down = (lastIndex/this.templateAreas[0].length)>>0;
-      this.hoverCell.dataType = node.field?.dataType;
+      this.hoverCell.dataType = node.layoutDefinition?.field?.dataType;
+      this.hoverCell.layoutDefinition = node.layoutDefinition;
       this.hoverCell.isMultiCell = startIndex !== lastIndex;
     } else
        this.hoverCell = null;
@@ -213,6 +269,7 @@ export class CorewebEditor extends MobxLitElement {
     if (this.templateAreas.length > 1) {
       this.saveState();
       this.templateAreas.pop();
+      this.#mergeLayoutsWithAreas();
       this.update();
     }
   }
@@ -296,6 +353,7 @@ export class CorewebEditor extends MobxLitElement {
       this.templateAreas[points.rowMin-1+i].splice(points.colMin-1, len, ...fillArray);
     //this.getSelection().classList.remove('selected');
     this.hoverCell = null;
+    this.#mergeLayoutsWithAreas();
     this.update(this.templateAreas);
   }
 
@@ -313,18 +371,27 @@ export class CorewebEditor extends MobxLitElement {
     this.update(this.templateAreas);
   }
 
-  /**
-   * deprecated
-   * @param evt
-   */
-  toggleSelected(evt) {
-    const selection = this.getSelection();
-    if (!selection && selection !== evt.target) {
-      evt.target.classList.toggle('selected');
-    } else {
-      this.joinCell(window.getComputedStyle(selection).gridRowStart, window.getComputedStyle(evt.target).gridRowStart);
+  #mergeLayoutsWithAreas() {
+    const layoutDefinitionKeys = [...state.form.fieldLayoutDefinitions.keys()];
+    const areas = [...new Set(this.templateAreas.flat())];
+    for (const area of layoutDefinitionKeys) {
+      if (!areas.includes(area))
+        state.form.removeFieldLayoutDefinition(area);
     }
   }
+
+  // /**
+  //  * deprecated
+  //  * @param evt
+  //  */
+  // toggleSelected(evt) {
+  //   const selection = this.getSelection();
+  //   if (!selection && selection !== evt.target) {
+  //     evt.target.classList.toggle('selected');
+  //   } else {
+  //     this.joinCell(window.getComputedStyle(selection).gridRowStart, window.getComputedStyle(evt.target).gridRowStart);
+  //   }
+  // }
 
   render() {
     const {isLoading, formsList, form} = state;
@@ -355,6 +422,8 @@ export class CorewebEditor extends MobxLitElement {
             ${this.#getHoverCellTemplate()}
           </div>
 
+          <available-fields></available-fields>
+
           ${this.#getDialogTemplate()}
     `;
   }
@@ -365,24 +434,29 @@ export class CorewebEditor extends MobxLitElement {
     dialog.showModal();
   }
 
+  // onDeleteField() {
+  //   let area = this.hoverCell.area;
+  //   state.form.removeField(area);
+  //   this.updateCellByArea(area);
+  // }
+
   onDeleteField() {
-    let area = this.hoverCell.area;
-    state.form.removeField(area);
-    this.updateCellByArea(area);
+    let layoutDefinition = this.hoverCell.layoutDefinition;
+    layoutDefinition.clearField();
   }
 
-  onDialogClose(e) {
-    const dialog = e.target;
-    const dataType = dialog.returnValue;
-    state.form.addField({dataType}, dialog.area);
-    this.updateCellByArea(dialog.area);
-  }
-
-  updateCellByArea(area) {
-    let formField = this.shadowRoot.querySelector(`form-field[data-area="${area}"]`);
-    formField.field = state.form.fields[area];
-    this.hoverCell = null;
-  }
+  // onDialogClose(e) {
+  //   const dialog = e.target;
+  //   const dataType = dialog.returnValue;
+  //   state.form.addField({dataType}, dialog.area);
+  //   this.updateCellByArea(dialog.area);
+  // }
+  //
+  // updateCellByArea(area) {
+  //   let formField = this.shadowRoot.querySelector(`form-field[data-area="${area}"]`);
+  //   formField.field = state.form.fields[area];
+  //   this.hoverCell = null;
+  // }
 
   saveForm() {
     const form = state.form;
@@ -393,12 +467,12 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   makeTemplateContent() {
-    let content = `<div data-container-id="Fields">`;
-    state.form.fields.forEach(field => {
-      content += `<div data-fieldname="${field.fieldName}"></div>`;
+    let content = `<div data-container-id="Fields" style="display: grid;${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">`;
+    const fieldLayoutDefinitions = [...state.form.fieldLayoutDefinitions.values()];
+    fieldLayoutDefinitions.forEach(({field, name}) => {
+      content += `<div data-fieldname="${field.fieldName}" style="grid-area: ${name}"></div>`;
     });
     content += `</div>`;
-    content += `<style>${CorewebEditor.containerStyles}</style>`;
     return content;
   }
 

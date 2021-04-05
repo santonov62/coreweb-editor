@@ -11,10 +11,12 @@ export class Form {
 
   isLoading = false
   fieldsForDelete
+  deletedFieldLayoutDefinitions
   layout
   layoutContainer
   layoutTemplate
-  fields = {}
+  fields = []
+  fieldLayoutDefinitions = new Map()
   name
   id
   type
@@ -22,6 +24,7 @@ export class Form {
   constructor(data = {}) {
     makeAutoObservable(this, {
       deletedFields: false,
+      deletedFieldLayoutDefinitions: false,
       isNew: false,
       saveNew: false
     });
@@ -32,17 +35,24 @@ export class Form {
     this.layoutContainer = new LayoutContainer({form: this});
     this.layout = new Layout({form: this});
     this.state = data.state;
+    this.deletedFieldLayoutDefinitions = [];
   }
 
-  removeField(area) {
-    const deletedField = this.fields[area];
-    delete this.fields[area];
-    if (!!deletedField?.databean?.instanceId)
-    this.fieldsForDelete.push(deletedField);
-  }
+  // removeField(area) {
+  //   const deletedField = this.fields[area];
+  //   delete this.fields[area];
+  //   if (!!deletedField?.databean?.instanceId)
+  //   this.fieldsForDelete.push(deletedField);
+  // }
 
-  addField({id = Date.now(), fieldName = '', dataType = ''}, area) {
-    this.fields[area] = new Field({id, fieldName, dataType});
+  // addField({id = Date.now(), fieldName = '', dataType = ''}, area) {
+  //   this.fields[area] = new Field({id, fieldName, dataType});
+  // }
+
+  addField({id = `-${Date.now()}`, fieldName = '', dataType = ''}, area) {
+    const field = new Field({id, fieldName, dataType});
+    this.fields.push(field);
+    return field;
   }
 
   async loadDependencies() {
@@ -51,7 +61,7 @@ export class Form {
       const form = this;
       const formDefinitionsBeans = await api.getFormDependencies({formId: form.id});
 
-      const fields = {};
+      const fields = [];
       for (const bean of formDefinitionsBeans) {
         const {beanType} = bean;
         if (beanType === databeanTypesEnum.LayoutTemplate) form.layoutTemplate.fromDatabean(bean);
@@ -61,21 +71,18 @@ export class Form {
       }
 
       const fieldLayoutDefinitionBeans = await api.getFieldLayoutDefinitions({layoutId: form.layout.id});
-      fields.forEach((field, index) => {
-        const bean = fieldLayoutDefinitionBeans.find(({values: {target: fieldId}}) => fieldId === field.id);
-        if (bean)
-          field.layoutDefinition.fromDatabean(bean);
-        else
-          field.layoutDefinition = new FieldLayoutDefinition({
-            fieldId: field.id,
-            layoutId: form.layout.id,
-            layoutContainerId: form.layoutContainer.id,
-            order: index,
-          });
-      });
+      const fieldLayoutDefinitions = new Map(fieldLayoutDefinitionBeans.map((bean, index) => {
+        const fieldLayoutDefinition = new FieldLayoutDefinition().fromDatabean(bean);
+        // field.layoutDefinition = fieldLayoutDefinition;
+        fieldLayoutDefinition.field = fields.find(field => field.id === fieldLayoutDefinition.fieldId);
+        if (!fieldLayoutDefinition.name)
+          fieldLayoutDefinition.name = `x${index}x1`;
+        return [fieldLayoutDefinition.name, fieldLayoutDefinition];
+      }));
 
       runInAction(() => {
         this.fields = fields;
+        this.fieldLayoutDefinitions = fieldLayoutDefinitions;
         this.fieldsForDelete = [];
       });
     } finally {
@@ -105,13 +112,18 @@ export class Form {
       form.layoutContainer.isNew() && layoutsPromises.push(form.layoutContainer.saveUpdate());
       await Promise.all(layoutsPromises);
 
-      const forDelete = form.fieldsForDelete?.slice();
+      const forDelete = form.deletedFieldLayoutDefinitions?.filter(({databean}) => !!databean?.instanceId);
       if (forDelete && forDelete.length > 0) {
-        await Promise.all([
-          api.deleteFormFields(forDelete.map(({databean}) => databean.instanceId)),
-          api.deleteFieldLayoutDefinitions(forDelete.map(field => field.layoutDefinition.databean.instanceId)),
-        ]);
+          await api.deleteFieldLayoutDefinitions(forDelete.map(({databean}) => databean.instanceId));
       }
+
+      // const forDelete = form.fieldsForDelete?.slice();
+      // if (forDelete && forDelete.length > 0) {
+      //   await Promise.all([
+      //     api.deleteFormFields(forDelete.map(({databean}) => databean.instanceId)),
+      //     api.deleteFieldLayoutDefinitions(forDelete.map(field => field.layoutDefinition.databean.instanceId)),
+      //   ]);
+      // }
 
       const formId = form.id;
       const {content, databean: {rootId = '', instanceId: id = ''} = {}} = form.layoutTemplate;
@@ -137,21 +149,27 @@ export class Form {
   async saveUpdateFormFields() {
     const form = this;
     const formId = form.id;
+    const fieldLayoutDefinitions = [...form.fieldLayoutDefinitions.values()];
 
-    await api.saveFormFields({formId, fields: form.fields.slice()});
+    const fields = new Set();
+    const fieldsWithLayout = fieldLayoutDefinitions.map(({field}) => field);
+    for (const field of fieldsWithLayout.concat(form.fields)) {
+      fields.add(field);
+    }
+    console.log(fields);
+    await api.saveFormFields({formId, fields: [...fields]});
 
     const fieldBeans = await api.getFromFields({formId});
-    form.fields.forEach(field => {
+    fields.forEach(field => {
       const fieldBean = fieldBeans.find(({values:{fieldName}}) => fieldName === field.fieldName);
       field.fromDatabean(fieldBean);
     })
 
-    const fieldsLayoutDefinitions = form.fields.map(field => ({...field.layoutDefinition}));
     await api.saveFieldLayoutDefinitions({
       formId,
       layoutId: form.layout.id,
       layoutContainerId: form.layoutContainer.id,
-      fieldsLayoutDefinitions,
+      fieldsLayoutDefinitions: fieldLayoutDefinitions,
     });
   }
 
@@ -165,6 +183,22 @@ export class Form {
 
   setTemplateContent(content) {
     this.layoutTemplate.content = content;
+  }
+
+  newFieldLayoutDefinition(area) {
+    const fieldLayoutDefinition = new FieldLayoutDefinition({name: area});
+    runInAction(() =>
+      this.fieldLayoutDefinitions.set(area, fieldLayoutDefinition)
+    )
+    return fieldLayoutDefinition;
+  }
+
+  removeFieldLayoutDefinition(area) {
+    runInAction(() => {
+      const layout = this.fieldLayoutDefinitions.get(area);
+      this.deletedFieldLayoutDefinitions.push(layout);
+      this.fieldLayoutDefinitions.delete(area);
+    });
   }
 
   fromDatabean(databean) {

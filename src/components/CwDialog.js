@@ -99,7 +99,7 @@ class CWDialog extends LitElement {
                     <menu>
 <!--                        <button type="reset">Reset</button>-->
                         <button type="submit" style="margin-right: 8px;" value="true" @click="${this.setFormValue}">Ok</button>
-                        <button type="submit" value=''">Cancel</button>
+                        <button type="submit" value="">Cancel</button>
                     </menu>
                 </form>
                 </fieldset>

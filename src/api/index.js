@@ -156,16 +156,16 @@ export function saveFieldLayoutDefinitions({formId, layoutId, layoutContainerId,
     // // action_fieldValue:
     // //   action_fieldDefault:
   }
-  const listConfig = fieldsLayoutDefinitions.map(({id, access, fieldId, databean}, index) => {
+  const listConfig = fieldsLayoutDefinitions.map(({id, access, fieldId, databean, name, field}, index) => {
     return {
       databeanChecked: '',
       rootId: id,
       id: databean?.instanceId,
-      databeanName: '',
+      databeanName: name,
       databeanDescription: '',
       action_placeholder: '',
       action_order: index,
-      action_target: fieldId,
+      action_target: field?.id,
       action_access: access,
       action_fieldValue: '',
       action_fieldDefault: '',
