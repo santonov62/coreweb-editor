@@ -1,12 +1,9 @@
 import {LitElement, html, css} from 'lit-element';
 import FieldDataTypeEnum from "../../FieldDataTypeEnum";
-import {state} from '../../state';
 import {MobxLitElement} from "@adobe/lit-mobx";
 import {Field} from "../../state/Field";
 
 export class FormField extends MobxLitElement {
-
-  //field = new Field()
 
   static get properties() {
     return {
@@ -47,7 +44,6 @@ export class FormField extends MobxLitElement {
 
   constructor() {
     super();
-    this.isEditEnabled = false;
     this.field = new Field();
     // this.addEventListener('focus', (event) =>  this.isEditEnabled = true );
     // this.addEventListener('blur', (event) =>  this.isEditEnabled = false );
@@ -56,7 +52,6 @@ export class FormField extends MobxLitElement {
   render() {
     if (!this.field)
       return;
-    const {isEditEnabled} = this;
     const field = this.field
     console.log('FormField render', field);
     const {fieldName, label, dataType, placeholder, id} = field;
@@ -64,10 +59,8 @@ export class FormField extends MobxLitElement {
     const editUrl = `${location.origin}/webadmin/rulesui2.crm-customer-fields.ct?formName=notStandardFields&filter_(databean)rootId=${id}`;
 
     return html`
-      ${isEditEnabled ? html`<edit-field .field=${field}></edit-field>` : ''}
       <div class="controls">
         <a href=${editUrl} target="_blank">Field</a> |
-        <button @click=${() => this.isEditEnabled = !isEditEnabled}>edit</button> |
       </div>
       <h2>${dataType}</h2>
       <div class="component">
@@ -79,16 +72,16 @@ export class FormField extends MobxLitElement {
   }
 }
 
-function renderFieldComponent({dataType}) {
+function renderFieldComponent({dataType, label, placeholder, layoutDefinition:{access}=''}) {
+  if (FieldDataTypeEnum[dataType] && customElements.get(dataType)) {
+    return html`<${dataType} label="${label}" placeholder="${placeholder}" ${access}/>`;
+  }
   switch (dataType) {
     case FieldDataTypeEnum.textfield:
       return html`
         <div>xtextfield widget</div>`;
-    case FieldDataTypeEnum.cwTextField:
-      return html`
-        <cw-text-field label="cwTextField"/>`;
     default:
-      return html`empty cell`;
+      return html`this widget can't be displayed`;
   }
 }
 

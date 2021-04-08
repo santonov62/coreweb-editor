@@ -60,6 +60,9 @@ export class CorewebEditor extends MobxLitElement {
       .container form-field.selected {
         background: blueviolet;
       }
+      .container .not-item {
+        background: darkgrey;
+      }
       .cellEditor {
         background-color: rgba(15,15,15,0.25);
         z-index: 999;
@@ -126,9 +129,51 @@ export class CorewebEditor extends MobxLitElement {
     }
   }
 
+  #getNonFormFields() {
+    return html``;
+    for (let i=points.rowMin-1; i<points.rowMax; i++) {
+      for (let j=points.colMin-1; j<points.colMax; j++) {
+        if (i!==points.rowMin-1 && j!==points.colMin-1) {
+          let field = state.form.fields[`x${i}x${j}`];
+          if (field) {
+            this.deletedCells.push(`x${i}x${j}`);
+          }
+          this.templateAreas[i][j] = `x${row1}x${col1}`;
+        }
+      }
+    }
+  }
+
   #getCellTemlates() {
     const fields = state.form.fields;
-    return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
+    // return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
+    //     return html`<form-field draggable="true" .field="${fields[cell]}"
+    //                           ondrag="this.classList.add('selected')"
+    //                           ondragend="this.classList.remove('selected')"
+    //                           ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'move'"
+    //                           @drop="${this.prepareJoinCell}"
+    //                           class="item"
+    //                           data-fieldname="name${i}"
+    //                           tabindex="0"
+    //                           data-area="${cell}"
+    //                           style="grid-area: ${cell}">${i+1}>
+    //     </form-field>`
+    // })
+   // let cells = new Set();
+    return this.templateAreas.flat().map((cell,i)=>{
+      //todo compare cell with field if not equal when check cell (has or no)
+      let field = 'x'+((i/this.templateAreas[0].length>>0)+1)+'x'+(i%this.templateAreas[0].length+1);
+      if (field !== cell/* && cells.has(cell)*/) { //non grid cell
+        return fields[field] ? html`<form-field draggable="true" .field="${fields[field]}"
+                              ondrag="this.classList.add('selected')"
+                              ondragend="this.classList.remove('selected')"
+                              ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'none'"
+                              class="not-item"
+                              data-fieldname="name${i}"
+                              data-area="${field}">${i+1}
+        </form-field>` : html``;
+      } else { //grid cell
+        //cells.add(cell);
         return html`<form-field draggable="true" .field="${fields[cell]}"
                               ondrag="this.classList.add('selected')"
                               ondragend="this.classList.remove('selected')"
@@ -138,8 +183,9 @@ export class CorewebEditor extends MobxLitElement {
                               data-fieldname="name${i}"
                               tabindex="0"
                               data-area="${cell}"
-                              style="grid-area: ${cell}">${i+1}>
+                              style="grid-area: ${cell}">${i+1}
         </form-field>`
+      }
     })
   }
 
@@ -196,7 +242,7 @@ export class CorewebEditor extends MobxLitElement {
     let node = evt.path[0];
     if (node?.classList.contains('cellEditor') || evt.path[1]?.classList?.contains('cellEditor'))
       return;
-    if (node.nodeName === 'FORM-FIELD') {
+    if (node.nodeName === 'FORM-FIELD' && !node.classList.contains('not-item')) {
       this.hoverCell = {area:node.dataset['area'], direction:{}};
       let flatAreas = this.templateAreas.flat();
       let startIndex = flatAreas.indexOf(this.hoverCell.area);
@@ -309,9 +355,11 @@ export class CorewebEditor extends MobxLitElement {
     let points = {rowMin: Math.min(...rows), rowMax: Math.max(...rows), colMin: Math.min(...cols), colMax: Math.max(...cols)};
     const len = points.colMax-points.colMin+1;
     let fillArray = new Array(len).fill(`x${row1}x${col1}`);
+    //let fillArray = new Array(len).fill(`x${points.rowMin}x${points.colMin}`);
     for (let i=0; i<=points.rowMax-points.rowMin; i++)
       this.templateAreas[points.rowMin-1+i].splice(points.colMin-1, len, ...fillArray);
     //todo check templateAreas[i ---- != rowMin,colMin][all cols] for fields, and put it in ui nongrid fields list below grid
+    //todo synchronize templateAreas and fields
     //this.getSelection().classList.remove('selected');
     this.hoverCell = null;
     this.update(this.templateAreas);
@@ -371,6 +419,10 @@ export class CorewebEditor extends MobxLitElement {
           <div class="container" @mouseover="${this.onMouseOver}" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
             ${this.#getCellTemlates()}
             ${this.#getHoverCellTemplate()}
+          </div>
+          <div>
+            <hr/>
+            ${this.#getNonFormFields()}
           </div>
 
           ${this.#getDialogTemplate()}
