@@ -12,7 +12,7 @@ export class Field {
   description
   label
   id
-  layoutDefinition = new FieldLayoutDefinition();
+  layoutDefinition
 
   constructor(data = {}) {
     makeAutoObservable(this, {
@@ -24,9 +24,7 @@ export class Field {
     this.placeholder = data.placeholder || this.fieldName;
     this.description = data.description || this.fieldName;
     this.label = data.label || this.fieldName;
-    this.layoutDefinition.fieldId = data.id;
-    if (data.access)
-      this.layoutDefinition.access = data.access;
+    // this.layoutDefinition.fieldId = data.id;
   }
 
   update(props = {}) {
@@ -48,7 +46,7 @@ export class Field {
     this.placeholder = databean.values.placeholder;
     this.description = databean.values[Field.#DESCRIPTION_FIELD];
     this.label = databean.values[Field.#LABEL_FIELD];
-    this.layoutDefinition.fieldId = databean.rootId;
+    // this.layoutDefinition.fieldId = databean.rootId;
     this.databean = databean;
     return this;
   }

@@ -2,6 +2,7 @@ import databeanTypesEnum from "../api/DatabeanTypesEnum";
 import {makeAutoObservable} from "mobx";
 
 export class FieldLayoutDefinition {
+  static FIELD_NAME = '(databean)name';
 
   id
   name
@@ -10,6 +11,7 @@ export class FieldLayoutDefinition {
   layoutId
   fieldId
   layoutContainerId
+  _field
 
   constructor(data = {}) {
     makeAutoObservable(this);
@@ -22,17 +24,23 @@ export class FieldLayoutDefinition {
     this.layoutId = data.layoutId;
     this.order = data.order;
     this.fieldId = data.fieldId;
+    this.field = data.field;
   }
 
   update(props = {}) {
     for (const [key, value] of Object.entries(props)) {
-      if (!!value)
+      // if (!!value)
         this[key] = value;
     }
   }
 
+  clearField() {
+    this.field = null;
+    this.fieldId = null;
+  }
+
   fromDatabean(databean) {
-    this.name = databean.values.name;
+    this.name = databean.values[FieldLayoutDefinition.FIELD_NAME];
     this.id = databean.rootId;
     this.type = databean.type;
 
@@ -43,5 +51,14 @@ export class FieldLayoutDefinition {
     this.fieldId = databean.values.target;  // crm.config.widget.Field
     this.databean = databean;
     return this;
+  }
+
+  set field(field) {
+    this._field = field;
+    this.fieldId = field?.id;
+  }
+
+  get field() {
+    return this._field;
   }
 }
