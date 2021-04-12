@@ -6,10 +6,22 @@ export class State {
   isLoading = false
   formsList = []
   form
+  templateAreas
 
   constructor() {
     makeAutoObservable(this);
     this.form = new Form({state: this});
+    this.templateAreas = [["x1x1"]];
+  }
+
+  parseAreas(content) {
+    const template = document.createElement('template');
+    template.innerHTML = content.toString();
+    const container = template.content.querySelector('[data-container-id]');
+    console.log(`layoutTemplate container`, container);
+    return container.style.gridTemplateAreas
+      .split('" "')
+      .map(area => area.replaceAll('"', '').split(' '));
   }
 
   async loadAllForms() {
@@ -38,8 +50,8 @@ export class State {
     const form = forms.find(({id}) => id === Number.parseInt(formId));
     runInAction(() => {
       this.form = form;
-      // if (!form.fields)
-        this.form.loadDependencies();
+      form.loadDependencies();
+      this.templateAreas = this.parseAreas(form.layoutTemplate.content);
     });
   }
 

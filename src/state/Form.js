@@ -72,12 +72,10 @@ export class Form {
 
       const fieldLayoutDefinitionBeans = await api.getFieldLayoutDefinitions({layoutId: form.layout.id});
       const fieldLayoutDefinitions = new Map(fieldLayoutDefinitionBeans.map((bean, index) => {
-        const fieldLayoutDefinition = new FieldLayoutDefinition().fromDatabean(bean);
-        // field.layoutDefinition = fieldLayoutDefinition;
-        fieldLayoutDefinition.field = fields.find(field => field.id === fieldLayoutDefinition.fieldId);
-        if (!fieldLayoutDefinition.name)
-          fieldLayoutDefinition.name = `x${index}x1`;
-        return [fieldLayoutDefinition.name, fieldLayoutDefinition];
+        const layout = new FieldLayoutDefinition().fromDatabean(bean);
+        layout.field = fields.find(field => field.id === layout.fieldId);
+        layout.area = `x${index}x1`;
+        return [layout.area, layout];
       }));
 
       runInAction(() => {

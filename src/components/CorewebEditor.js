@@ -93,27 +93,28 @@ export class CorewebEditor extends MobxLitElement {
 
   constructor() {
     super();
-    const editor = this;
-    this.templateAreas = [["x1x1"]];
-    reaction(
-      () => state.form.layoutTemplate.content,
-      content => {
-        if (content)
-          editor.templateAreas = editor.#parseAreas(content);
-      }
-    )
+    // const editor = this;
+    this.templateAreas = state.templateAreas;
+    // this.templateAreas = [["x1x1"]];
+    // reaction(
+    //   () => state.form.layoutTemplate.content,
+    //   content => {
+    //     if (content)
+    //       editor.templateAreas = editor.#parseAreas(content);
+    //   }
+    // )
     state.loadAllForms();
   }
 
-  #parseAreas(content) {
-    const template = document.createElement('template');
-    template.innerHTML = content.toString();
-    const container = template.content.querySelector('[data-container-id]');
-    console.log(`layoutTemplate container`, container);
-    return container.style.gridTemplateAreas
-      .split('" "')
-      .map(area => area.replaceAll('"', '').split(' '));
-  }
+  // #parseAreas(content) {
+  //   const template = document.createElement('template');
+  //   template.innerHTML = content.toString();
+  //   const container = template.content.querySelector('[data-container-id]');
+  //   console.log(`layoutTemplate container`, container);
+  //   return container.style.gridTemplateAreas
+  //     .split('" "')
+  //     .map(area => area.replaceAll('"', '').split(' '));
+  // }
 
   #getColumnsTemplateStr() {
     return this.templateAreas[0].reduce((res) => res + ' 1fr', 'grid-template-columns: ');
@@ -121,6 +122,13 @@ export class CorewebEditor extends MobxLitElement {
 
   #getRowTemplateStr() {
     return this.templateAreas.reduce((res, row) => `${res}'${row.join(' ')}'`, 'grid-template-areas:');
+  }
+
+  #getMappedRowTemplateStr() {
+    const layoutDefinitions = state.form.fieldLayoutDefinitions;
+    const templateAreas = this.templateAreas.map(areas =>
+      areas.map(area => layoutDefinitions.get(area).field.fieldName));
+    return templateAreas.reduce((res, row) => `${res}'${row.join(' ')}'`, 'grid-template-areas:');
   }
 
   addColumn() {
@@ -463,17 +471,21 @@ export class CorewebEditor extends MobxLitElement {
     const content = this.makeTemplateContent();
     console.log('saveForm', content)
     form.setTemplateContent(content);
-    form.save();
+    // form.save();
   }
 
   makeTemplateContent() {
-    let content = `<div data-container-id="Fields" style="display: grid;${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">`;
-    const fieldLayoutDefinitions = [...state.form.fieldLayoutDefinitions.values()];
-    fieldLayoutDefinitions.forEach(({field, name}) => {
-      content += `<div data-fieldname="${field.fieldName}" style="grid-area: ${name}"></div>`;
-    });
-    content += `</div>`;
-    return content;
+    return `
+<!-- Generated with visual coreweb editor -->
+<div data-container-id="Fields"></div>
+<style id="corewebEditor">
+  [data-container-id="Fields"] {
+    display: grid;
+    ${this.#getColumnsTemplateStr()};
+    ${this.#getMappedRowTemplateStr()}
+  }
+</style>
+`;
   }
 
   get container() {
