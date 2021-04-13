@@ -94,8 +94,8 @@ export class CorewebEditor extends MobxLitElement {
   constructor() {
     super();
     // const editor = this;
-    this.templateAreas = state.templateAreas;
-    // this.templateAreas = [["x1x1"]];
+    state.form.layoutTemplate.templateAreas = state.form.layoutTemplate.templateAreas;
+    // state.form.layoutTemplate.templateAreas = [["x1x1"]];
     // reaction(
     //   () => state.form.layoutTemplate.content,
     //   content => {
@@ -117,34 +117,36 @@ export class CorewebEditor extends MobxLitElement {
   // }
 
   #getColumnsTemplateStr() {
-    return this.templateAreas[0].reduce((res) => res + ' 1fr', 'grid-template-columns: ');
+    const {templateAreas} = state.form.layoutTemplate;
+    return templateAreas[0].reduce((res) => res + ' 1fr', 'grid-template-columns: ');
   }
 
   #getRowTemplateStr() {
-    return this.templateAreas.reduce((res, row) => `${res}'${row.join(' ')}'`, 'grid-template-areas:');
+    const {templateAreas} = state.form.layoutTemplate;
+    return templateAreas.reduce((res, row) => `${res}'${row.join(' ')}'`, 'grid-template-areas:');
   }
 
   #getMappedRowTemplateStr() {
     const layoutDefinitions = state.form.fieldLayoutDefinitions;
-    const templateAreas = this.templateAreas.map(areas =>
+    const templateAreas = state.form.layoutTemplate.templateAreas.map(areas =>
       areas.map(area => layoutDefinitions.get(area).field.fieldName));
     return templateAreas.reduce((res, row) => `${res}'${row.join(' ')}'`, 'grid-template-areas:');
   }
 
   addColumn() {
     this.saveState();
-    const cols = this.templateAreas[0].length+1;
-    this.templateAreas.forEach((ta, i)=>{
+    const cols = state.form.layoutTemplate.templateAreas[0].length+1;
+    state.form.layoutTemplate.templateAreas.forEach((ta, i)=>{
       ta.push(`x${i+1}x${cols}`)
     })
     this.update();
   }
 
   deleteColumn() {
-    const cols = this.templateAreas[0].length;
+    const cols = state.form.layoutTemplate.templateAreas[0].length;
     if (cols > 1) {
       this.saveState();
-      this.templateAreas.forEach((ta, i) => {
+      state.form.layoutTemplate.templateAreas.forEach((ta, i) => {
         ta.pop();
       });
       this.#mergeLayoutsWithAreas();
@@ -154,7 +156,7 @@ export class CorewebEditor extends MobxLitElement {
 
   // #getCellTemlates() {
   //   const fields = state.form.fields;
-  //   return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
+  //   return [...new Set(state.form.layoutTemplate.templateAreas.flat())].map((cell,i)=>{
   //       return html`<form-field draggable="true" .field="${fields[cell]}"
   //                             ondrag="this.classList.add('selected')"
   //                             ondragend="this.classList.remove('selected')"
@@ -170,8 +172,9 @@ export class CorewebEditor extends MobxLitElement {
   // }
 
   #getCellTemlates() {
+    const {templateAreas} = state.form.layoutTemplate;
     const {fields, fieldLayoutDefinitions} = state.form;
-    return [...new Set(this.templateAreas.flat())].map((cell,i)=>{
+    return [...new Set(templateAreas.flat())].map((cell,i)=>{
       let layoutDefinition = fieldLayoutDefinitions.get(cell) || state.form.newFieldLayoutDefinition(cell);
 
       return html`<layout-definition-field draggable="true"
@@ -200,11 +203,11 @@ export class CorewebEditor extends MobxLitElement {
                    @click="${this.splitCell}">Split</button>`:''}
               <div class="arrow top" ?hidden=${this.hoverCell.direction.top === 0}
                    @click="${()=>this.prepareJoinCell('up')}">🡁</div>
-              <div class="arrow bottom" ?hidden=${this.hoverCell.direction.down === this.templateAreas.length-1}
+              <div class="arrow bottom" ?hidden=${this.hoverCell.direction.down === state.form.layoutTemplate.templateAreas.length-1}
                    @click="${()=>this.prepareJoinCell('down')}">🡃</div>
               <div class="arrow left" ?hidden=${this.hoverCell.direction.left === 0}
                    @click="${()=>this.prepareJoinCell('left')}">🡀</div>
-              <div class="arrow right" ?hidden=${this.hoverCell.direction.right === this.templateAreas[0].length-1}
+              <div class="arrow right" ?hidden=${this.hoverCell.direction.right === state.form.layoutTemplate.templateAreas[0].length-1}
                    @click="${()=>this.prepareJoinCell('right')}">🡂</div>
             </div>`:''}`
   }
@@ -244,13 +247,13 @@ export class CorewebEditor extends MobxLitElement {
       return;
     if (node.nodeName === 'LAYOUT-DEFINITION-FIELD') {
       this.hoverCell = {area:node.dataset['area'], direction:{}};
-      let flatAreas = this.templateAreas.flat();
+      let flatAreas = state.form.layoutTemplate.templateAreas.flat();
       let startIndex = flatAreas.indexOf(this.hoverCell.area);
       let lastIndex = flatAreas.lastIndexOf(this.hoverCell.area);
-      this.hoverCell.direction.left = startIndex%this.templateAreas[0].length;
-      this.hoverCell.direction.right = lastIndex%this.templateAreas[0].length;
-      this.hoverCell.direction.top = (startIndex/this.templateAreas[0].length)>>0;
-      this.hoverCell.direction.down = (lastIndex/this.templateAreas[0].length)>>0;
+      this.hoverCell.direction.left = startIndex%state.form.layoutTemplate.templateAreas[0].length;
+      this.hoverCell.direction.right = lastIndex%state.form.layoutTemplate.templateAreas[0].length;
+      this.hoverCell.direction.top = (startIndex/state.form.layoutTemplate.templateAreas[0].length)>>0;
+      this.hoverCell.direction.down = (lastIndex/state.form.layoutTemplate.templateAreas[0].length)>>0;
       this.hoverCell.dataType = node.layoutDefinition?.field?.dataType;
       this.hoverCell.layoutDefinition = node.layoutDefinition;
       this.hoverCell.isMultiCell = startIndex !== lastIndex;
@@ -260,12 +263,12 @@ export class CorewebEditor extends MobxLitElement {
 
   addRow() {
     this.saveState();
-    const rows = this.templateAreas.length+1;
+    const rows = state.form.layoutTemplate.templateAreas.length+1;
     let row = [];
-    this.templateAreas[0].forEach((ta, i) => {
+    state.form.layoutTemplate.templateAreas[0].forEach((ta, i) => {
       row[i] = `x${rows}x${i+1}`;
     })
-    this.templateAreas.push(row);
+    state.form.layoutTemplate.templateAreas.push(row);
     this.update();
   }
 
@@ -274,23 +277,23 @@ export class CorewebEditor extends MobxLitElement {
   // }
 
   deleteRow() {
-    if (this.templateAreas.length > 1) {
+    if (state.form.layoutTemplate.templateAreas.length > 1) {
       this.saveState();
-      this.templateAreas.pop();
+      state.form.layoutTemplate.templateAreas.pop();
       this.#mergeLayoutsWithAreas();
       this.update();
     }
   }
 
-  saveState(state = JSON.parse(JSON.stringify(this.templateAreas))) {
+  saveState(s = JSON.parse(JSON.stringify(state.form.layoutTemplate.templateAreas))) {
     if (this.#templateChanges.length > 20)
       this.#templateChanges.shift();
-    this.#templateChanges.push(state);
+    this.#templateChanges.push(s);
   }
 
   undo() {
     if (this.#templateChanges.length > 0) {
-      this.templateAreas = this.#templateChanges.pop();
+      state.form.layoutTemplate.templateAreas = this.#templateChanges.pop();
       this.update();
     }
   }
@@ -320,16 +323,16 @@ export class CorewebEditor extends MobxLitElement {
       let destArea;
       switch (direction) {
         case 'up':
-          destArea = this.templateAreas[top-1][left];
+          destArea = state.form.layoutTemplate.templateAreas[top-1][left];
           break;
         case 'down':
-          destArea = this.templateAreas[down+1][right];
+          destArea = state.form.layoutTemplate.templateAreas[down+1][right];
           break;
         case 'left':
-          destArea = this.templateAreas[top][left-1];
+          destArea = state.form.layoutTemplate.templateAreas[top][left-1];
           break;
         case 'right':
-          destArea = this.templateAreas[down][right+1];
+          destArea = state.form.layoutTemplate.templateAreas[down][right+1];
           break;
         default:
           if (direction instanceof Event)
@@ -345,7 +348,7 @@ export class CorewebEditor extends MobxLitElement {
     let [,row2,col2] = cell2.split('x');
     let rows = [];
     let cols = [];
-    this.templateAreas.forEach((row,i)=>{
+    state.form.layoutTemplate.templateAreas.forEach((row,i)=>{
       row.forEach((cell,j)=> {
         let [, r, c] = cell.split('x');
         if ((row1 == r && col1 == c) || (row2 == r && col2 == c)) {
@@ -358,30 +361,30 @@ export class CorewebEditor extends MobxLitElement {
     const len = points.colMax-points.colMin+1;
     let fillArray = new Array(len).fill(`x${row1}x${col1}`);
     for (let i=0; i<=points.rowMax-points.rowMin; i++)
-      this.templateAreas[points.rowMin-1+i].splice(points.colMin-1, len, ...fillArray);
+      state.form.layoutTemplate.templateAreas[points.rowMin-1+i].splice(points.colMin-1, len, ...fillArray);
     //this.getSelection().classList.remove('selected');
     this.hoverCell = null;
     this.#mergeLayoutsWithAreas();
-    this.update(this.templateAreas);
+    this.update(state.form.layoutTemplate.templateAreas);
   }
 
   splitCell() {
     this.saveState();
     let area = this.hoverCell.area;
-    this.templateAreas.forEach((row,i)=>{
+    state.form.layoutTemplate.templateAreas.forEach((row,i)=>{
       row.forEach((cell,j)=> {
         if (cell === area) {
-          this.templateAreas[i][j] = `x${i+1}x${j+1}`;
+          state.form.layoutTemplate.templateAreas[i][j] = `x${i+1}x${j+1}`;
         }
       })
     })
     this.hoverCell = null;
-    this.update(this.templateAreas);
+    this.update(state.form.layoutTemplate.templateAreas);
   }
 
   #mergeLayoutsWithAreas() {
     const layoutDefinitionKeys = [...state.form.fieldLayoutDefinitions.keys()];
-    const areas = [...new Set(this.templateAreas.flat())];
+    const areas = [...new Set(state.form.layoutTemplate.templateAreas.flat())];
     for (const area of layoutDefinitionKeys) {
       if (!areas.includes(area))
         state.form.removeFieldLayoutDefinition(area);
@@ -471,20 +474,26 @@ export class CorewebEditor extends MobxLitElement {
     const content = this.makeTemplateContent();
     console.log('saveForm', content)
     form.setTemplateContent(content);
-    // form.save();
+    form.save();
   }
 
+//   makeTemplateContent() {
+//     return `
+// <!-- Generated with visual coreweb editor -->
+// <div data-container-id="Fields" ></div>
+// <style id="corewebEditor">
+//   [data-container-id="Fields"] {
+//     display: grid;
+//     ${this.#getColumnsTemplateStr()};
+//     ${this.#getMappedRowTemplateStr()}
+//   }
+// </style>
+// `;
+//   }
   makeTemplateContent() {
     return `
 <!-- Generated with visual coreweb editor -->
-<div data-container-id="Fields"></div>
-<style id="corewebEditor">
-  [data-container-id="Fields"] {
-    display: grid;
-    ${this.#getColumnsTemplateStr()};
-    ${this.#getMappedRowTemplateStr()}
-  }
-</style>
+<div data-container-id="Fields" style="display: grid;${this.#getColumnsTemplateStr()};${this.#getMappedRowTemplateStr()};"></div>
 `;
   }
 

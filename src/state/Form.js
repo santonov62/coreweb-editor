@@ -15,8 +15,8 @@ export class Form {
   layout
   layoutContainer
   layoutTemplate
-  fields = []
-  fieldLayoutDefinitions = new Map()
+  fields
+  fieldLayoutDefinitions
   name
   id
   type
@@ -36,6 +36,8 @@ export class Form {
     this.layout = new Layout({form: this});
     this.state = data.state;
     this.deletedFieldLayoutDefinitions = [];
+    this.fields = [];
+    this.fieldLayoutDefinitions = new Map();
   }
 
   // removeField(area) {
@@ -49,7 +51,7 @@ export class Form {
   //   this.fields[area] = new Field({id, fieldName, dataType});
   // }
 
-  addField({id = `-${Date.now()}`, fieldName = '', dataType = ''}, area) {
+  addField({id = `${Date.now()}`, fieldName = '', dataType = ''}, area) {
     const field = new Field({id, fieldName, dataType});
     this.fields.push(field);
     return field;
@@ -71,16 +73,40 @@ export class Form {
       }
 
       const fieldLayoutDefinitionBeans = await api.getFieldLayoutDefinitions({layoutId: form.layout.id});
-      const fieldLayoutDefinitions = new Map(fieldLayoutDefinitionBeans.map((bean, index) => {
+      // const fieldLayoutDefinitions = new Map(fieldLayoutDefinitionBeans.map((bean, index) => {
+      //   const layout = new FieldLayoutDefinition().fromDatabean(bean);
+      //   layout.field = fields.find(field => field.id === layout.fieldId);
+      //   layout.area = `x${index}x1`;
+      //   return [layout.area, layout];
+      // }));
+      const fieldLayoutDefinitions = fieldLayoutDefinitionBeans.map((bean, index) => {
         const layout = new FieldLayoutDefinition().fromDatabean(bean);
         layout.field = fields.find(field => field.id === layout.fieldId);
-        layout.area = `x${index}x1`;
-        return [layout.area, layout];
-      }));
+        return layout;
+      });
+
+      const fieldAreas = form.layoutTemplate.parseFieldAreas();
+      const templateAreas = [...fieldAreas];
+      const areaToFieldNameMap = new Map();
+      const fieldLayoutDefinitionsMap = new Map();
+      fieldAreas.forEach((fieldAreas, line) => {
+        fieldAreas.forEach((fieldName, col) => {
+          let area = `x${line}x${col}`;
+          if (areaToFieldNameMap.has(fieldName)) {
+            area = areaToFieldNameMap.get(fieldName);
+          } else {
+            areaToFieldNameMap.set(fieldName, area);
+            fieldLayoutDefinitionsMap.set(area, fieldLayoutDefinitions.find(({field}) => field.fieldName === fieldName))
+          }
+          templateAreas[line][col] = area;
+        });
+      });
+      form.layoutTemplate.templateAreas = templateAreas;
+
 
       runInAction(() => {
         this.fields = fields;
-        this.fieldLayoutDefinitions = fieldLayoutDefinitions;
+        this.fieldLayoutDefinitions = fieldLayoutDefinitionsMap;
         this.fieldsForDelete = [];
       });
     } finally {

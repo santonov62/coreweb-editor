@@ -1,27 +1,20 @@
 import {makeAutoObservable, makeObservable, observable, runInAction, get, set} from 'mobx';
 import {getForms} from "../api";
 import {Form} from "./Form";
+import {Editor} from "./Editor";
 
 export class State {
   isLoading = false
   formsList = []
   form
-  templateAreas
+  editor
 
   constructor() {
-    makeAutoObservable(this);
+    makeAutoObservable(this, {
+      editor: false
+    });
     this.form = new Form({state: this});
-    this.templateAreas = [["x1x1"]];
-  }
-
-  parseAreas(content) {
-    const template = document.createElement('template');
-    template.innerHTML = content.toString();
-    const container = template.content.querySelector('[data-container-id]');
-    console.log(`layoutTemplate container`, container);
-    return container.style.gridTemplateAreas
-      .split('" "')
-      .map(area => area.replaceAll('"', '').split(' '));
+    this.editor = new Editor({state: this});
   }
 
   async loadAllForms() {
@@ -51,7 +44,6 @@ export class State {
     runInAction(() => {
       this.form = form;
       form.loadDependencies();
-      this.templateAreas = this.parseAreas(form.layoutTemplate.content);
     });
   }
 
