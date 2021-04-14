@@ -22,8 +22,20 @@ export class AvailableFields extends MobxLitElement {
   }
 
   render() {
-    const layoutDefinitions = [...state.form.fieldLayoutDefinitions.values()];
-    const fields = state.form.fields.filter(({id}) => layoutDefinitions.findIndex(({fieldId}) => id === fieldId) === -1);
+    const layoutDefinitions = state.form.fieldLayoutDefinitions;
+    const {templateAreas} = state.form.layoutTemplate;
+    const areas = [...new Set(templateAreas.flat())];
+    const fieldIdsWithLayout = [...layoutDefinitions.entries()]
+      .reduce((acc, [area, {field}]) => {
+        if (field?.id && areas.includes(area)) {
+          acc.push(field.id);
+        }
+        return acc;
+      }, []);
+
+    const fields = state.form.fields.filter(({id}) => {
+      return !fieldIdsWithLayout.includes(id);
+    });
     if (fields.length === 0)
       return nothing;
 

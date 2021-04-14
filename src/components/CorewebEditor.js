@@ -94,7 +94,7 @@ export class CorewebEditor extends MobxLitElement {
   constructor() {
     super();
     // const editor = this;
-    state.form.layoutTemplate.templateAreas = state.form.layoutTemplate.templateAreas;
+    this.templateAreas = state.form.layoutTemplate.templateAreas;
     // state.form.layoutTemplate.templateAreas = [["x1x1"]];
     // reaction(
     //   () => state.form.layoutTemplate.content,
@@ -134,25 +134,33 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   addColumn() {
-    this.saveState();
-    const cols = state.form.layoutTemplate.templateAreas[0].length+1;
-    state.form.layoutTemplate.templateAreas.forEach((ta, i)=>{
-      ta.push(`x${i+1}x${cols}`)
-    })
-    this.update();
+    state.form.layoutTemplate.addColumn();
   }
 
+  // addColumn() {
+  //   this.saveState();
+  //   const cols = state.form.layoutTemplate.templateAreas[0].length+1;
+  //   state.form.layoutTemplate.templateAreas.forEach((ta, i)=>{
+  //     ta.push(`x${i+1}x${cols}`)
+  //   })
+  //   this.update();
+  // }
+
   deleteColumn() {
-    const cols = state.form.layoutTemplate.templateAreas[0].length;
-    if (cols > 1) {
-      this.saveState();
-      state.form.layoutTemplate.templateAreas.forEach((ta, i) => {
-        ta.pop();
-      });
-      this.#mergeLayoutsWithAreas();
-      this.update();
-    }
+    state.form.layoutTemplate.deleteColumn();
   }
+
+  // deleteColumn() {
+  //   const cols = state.form.layoutTemplate.templateAreas[0].length;
+  //   if (cols > 1) {
+  //     this.saveState();
+  //     state.form.layoutTemplate.templateAreas.forEach((ta, i) => {
+  //       ta.pop();
+  //     });
+  //     this.#mergeLayoutsWithAreas();
+  //     this.update();
+  //   }
+  // }
 
   // #getCellTemlates() {
   //   const fields = state.form.fields;
@@ -262,14 +270,16 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   addRow() {
-    this.saveState();
-    const rows = state.form.layoutTemplate.templateAreas.length+1;
-    let row = [];
-    state.form.layoutTemplate.templateAreas[0].forEach((ta, i) => {
-      row[i] = `x${rows}x${i+1}`;
-    })
-    state.form.layoutTemplate.templateAreas.push(row);
-    this.update();
+    // this.saveState();
+    // const {layoutTemplate} = state.form;
+    state.form.layoutTemplate.addRow();
+    // const rows = state.form.layoutTemplate.templateAreas.length+1;
+    // let row = [];
+    // state.form.layoutTemplate.templateAreas[0].forEach((ta, i) => {
+    //   row[i] = `x${rows}x${i+1}`;
+    // })
+    // state.form.layoutTemplate.templateAreas.push(row);
+    // this.update();
   }
 
   // addField() {
@@ -277,38 +287,39 @@ export class CorewebEditor extends MobxLitElement {
   // }
 
   deleteRow() {
-    if (state.form.layoutTemplate.templateAreas.length > 1) {
-      this.saveState();
-      state.form.layoutTemplate.templateAreas.pop();
-      this.#mergeLayoutsWithAreas();
-      this.update();
-    }
+    const {layoutTemplate} = state.form;
+    state.form.layoutTemplate.deleteRow();
   }
 
-  saveState(s = JSON.parse(JSON.stringify(state.form.layoutTemplate.templateAreas))) {
-    if (this.#templateChanges.length > 20)
-      this.#templateChanges.shift();
-    this.#templateChanges.push(s);
-  }
+  // saveState(cmpState) {
+  //   const {layoutTemplate} = state.form;
+  //   cmpState = cmpState || JSON.parse(JSON.stringify(layoutTemplate.templateAreas));
+  //   if (this.#templateChanges.length > 20)
+  //     this.#templateChanges.shift();
+  //   this.#templateChanges.push(cmpState);
+  // }
 
+  // undo() {
+  //   if (this.#templateChanges.length > 0) {
+  //     state.form.layoutTemplate.templateAreas = this.#templateChanges.pop();
+  //     // this.update();
+  //   }
+  // }
   undo() {
-    if (this.#templateChanges.length > 0) {
-      state.form.layoutTemplate.templateAreas = this.#templateChanges.pop();
-      this.update();
-    }
+    state.form.layoutTemplate.undo();
   }
 
-  getHTMLTemplate() {
-    return CorewebEditor.containerStyles + '\n' + this.shadowRoot.querySelector('.container').outerHTML;
-  }
+  // getHTMLTemplate() {
+  //   return CorewebEditor.containerStyles + '\n' + this.shadowRoot.querySelector('.container').outerHTML;
+  // }
 
-  /**
-   * deprecated
-   * @returns {Element}
-   */
-  getSelection() {
-    return this.shadowRoot.querySelector('.container .selected');
-  }
+  // /**
+  //  * deprecated
+  //  * @returns {Element}
+  //  */
+  // getSelection() {
+  //   return this.shadowRoot.querySelector('.container .selected');
+  // }
 
   /**
    * Prepare for join source and destination cell as rectangle
@@ -321,18 +332,19 @@ export class CorewebEditor extends MobxLitElement {
       let down = this.hoverCell.direction.down;
       let right = this.hoverCell.direction.right;
       let destArea;
+      const templateAreas = state.form.layoutTemplate.templateAreas;
       switch (direction) {
         case 'up':
-          destArea = state.form.layoutTemplate.templateAreas[top-1][left];
+          destArea = templateAreas[top-1][left];
           break;
         case 'down':
-          destArea = state.form.layoutTemplate.templateAreas[down+1][right];
+          destArea = templateAreas[down+1][right];
           break;
         case 'left':
-          destArea = state.form.layoutTemplate.templateAreas[top][left-1];
+          destArea = templateAreas[top][left-1];
           break;
         case 'right':
-          destArea = state.form.layoutTemplate.templateAreas[down][right+1];
+          destArea = templateAreas[down][right+1];
           break;
         default:
           if (direction instanceof Event)
@@ -343,53 +355,66 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   joinCell(cell1, cell2) {
-    this.saveState();
-    let [,row1,col1] = cell1.split('x');
-    let [,row2,col2] = cell2.split('x');
-    let rows = [];
-    let cols = [];
-    state.form.layoutTemplate.templateAreas.forEach((row,i)=>{
-      row.forEach((cell,j)=> {
-        let [, r, c] = cell.split('x');
-        if ((row1 == r && col1 == c) || (row2 == r && col2 == c)) {
-          rows.push(i+1);
-          cols.push(j+1);
-        }
-      })
-    })
-    let points = {rowMin: Math.min(...rows), rowMax: Math.max(...rows), colMin: Math.min(...cols), colMax: Math.max(...cols)};
-    const len = points.colMax-points.colMin+1;
-    let fillArray = new Array(len).fill(`x${row1}x${col1}`);
-    for (let i=0; i<=points.rowMax-points.rowMin; i++)
-      state.form.layoutTemplate.templateAreas[points.rowMin-1+i].splice(points.colMin-1, len, ...fillArray);
-    //this.getSelection().classList.remove('selected');
+    state.form.layoutTemplate.joinCell(cell1, cell2);
     this.hoverCell = null;
-    this.#mergeLayoutsWithAreas();
-    this.update(state.form.layoutTemplate.templateAreas);
+    // this.update();
   }
+  // joinCell(cell1, cell2) {
+  //   this.saveState();
+  //   let [,row1,col1] = cell1.split('x');
+  //   let [,row2,col2] = cell2.split('x');
+  //   let rows = [];
+  //   let cols = [];
+  //   const {templateAreas} = state.form.layoutTemplate;
+  //   templateAreas.forEach((row, i)=>{
+  //     row.forEach((cell,j)=> {
+  //       let [, r, c] = cell.split('x');
+  //       if ((row1 == r && col1 == c) || (row2 == r && col2 == c)) {
+  //         rows.push(i+1);
+  //         cols.push(j+1);
+  //       }
+  //     })
+  //   })
+  //   let points = {rowMin: Math.min(...rows), rowMax: Math.max(...rows), colMin: Math.min(...cols), colMax: Math.max(...cols)};
+  //   const len = points.colMax-points.colMin+1;
+  //   let fillArray = new Array(len).fill(`x${row1}x${col1}`);
+  //   for (let i=0; i<=points.rowMax-points.rowMin; i++)
+  //     templateAreas[points.rowMin-1+i].splice(points.colMin-1, len, ...fillArray);
+  //   //this.getSelection().classList.remove('selected');
+  //   this.hoverCell = null;
+  //   this.#mergeLayoutsWithAreas();
+  //   this.update(templateAreas);
+  // }
 
+  // splitCell() {
+  //   this.saveState();
+  //   let area = this.hoverCell.area;
+  //   state.form.layoutTemplate.templateAreas.forEach((row,i)=>{
+  //     row.forEach((cell,j)=> {
+  //       if (cell === area) {
+  //         state.form.layoutTemplate.templateAreas[i][j] = `x${i+1}x${j+1}`;
+  //       }
+  //     })
+  //   })
+  //   this.hoverCell = null;
+  //   this.update(state.form.layoutTemplate.templateAreas);
+  // }
   splitCell() {
-    this.saveState();
     let area = this.hoverCell.area;
-    state.form.layoutTemplate.templateAreas.forEach((row,i)=>{
-      row.forEach((cell,j)=> {
-        if (cell === area) {
-          state.form.layoutTemplate.templateAreas[i][j] = `x${i+1}x${j+1}`;
-        }
-      })
-    })
+    state.form.layoutTemplate.splitCell(area);
     this.hoverCell = null;
-    this.update(state.form.layoutTemplate.templateAreas);
+    // this.update();
   }
 
-  #mergeLayoutsWithAreas() {
-    const layoutDefinitionKeys = [...state.form.fieldLayoutDefinitions.keys()];
-    const areas = [...new Set(state.form.layoutTemplate.templateAreas.flat())];
-    for (const area of layoutDefinitionKeys) {
-      if (!areas.includes(area))
-        state.form.removeFieldLayoutDefinition(area);
-    }
-  }
+  // #mergeLayoutsWithAreas() {
+  //   const {templateAreas} = state.form.layoutTemplate;
+  //   const layoutDefinitionKeys = [...state.form.fieldLayoutDefinitions.keys()];
+  //   const areas = [...new Set(templateAreas.flat())];
+  //   for (const area of layoutDefinitionKeys) {
+  //     if (!areas.includes(area))
+  //       state.form.removeFieldLayoutDefinition(area);
+  //   }
+  // }
 
   // /**
   //  * deprecated
@@ -454,6 +479,7 @@ export class CorewebEditor extends MobxLitElement {
   onDeleteField() {
     let layoutDefinition = this.hoverCell.layoutDefinition;
     layoutDefinition.clearField();
+    this.update();
   }
 
   // onDialogClose(e) {
@@ -471,9 +497,9 @@ export class CorewebEditor extends MobxLitElement {
 
   saveForm() {
     const form = state.form;
-    const content = this.makeTemplateContent();
-    console.log('saveForm', content)
-    form.setTemplateContent(content);
+    // const content = form.layoutTemplate.makeTemplateContent();
+    // console.log('saveForm -> content', content)
+    // form.setTemplateContent(content);
     form.save();
   }
 
@@ -490,16 +516,17 @@ export class CorewebEditor extends MobxLitElement {
 // </style>
 // `;
 //   }
-  makeTemplateContent() {
-    return `
-<!-- Generated with visual coreweb editor -->
-<div data-container-id="Fields" style="display: grid;${this.#getColumnsTemplateStr()};${this.#getMappedRowTemplateStr()};"></div>
-`;
-  }
 
-  get container() {
-    return this.shadowRoot.querySelector('.container')
-  }
+//   makeTemplateContent() {
+//     return `
+// <!-- Generated with visual coreweb editor -->
+// <div data-container-id="Fields" style="display: grid;${this.#getColumnsTemplateStr()};${this.#getMappedRowTemplateStr()};"></div>
+// `;
+//   }
+
+  // get container() {
+  //   return this.shadowRoot.querySelector('.container')
+  // }
 
   onFromNameChange(e) {
     const name = e.target.value;

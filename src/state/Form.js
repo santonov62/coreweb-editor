@@ -85,24 +85,7 @@ export class Form {
         return layout;
       });
 
-      const fieldAreas = form.layoutTemplate.parseFieldAreas();
-      const templateAreas = [...fieldAreas];
-      const areaToFieldNameMap = new Map();
-      const fieldLayoutDefinitionsMap = new Map();
-      fieldAreas.forEach((fieldAreas, line) => {
-        fieldAreas.forEach((fieldName, col) => {
-          let area = `x${line}x${col}`;
-          if (areaToFieldNameMap.has(fieldName)) {
-            area = areaToFieldNameMap.get(fieldName);
-          } else {
-            areaToFieldNameMap.set(fieldName, area);
-            fieldLayoutDefinitionsMap.set(area, fieldLayoutDefinitions.find(({field}) => field.fieldName === fieldName))
-          }
-          templateAreas[line][col] = area;
-        });
-      });
-      form.layoutTemplate.templateAreas = templateAreas;
-
+      const fieldLayoutDefinitionsMap = form.layoutTemplate.mapLayoutDefinitionsToAreas(fieldLayoutDefinitions);
 
       runInAction(() => {
         this.fields = fields;
@@ -150,6 +133,7 @@ export class Form {
       // }
 
       const formId = form.id;
+      form.layoutTemplate.makeTemplateContent();
       const {content, databean: {rootId = '', instanceId: id = ''} = {}} = form.layoutTemplate;
       await Promise.all([
         api.saveFormTemplate({content, formId, rootId, id}),
@@ -205,9 +189,9 @@ export class Form {
     return !this.databean || !this.databean.rootId;
   }
 
-  setTemplateContent(content) {
-    this.layoutTemplate.content = content;
-  }
+  // setTemplateContent(content) {
+  //   this.layoutTemplate.content = content;
+  // }
 
   newFieldLayoutDefinition(area) {
     const fieldLayoutDefinition = new FieldLayoutDefinition({name: area});
