@@ -164,15 +164,11 @@ export class CorewebEditor extends MobxLitElement {
     const {templateAreas} = state.form.layoutTemplate;
     const {fields, fieldLayoutDefinitions} = state.form;
     return [...new Set(templateAreas.flat())].map((cell,i)=>{
-      let layoutDefinition = fieldLayoutDefinitions.get(cell) || state.form.newFieldLayoutDefinition(cell);
+      const layoutDefinition = fieldLayoutDefinitions.get(cell) || state.form.newFieldLayoutDefinition(cell);
 
-      return html`<layout-definition-field draggable="true"
+      return html`<layout-definition-field
                         .layoutDefinition=${layoutDefinition}
                         .onAddFieldCallback="${this.onAddField.bind(this)}"
-                        ondrag="this.classList.add('selected')"
-                        ondragend="this.classList.remove('selected')"
-                        ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'move'"
-                        @drop="${this.prepareJoinCell}"
                         class="item"
                         tabindex="0"
                         data-area="${cell}"

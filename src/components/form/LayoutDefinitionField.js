@@ -71,8 +71,12 @@ export class LayoutDefinitionField extends MobxLitElement {
 
   constructor() {
     super();
+    this.setAttribute('draggable', 'true');
     this.addEventListener('mouseenter', this.#onMouseOver);
     this.addEventListener('mouseleave', this.#onMouseLeave);
+    this.addEventListener('drop', this.#onDrop);
+    this.addEventListener('dragover', (e) => e.preventDefault());
+    this.addEventListener('dragstart', this.#onDragStart.bind(this));
   }
 
   onDeleteField() {
@@ -161,10 +165,33 @@ export class LayoutDefinitionField extends MobxLitElement {
     state.form.selectedLayout = this.layoutDefinition;
   }
 
+  #onDragStart(e) {
+    const {layoutDefinition} = this;
+    const area = this.dataset['area'];
+    const data = {
+      fieldId: layoutDefinition.field?.id,
+      fromArea: area,
+    };
+    e.dataTransfer.setData('text/plain', JSON.stringify(data));
+    e.dataTransfer.effectAllowed = 'move';
+    console.log(`Drag data: `, data);
+  }
+
+  #onDrop(e) {
+    const {fieldId, fromArea} = JSON.parse(e.dataTransfer.getData('text'));
+    const dragField = state.form.fields.find(({id}) => id === fieldId);
+    const currentLayoutDefinition = this.layoutDefinition;
+    if (fromArea) {
+      const fromLayout = state.form.fieldLayoutDefinitions.get(fromArea);
+      fromLayout.update({field: currentLayoutDefinition.field});
+    }
+    currentLayoutDefinition.update({field: dragField});
+  }
+
   #getHoverCellTemplate() {
     const area = this.dataset['area'];
     return html`${this.hoverCell ? html`
-            <div style="grid-area: ${this.hoverCell.area};" class="cellEditor" draggable="true">
+            <div style="grid-area: ${area};" class="cellEditor" draggable="true">
               ${this.hoverCell?.dataType ? html`
                 <button style="margin-right: 8px;" @click="${this.onAddField}">Edit</button>
                 <button @click="${this.onDeleteField}">Delete</button>`:

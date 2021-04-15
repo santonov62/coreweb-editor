@@ -18,11 +18,40 @@ export class AvailableFields extends MobxLitElement {
       form-field {
         margin: 5px;
         max-width: 200px;
+        cursor: move;
+      }
+      form-field:hover {
+        background-color: rgb(9,154,239,0.11);
       }
     `, common];
   }
 
+  onDragStart(e) {
+    const data = {fieldId: e.currentTarget.field.id};
+    e.dataTransfer.setData('text/plain', JSON.stringify(data));
+    e.dataTransfer.effectAllowed = 'move';
+    console.log(`Drag data: `, data);
+  }
+
   render() {
+    const fields = this.#getUnassignedFields();
+    if (fields.length === 0)
+      return nothing;
+
+    return html`
+      <div class="availableFields">
+        <span class="header1">Unassigned fields</span>
+        <div>
+        ${fields.map((field, index) => html`
+          <form-field .field=${field}
+                      draggable=true @dragstart="${this.onDragStart}"></form-field>
+        `)}
+        </div>
+      </div>
+    `;
+  }
+
+  #getUnassignedFields() {
     const layoutDefinitions = state.form.fieldLayoutDefinitions;
     const {templateAreas} = state.form.layoutTemplate;
     const areas = [...new Set(templateAreas.flat())];
@@ -37,19 +66,7 @@ export class AvailableFields extends MobxLitElement {
     const fields = state.form.fields.filter(({id}) => {
       return !fieldIdsWithLayout.includes(id);
     });
-    if (fields.length === 0)
-      return nothing;
-
-    return html`
-      <div class="availableFields">
-        <span class="header1">Unassigned fields</span>
-        <div>
-        ${fields.map((field, index) => html`
-          <form-field .field=${field}></form-field>
-        `)}
-        </div>
-      </div>
-    `;
+    return fields;
   }
 }
 
