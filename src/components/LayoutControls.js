@@ -11,7 +11,7 @@ export class LayoutControls extends LitElement {
         margin: 15px;
         position: sticky;
         top: 20px;
-        z-index: 99999;
+        z-index: 2;
       }
     `, webadminButtonStyles];
   }

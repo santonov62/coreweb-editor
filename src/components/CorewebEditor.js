@@ -427,16 +427,17 @@ export class CorewebEditor extends MobxLitElement {
         <button @click="${this.saveForm}">Save</button>
       </div>
 
-      ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
-      <div style="width: 100%">
-        <layout-controls></layout-controls>
-        <div class="container" @mouseover="${this.onMouseOver}" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
-          ${this.#getCellTemlates()}
+      ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : html`
+        <div style="width: 100%">
+          <layout-controls></layout-controls>
+          <div class="container" @mouseover="${this.onMouseOver}" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
+            ${this.#getCellTemlates()}
+          </div>
+          <available-fields></available-fields>
         </div>
-        <available-fields></available-fields>
-      </div>
 
-      ${this.#getDialogTemplate()}
+        ${this.#getDialogTemplate()}
+      `}
     `;
   }
 

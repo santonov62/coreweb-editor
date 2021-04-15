@@ -1,20 +1,15 @@
 import {makeAutoObservable, makeObservable, observable, runInAction, get, set} from 'mobx';
 import {getForms} from "../api";
 import {Form} from "./Form";
-import {Editor} from "./Editor";
 
 export class State {
   isLoading = false
   formsList = []
   form
-  editor
 
   constructor() {
-    makeAutoObservable(this, {
-      editor: false
-    });
+    makeAutoObservable(this);
     this.form = new Form({state: this});
-    this.editor = new Editor({state: this});
   }
 
   async loadAllForms() {

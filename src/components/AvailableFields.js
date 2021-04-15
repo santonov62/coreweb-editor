@@ -12,16 +12,25 @@ export class AvailableFields extends MobxLitElement {
         margin: 0 10px 0 10px;
         align-self: stretch;
       }
+      .availableFields {
+        position: sticky;
+        bottom: 0;
+        z-index: 2;
+        background-color: #eaf3f6;
+        padding-top: 10px;
+        opacity: 0.9;
+        -webkit-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+        -moz-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+        box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+      }
       .availableFields > div {
         display: flex;
       }
-      form-field {
-        margin: 5px;
-        max-width: 200px;
+      form-field-short {
         cursor: move;
       }
-      form-field:hover {
-        background-color: rgb(9,154,239,0.11);
+      form-field-short:hover {
+        background-color: #e9f4fe;
       }
     `, common];
   }
@@ -41,10 +50,9 @@ export class AvailableFields extends MobxLitElement {
     return html`
       <div class="availableFields">
         <span class="header1">Unassigned fields</span>
-        <div>
+        <div style="padding: 5px">
         ${fields.map((field, index) => html`
-          <form-field .field=${field}
-                      draggable=true @dragstart="${this.onDragStart}"></form-field>
+          <form-field-short .field=${field} draggable=true @dragstart="${this.onDragStart}"></form-field-short>
         `)}
         </div>
       </div>

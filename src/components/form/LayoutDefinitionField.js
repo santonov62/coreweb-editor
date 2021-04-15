@@ -27,7 +27,7 @@ export class LayoutDefinitionField extends MobxLitElement {
       .cellEditor {
         background-color: rgb(9,154,239,0.11);
         border-radius: 5px;
-        z-index: 999;
+        z-index: 1;
         align-items: center;
         justify-content: center;
         display: flex;
