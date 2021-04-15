@@ -65,6 +65,7 @@ export class LayoutDefinitionField extends MobxLitElement {
     return {
       layoutDefinition: {type: Object},
       hoverCell: {type: Object},
+      onAddFieldCallback: {type: Function},
     }
   }
 
@@ -119,6 +120,10 @@ export class LayoutDefinitionField extends MobxLitElement {
     this.hoverCell = null;
   }
 
+  onAddField() {
+    this.onAddFieldCallback(this.dataset['area']);
+  }
+
   // disconnectedCallback() {
   //   super.disconnectedCallback();
   //   const {area} = this.dataset;
@@ -153,9 +158,11 @@ export class LayoutDefinitionField extends MobxLitElement {
     hoverCell.layoutDefinition = node.layoutDefinition;
     hoverCell.isMultiCell = startIndex !== lastIndex;
     this.hoverCell = hoverCell;
+    state.form.selectedLayout = this.layoutDefinition;
   }
 
   #getHoverCellTemplate() {
+    const area = this.dataset['area'];
     return html`${this.hoverCell ? html`
             <div style="grid-area: ${this.hoverCell.area};" class="cellEditor" draggable="true">
               ${this.hoverCell?.dataType ? html`

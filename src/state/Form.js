@@ -20,6 +20,7 @@ export class Form {
   name
   id
   type
+  selectedLayout
 
   constructor(data = {}) {
     makeAutoObservable(this, {
@@ -51,7 +52,7 @@ export class Form {
   //   this.fields[area] = new Field({id, fieldName, dataType});
   // }
 
-  addField({id = `${Date.now()}`, fieldName = '', dataType = ''}, area) {
+  addField({id = Date.now(), fieldName = '', dataType = ''}, area) {
     const field = new Field({id, fieldName, dataType});
     this.fields.push(field);
     return field;

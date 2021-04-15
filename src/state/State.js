@@ -8,7 +8,6 @@ export class State {
   formsList = []
   form
   editor
-  hoverCell
 
   constructor() {
     makeAutoObservable(this, {

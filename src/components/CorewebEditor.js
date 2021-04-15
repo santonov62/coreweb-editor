@@ -168,6 +168,7 @@ export class CorewebEditor extends MobxLitElement {
 
       return html`<layout-definition-field draggable="true"
                         .layoutDefinition=${layoutDefinition}
+                        .onAddFieldCallback="${this.onAddField.bind(this)}"
                         ondrag="this.classList.add('selected')"
                         ondragend="this.classList.remove('selected')"
                         ondragover="event.preventDefault(); event.dataTransfer.dropEffect = 'move'"
@@ -215,9 +216,9 @@ export class CorewebEditor extends MobxLitElement {
   // }
 
   #getDialogTemplate() {
-    if (!this.hoverCell)
+    if (!state.form.selectedLayout)
       return nothing;
-    const {layoutDefinition} = this.hoverCell;
+    const layoutDefinition = state.form.selectedLayout;
     const {field} = layoutDefinition;
     return html`
       <cw-dialog id="dialog" title="Add/Edit Field">
@@ -443,9 +444,14 @@ export class CorewebEditor extends MobxLitElement {
     `;
   }
 
-  onAddField(e) {
+  // onAddField(e) {
+  //   let dialog = this.shadowRoot.getElementById('dialog');
+  //   dialog.area = this.hoverCell.area;
+  //   dialog.showModal();
+  // }
+  onAddField(area) {
     let dialog = this.shadowRoot.getElementById('dialog');
-    dialog.area = this.hoverCell.area;
+    dialog.area = area;
     dialog.showModal();
   }
 
@@ -455,11 +461,11 @@ export class CorewebEditor extends MobxLitElement {
   //   this.updateCellByArea(area);
   // }
 
-  onDeleteField() {
-    let layoutDefinition = this.hoverCell.layoutDefinition;
-    layoutDefinition.clearField();
-    this.update();
-  }
+  // onDeleteField() {
+  //   let layoutDefinition = this.hoverCell.layoutDefinition;
+  //   layoutDefinition.clearField();
+  //   this.update();
+  // }
 
   // onDialogClose(e) {
   //   const dialog = e.target;
