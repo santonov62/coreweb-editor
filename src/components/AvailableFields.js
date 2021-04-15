@@ -8,7 +8,7 @@ export class AvailableFields extends MobxLitElement {
   static get styles() {
     return css`
       :host {
-        margin: 0 15px 0 15px;
+        margin: 0 10px 0 10px;
         align-self: stretch;
       }
       .availableFields > div {

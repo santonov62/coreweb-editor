@@ -5,3 +5,4 @@ import './components/form/EditField.js';
 import './components/form/AddField.js';
 import './components/form/LayoutDefinitionField.js';
 import './components/AvailableFields.js';
+import './components/LayoutControls.js';

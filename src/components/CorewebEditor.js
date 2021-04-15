@@ -2,7 +2,7 @@ import { LitElement, css } from 'lit-element';
 import {html, nothing} from 'lit-html';
 import {MobxLitElement} from "@adobe/lit-mobx";
 import {state} from '../state';
-import { buttonStyles } from './styles';
+import {buttonStyles, webadminButtonStyles} from './styles';
 import FieldDataTypeEnum from "../FieldDataTypeEnum";
 import {reaction} from "mobx";
 import {FieldLayoutDefinition} from "../state/FieldLayoutDefinition";
@@ -26,7 +26,7 @@ export class CorewebEditor extends MobxLitElement {
   static get styles() {
     return [css`
       :host {
-        height: 80vh;
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
@@ -44,20 +44,8 @@ export class CorewebEditor extends MobxLitElement {
         width: 100%;
       }
       .container {
-        padding: 20px;
+        margin-bottom: 20px;
         align-self: stretch;
-      }
-      .container form-field {
-        background: #3273dc;
-        color: white;
-        padding: 20px;
-        border-radius: 5px;
-      }
-      .container form-field:hover {
-        background: cornflowerblue;
-      }
-      .container form-field.selected {
-        background: blueviolet;
       }
       .cellEditor {
         background-color: rgba(15,15,15,0.25);
@@ -88,7 +76,7 @@ export class CorewebEditor extends MobxLitElement {
       .left {
         left:0
       }
-    `, buttonStyles, this.containerStyles];
+    `, webadminButtonStyles, this.containerStyles];
   }
 
   constructor() {
@@ -126,16 +114,9 @@ export class CorewebEditor extends MobxLitElement {
     return templateAreas.reduce((res, row) => `${res}'${row.join(' ')}'`, 'grid-template-areas:');
   }
 
-  #getMappedRowTemplateStr() {
-    const layoutDefinitions = state.form.fieldLayoutDefinitions;
-    const templateAreas = state.form.layoutTemplate.templateAreas.map(areas =>
-      areas.map(area => layoutDefinitions.get(area).field.fieldName));
-    return templateAreas.reduce((res, row) => `${res}'${row.join(' ')}'`, 'grid-template-areas:');
-  }
-
-  addColumn() {
-    state.form.layoutTemplate.addColumn();
-  }
+  // addColumn() {
+  //   state.form.layoutTemplate.addColumn();
+  // }
 
   // addColumn() {
   //   this.saveState();
@@ -146,9 +127,9 @@ export class CorewebEditor extends MobxLitElement {
   //   this.update();
   // }
 
-  deleteColumn() {
-    state.form.layoutTemplate.deleteColumn();
-  }
+  // deleteColumn() {
+  //   state.form.layoutTemplate.deleteColumn();
+  // }
 
   // deleteColumn() {
   //   const cols = state.form.layoutTemplate.templateAreas[0].length;
@@ -199,26 +180,26 @@ export class CorewebEditor extends MobxLitElement {
     })
   }
 
-  #getHoverCellTemplate() {
-    return html`${this.hoverCell ? html`
-            <div style="grid-area: ${this.hoverCell.area};" class="cellEditor" draggable="true">
-              ${this.hoverCell?.dataType ? html`
-                <button style="margin-right: 8px;" @click="${this.onAddField}">Edit</button>
-                <button @click="${this.onDeleteField}">Delete</button>`:
-                html`<button @click="${this.onAddField}">Add</button>`
-              }
-              ${this.hoverCell.isMultiCell ? html`<button style="margin-left: 8px;"
-                   @click="${this.splitCell}">Split</button>`:''}
-              <div class="arrow top" ?hidden=${this.hoverCell.direction.top === 0}
-                   @click="${()=>this.prepareJoinCell('up')}">🡁</div>
-              <div class="arrow bottom" ?hidden=${this.hoverCell.direction.down === state.form.layoutTemplate.templateAreas.length-1}
-                   @click="${()=>this.prepareJoinCell('down')}">🡃</div>
-              <div class="arrow left" ?hidden=${this.hoverCell.direction.left === 0}
-                   @click="${()=>this.prepareJoinCell('left')}">🡀</div>
-              <div class="arrow right" ?hidden=${this.hoverCell.direction.right === state.form.layoutTemplate.templateAreas[0].length-1}
-                   @click="${()=>this.prepareJoinCell('right')}">🡂</div>
-            </div>`:''}`
-  }
+  // #getHoverCellTemplate() {
+  //   return html`${this.hoverCell ? html`
+  //           <div style="grid-area: ${this.hoverCell.area};" class="cellEditor" draggable="true">
+  //             ${this.hoverCell?.dataType ? html`
+  //               <button style="margin-right: 8px;" @click="${this.onAddField}">Edit</button>
+  //               <button @click="${this.onDeleteField}">Delete</button>`:
+  //               html`<button @click="${this.onAddField}">Add</button>`
+  //             }
+  //             ${this.hoverCell.isMultiCell ? html`<button style="margin-left: 8px;"
+  //                  @click="${this.splitCell}">Split</button>`:''}
+  //             <div class="arrow top" ?hidden=${this.hoverCell.direction.top === 0}
+  //                  @click="${()=>this.prepareJoinCell('up')}">🡁</div>
+  //             <div class="arrow bottom" ?hidden=${this.hoverCell.direction.down === state.form.layoutTemplate.templateAreas.length-1}
+  //                  @click="${()=>this.prepareJoinCell('down')}">🡃</div>
+  //             <div class="arrow left" ?hidden=${this.hoverCell.direction.left === 0}
+  //                  @click="${()=>this.prepareJoinCell('left')}">🡀</div>
+  //             <div class="arrow right" ?hidden=${this.hoverCell.direction.right === state.form.layoutTemplate.templateAreas[0].length-1}
+  //                  @click="${()=>this.prepareJoinCell('right')}">🡂</div>
+  //           </div>`:''}`
+  // }
 
   // #getDialogTemplate() {
   //   return html`
@@ -250,46 +231,48 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   onMouseOver(evt) {
-    let node = evt.path[0];
-    if (node?.classList.contains('cellEditor') || evt.path[1]?.classList?.contains('cellEditor'))
-      return;
-    if (node.nodeName === 'LAYOUT-DEFINITION-FIELD') {
-      this.hoverCell = {area:node.dataset['area'], direction:{}};
-      let flatAreas = state.form.layoutTemplate.templateAreas.flat();
-      let startIndex = flatAreas.indexOf(this.hoverCell.area);
-      let lastIndex = flatAreas.lastIndexOf(this.hoverCell.area);
-      this.hoverCell.direction.left = startIndex%state.form.layoutTemplate.templateAreas[0].length;
-      this.hoverCell.direction.right = lastIndex%state.form.layoutTemplate.templateAreas[0].length;
-      this.hoverCell.direction.top = (startIndex/state.form.layoutTemplate.templateAreas[0].length)>>0;
-      this.hoverCell.direction.down = (lastIndex/state.form.layoutTemplate.templateAreas[0].length)>>0;
-      this.hoverCell.dataType = node.layoutDefinition?.field?.dataType;
-      this.hoverCell.layoutDefinition = node.layoutDefinition;
-      this.hoverCell.isMultiCell = startIndex !== lastIndex;
-    } else
-       this.hoverCell = null;
+    // let node = evt.path[0];
+    // if (node?.classList.contains('cellEditor') || evt.path[1]?.classList?.contains('cellEditor'))
+    //   return;
+    // if (node.nodeName === 'LAYOUT-DEFINITION-FIELD') {
+    //   const hoverCell = {area:node.dataset['area'], direction:{}};
+    //   const {templateAreas} = state.form.layoutTemplate;
+    //   let flatAreas = templateAreas.flat();
+    //   let startIndex = flatAreas.indexOf(hoverCell.area);
+    //   let lastIndex = flatAreas.lastIndexOf(hoverCell.area);
+    //   hoverCell.direction.left = startIndex%templateAreas[0].length;
+    //   hoverCell.direction.right = lastIndex%templateAreas[0].length;
+    //   hoverCell.direction.top = (startIndex/templateAreas[0].length)>>0;
+    //   hoverCell.direction.down = (lastIndex/templateAreas[0].length)>>0;
+    //   hoverCell.dataType = node.layoutDefinition?.field?.dataType;
+    //   hoverCell.layoutDefinition = node.layoutDefinition;
+    //   hoverCell.isMultiCell = startIndex !== lastIndex;
+    //   this.hoverCell = hoverCell;
+    // } else
+    //    this.hoverCell = null;
   }
 
-  addRow() {
-    // this.saveState();
-    // const {layoutTemplate} = state.form;
-    state.form.layoutTemplate.addRow();
-    // const rows = state.form.layoutTemplate.templateAreas.length+1;
-    // let row = [];
-    // state.form.layoutTemplate.templateAreas[0].forEach((ta, i) => {
-    //   row[i] = `x${rows}x${i+1}`;
-    // })
-    // state.form.layoutTemplate.templateAreas.push(row);
-    // this.update();
-  }
+  // addRow() {
+  //   // this.saveState();
+  //   // const {layoutTemplate} = state.form;
+  //   state.form.layoutTemplate.addRow();
+  //   // const rows = state.form.layoutTemplate.templateAreas.length+1;
+  //   // let row = [];
+  //   // state.form.layoutTemplate.templateAreas[0].forEach((ta, i) => {
+  //   //   row[i] = `x${rows}x${i+1}`;
+  //   // })
+  //   // state.form.layoutTemplate.templateAreas.push(row);
+  //   // this.update();
+  // }
 
   // addField() {
   //   state.form.addField({});
   // }
 
-  deleteRow() {
-    const {layoutTemplate} = state.form;
-    state.form.layoutTemplate.deleteRow();
-  }
+  // deleteRow() {
+  //   const {layoutTemplate} = state.form;
+  //   state.form.layoutTemplate.deleteRow();
+  // }
 
   // saveState(cmpState) {
   //   const {layoutTemplate} = state.form;
@@ -305,9 +288,10 @@ export class CorewebEditor extends MobxLitElement {
   //     // this.update();
   //   }
   // }
-  undo() {
-    state.form.layoutTemplate.undo();
-  }
+
+  // undo() {
+  //   state.form.layoutTemplate.undo();
+  // }
 
   // getHTMLTemplate() {
   //   return CorewebEditor.containerStyles + '\n' + this.shadowRoot.querySelector('.container').outerHTML;
@@ -321,44 +305,45 @@ export class CorewebEditor extends MobxLitElement {
   //   return this.shadowRoot.querySelector('.container .selected');
   // }
 
-  /**
-   * Prepare for join source and destination cell as rectangle
-   * @param direction can be ['up','down','left','right'] or drop event
-   */
-  prepareJoinCell(direction) {
-    if (this.hoverCell) {
-      let left = this.hoverCell.direction.left;
-      let top = this.hoverCell.direction.top;
-      let down = this.hoverCell.direction.down;
-      let right = this.hoverCell.direction.right;
-      let destArea;
-      const templateAreas = state.form.layoutTemplate.templateAreas;
-      switch (direction) {
-        case 'up':
-          destArea = templateAreas[top-1][left];
-          break;
-        case 'down':
-          destArea = templateAreas[down+1][right];
-          break;
-        case 'left':
-          destArea = templateAreas[top][left-1];
-          break;
-        case 'right':
-          destArea = templateAreas[down][right+1];
-          break;
-        default:
-          if (direction instanceof Event)
-            destArea = window.getComputedStyle(direction.target).gridRowStart;
-      }
-      this.joinCell(this.hoverCell.area, destArea);
-    }
-  }
+  // /**
+  //  * Prepare for join source and destination cell as rectangle
+  //  * @param direction can be ['up','down','left','right'] or drop event
+  //  */
+  // prepareJoinCell(direction) {
+  //   if (this.hoverCell) {
+  //     let left = this.hoverCell.direction.left;
+  //     let top = this.hoverCell.direction.top;
+  //     let down = this.hoverCell.direction.down;
+  //     let right = this.hoverCell.direction.right;
+  //     let destArea;
+  //     const templateAreas = state.form.layoutTemplate.templateAreas;
+  //     switch (direction) {
+  //       case 'up':
+  //         destArea = templateAreas[top-1][left];
+  //         break;
+  //       case 'down':
+  //         destArea = templateAreas[down+1][right];
+  //         break;
+  //       case 'left':
+  //         destArea = templateAreas[top][left-1];
+  //         break;
+  //       case 'right':
+  //         destArea = templateAreas[down][right+1];
+  //         break;
+  //       default:
+  //         if (direction instanceof Event)
+  //           destArea = window.getComputedStyle(direction.target).gridRowStart;
+  //     }
+  //     this.joinCell(this.hoverCell.area, destArea);
+  //   }
+  // }
 
-  joinCell(cell1, cell2) {
-    state.form.layoutTemplate.joinCell(cell1, cell2);
-    this.hoverCell = null;
-    // this.update();
-  }
+  // joinCell(cell1, cell2) {
+  //   state.form.layoutTemplate.joinCell(cell1, cell2);
+  //   this.hoverCell = null;
+  //   // this.update();
+  // }
+
   // joinCell(cell1, cell2) {
   //   this.saveState();
   //   let [,row1,col1] = cell1.split('x');
@@ -399,12 +384,13 @@ export class CorewebEditor extends MobxLitElement {
   //   this.hoverCell = null;
   //   this.update(state.form.layoutTemplate.templateAreas);
   // }
-  splitCell() {
-    let area = this.hoverCell.area;
-    state.form.layoutTemplate.splitCell(area);
-    this.hoverCell = null;
-    // this.update();
-  }
+
+  // splitCell() {
+  //   let area = this.hoverCell.area;
+  //   state.form.layoutTemplate.splitCell(area);
+  //   this.hoverCell = null;
+  //   // this.update();
+  // }
 
   // #mergeLayoutsWithAreas() {
   //   const {templateAreas} = state.form.layoutTemplate;
@@ -432,35 +418,28 @@ export class CorewebEditor extends MobxLitElement {
   render() {
     const {isLoading, formsList, form} = state;
     return html`
-          <div style="margin: 15px">
-            <button @click="${this.addRow}">Add Row</button>
-            <button @click="${this.deleteRow}">Delete Row</button>
-            <button @click="${this.addColumn}">Add Column</button>
-            <button @click="${this.deleteColumn}">Delete Column</button>
-            <button @click="${this.undo}">Undo</button>
-          </div>
+      ${isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
 
-          ${isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
+      <div class="form-name-container">
+        <label for="formName">Form name: </label>
+        <select @change=${this.onFormSelect}>
+          <option value="">New form --></option>
+          ${formsList.map(({id, name}) => html`<option value=${id}>${name}</option>`)}
+        </select>
+        <input id="formName" value="" type="text" @change=${this.onFromNameChange} ?hidden=${!!form.databean} />
+        <button @click="${this.saveForm}">Save</button>
+      </div>
 
-          <div class="form-name-container">
-            <label for="formName">Form name: </label>
-            <select @change=${this.onFormSelect}>
-              <option value="">New form --></option>
-              ${formsList.map(({id, name}) => html`<option value=${id}>${name}</option>`)}
-            </select>
-            <input id="formName" value="" type="text" @change=${this.onFromNameChange} ?hidden=${!!form.databean} />
-            <button @click="${this.saveForm}">Save</button>
-          </div>
+      ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
+      <div style="width: 100%">
+        <layout-controls></layout-controls>
+        <div class="container" @mouseover="${this.onMouseOver}" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
+          ${this.#getCellTemlates()}
+        </div>
+        <available-fields></available-fields>
+      </div>
 
-          ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
-          <div class="container" @mouseover="${this.onMouseOver}" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
-            ${this.#getCellTemlates()}
-            ${this.#getHoverCellTemplate()}
-          </div>
-
-          <available-fields></available-fields>
-
-          ${this.#getDialogTemplate()}
+      ${this.#getDialogTemplate()}
     `;
   }
 

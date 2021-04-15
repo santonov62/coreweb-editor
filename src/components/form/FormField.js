@@ -29,10 +29,11 @@ export class FormField extends MobxLitElement {
         align-items: flex-start;
         justify-content: flex-start;
         position: relative;
-        background: #3273dc;
-        color: white;
+        background: #fff;
         padding: 20px;
         border-radius: 5px;
+        min-height: 60px;
+        color: #2c789e;
       }
       select {
         margin: 10px 0 10px 0;
@@ -69,9 +70,6 @@ export class FormField extends MobxLitElement {
     //     <a href=${editUrl} target="_blank">Open field</a>
     //   </div>
     return html`
-      <div class="controls">
-        <a href=${editUrl} target="_blank">Open field</a>
-      </div>
       <h2>${dataType}</h2>
       <div class="component">
         ${renderFieldComponent(field)}
