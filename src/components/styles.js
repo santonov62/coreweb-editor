@@ -41,3 +41,13 @@ export const webadminButtonStyles = css`
       text-shadow: 0px -1px 0 #1a242c;
     }
 `;
+
+export const common = css`
+  .header1 {
+    font: 22px/24px Arial, Helvetica, sans-serif;
+    text-decoration: none;
+    color: #2683B3;
+    padding: 18px 0 0 0;
+    text-shadow: 0 -1px 0 #5f6d76;
+  }
+`;

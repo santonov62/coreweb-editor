@@ -21,6 +21,9 @@ export class LayoutDefinitionField extends MobxLitElement {
         border: 2px dashed rgb(117 169 191);
         background: #fff;
       }
+      form-field {
+        border: 0px;
+      }
       .cellEditor {
         background-color: rgb(9,154,239,0.11);
         border-radius: 5px;

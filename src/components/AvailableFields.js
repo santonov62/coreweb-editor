@@ -2,11 +2,12 @@ import {MobxLitElement} from "@adobe/lit-mobx";
 import {css, html} from "lit-element";
 import {state} from '../state';
 import {nothing} from "lit-html";
+import {common} from "./styles";
 
 export class AvailableFields extends MobxLitElement {
 
   static get styles() {
-    return css`
+    return [css`
       :host {
         margin: 0 10px 0 10px;
         align-self: stretch;
@@ -18,7 +19,7 @@ export class AvailableFields extends MobxLitElement {
         margin: 5px;
         max-width: 200px;
       }
-    `;
+    `, common];
   }
 
   render() {
@@ -41,8 +42,7 @@ export class AvailableFields extends MobxLitElement {
 
     return html`
       <div class="availableFields">
-        Unassigned fields:
-        <hr />
+        <span class="header1">Unassigned fields</span>
         <div>
         ${fields.map((field, index) => html`
           <form-field .field=${field}></form-field>

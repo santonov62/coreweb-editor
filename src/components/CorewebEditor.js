@@ -44,7 +44,7 @@ export class CorewebEditor extends MobxLitElement {
         width: 100%;
       }
       .container {
-        margin-bottom: 20px;
+        margin-bottom: 40px;
         align-self: stretch;
       }
       .cellEditor {

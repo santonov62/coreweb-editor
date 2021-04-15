@@ -34,6 +34,7 @@ export class FormField extends MobxLitElement {
         border-radius: 5px;
         min-height: 60px;
         color: #2c789e;
+        border: 1px solid rgb(117 169 191);
       }
       select {
         margin: 10px 0 10px 0;
