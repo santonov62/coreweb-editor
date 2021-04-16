@@ -81,7 +81,8 @@ export class LayoutDefinitionField extends MobxLitElement {
     this.addEventListener('click', this.edit.bind(this));
   }
 
-  onDeleteField() {
+  onDeleteField(e) {
+    e.stopPropagation();
     let layoutDefinition = this.layoutDefinition;
     layoutDefinition.clearField();
   }
@@ -120,13 +121,15 @@ export class LayoutDefinitionField extends MobxLitElement {
     }
   }
 
-  splitCell() {
+  splitCell(e) {
+    e.stopPropagation();
     let area = this.hoverCell.area;
     state.form.layoutTemplate.splitCell(area);
     this.hoverCell = null;
   }
 
-  onAddField() {
+  onAddField(e) {
+    e.stopPropagation();
     this.onAddFieldCallback(this.dataset['area']);
   }
 
@@ -207,13 +210,25 @@ export class LayoutDefinitionField extends MobxLitElement {
               ${this.hoverCell.isMultiCell ? html`<button style="margin-left: 8px;"
                    @click="${this.splitCell}">Split</button>`:''}
               <div class="arrow top" ?hidden=${this.hoverCell.direction.top === 0}
-                   @click="${()=>this.prepareJoinCell('up')}">+</div>
+                   @click="${e=> {
+                     e.stopPropagation();
+                     this.prepareJoinCell('up');
+                   }}">+</div>
               <div class="arrow bottom" ?hidden=${this.hoverCell.direction.down === templateAreas.length-1}
-                   @click="${()=>this.prepareJoinCell('down')}">+</div>
+                   @click="${(e)=> {
+                     e.stopPropagation();
+                     this.prepareJoinCell('down')
+                   }}">+</div>
               <div class="arrow left" ?hidden=${this.hoverCell.direction.left === 0}
-                   @click="${()=>this.prepareJoinCell('left')}">+</div>
+                   @click="${(e)=> {
+                     e.stopPropagation();
+                     this.prepareJoinCell('left')
+                   }}">+</div>
               <div class="arrow right" ?hidden=${this.hoverCell.direction.right === templateAreas[0].length-1}
-                   @click="${()=>this.prepareJoinCell('right')}">+</div>
+                   @click="${(e)=> {
+                     e.stopPropagation();
+                     this.prepareJoinCell('right')
+                   }}">+</div>
             </div>`:''}`
   }
 }

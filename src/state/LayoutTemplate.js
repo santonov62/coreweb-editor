@@ -34,7 +34,7 @@ export class LayoutTemplate {
     const fieldLayoutDefinitionsMap = new Map();
     fieldAreas.forEach((fieldAreas, line) => {
       fieldAreas.forEach((fieldName, col) => {
-        let area = `x${line}x${col}`;
+        let area = `x${line + 1}x${col + 1}`;
         if (areaToFieldNameMap.has(fieldName)) {
           area = areaToFieldNameMap.get(fieldName);
         } else {
