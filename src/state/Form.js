@@ -190,6 +190,10 @@ export class Form {
     return !this.databean || !this.databean.rootId;
   }
 
+  setSelectedLayoutDefinition(layout) {
+    this.selectedLayout = layout;
+  }
+
   // setTemplateContent(content) {
   //   this.layoutTemplate.content = content;
   // }

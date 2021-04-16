@@ -20,13 +20,12 @@ export class EditField extends MobxLitElement {
   }
 
   render() {
-    const {field, layoutDefinition} = this;
+    const {layoutDefinition, field} = this;
     const {fieldName, label, dataType, placeholder, id} = field;
     // const {access} = layoutDefinition;
     console.log('EditField render', field);
     return html`
       <div class="edit-field">
-
         <label for="fieldName">dataType: </label>
         <select @change=${(e) => field.update({dataType: e.target.value})}>
           <option>???</option>

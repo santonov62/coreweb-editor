@@ -47,7 +47,7 @@ export const common = css`
     font: 22px/24px Arial, Helvetica, sans-serif;
     text-decoration: none;
     color: #2683B3;
-    padding: 18px 0 0 0;
+    // padding: 18px 0 0 0;
     text-shadow: 0 -1px 0 #5f6d76;
   }
 `;

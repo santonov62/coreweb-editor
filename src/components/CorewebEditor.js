@@ -2,7 +2,7 @@ import { LitElement, css } from 'lit-element';
 import {html, nothing} from 'lit-html';
 import {MobxLitElement} from "@adobe/lit-mobx";
 import {state} from '../state';
-import {buttonStyles, webadminButtonStyles} from './styles';
+import {buttonStyles, common, webadminButtonStyles} from './styles';
 import FieldDataTypeEnum from "../FieldDataTypeEnum";
 import {reaction} from "mobx";
 import {FieldLayoutDefinition} from "../state/FieldLayoutDefinition";
@@ -76,7 +76,25 @@ export class CorewebEditor extends MobxLitElement {
       .left {
         left:0
       }
-    `, webadminButtonStyles, this.containerStyles];
+      .editField{
+        position: fixed;
+        left: 0;
+        background-color: #fff;
+        padding: 30px 20px;
+        box-shadow: 0px 5px 32px 2px rgba(34, 60, 80, 0.4);
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        border: solid 1px rgb(185 190 194);
+        margin-left: -1px;
+        z-index: 3;
+      }
+      .editField .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        cursor: pointer;
+      }
+    `, webadminButtonStyles, common, this.containerStyles];
   }
 
   constructor() {
@@ -414,8 +432,16 @@ export class CorewebEditor extends MobxLitElement {
 
   render() {
     const {isLoading, formsList, form} = state;
+    const {selectedLayout} = form;
     return html`
       ${isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
+
+      ${selectedLayout && selectedLayout.field ? html`
+        <div class="editField">
+          <div class="close" @click="${() => state.form.setSelectedLayoutDefinition(null)}">X</div>
+          <span class="header1">Edit field</span>
+          <edit-field .layoutDefinition="${selectedLayout}" .field="${selectedLayout.field}"></edit-field>
+        </div>` : nothing}
 
       <div class="form-name-container">
         <label for="formName">Form name: </label>

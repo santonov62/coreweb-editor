@@ -9,19 +9,19 @@ export class AvailableFields extends MobxLitElement {
   static get styles() {
     return [css`
       :host {
-        margin: 0 10px 0 10px;
+        // margin: 0 10px 0 10px;
         align-self: stretch;
       }
       .availableFields {
         position: sticky;
         bottom: 0;
         z-index: 2;
-        background-color: #eaf3f6;
-        padding-top: 10px;
+        // background-color: #eaf3f6;
+        // padding-top: 10px;
         opacity: 0.9;
-        -webkit-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
-        -moz-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
-        box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+        // -webkit-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+        // -moz-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+        // box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
       }
       .availableFields > div {
         display: flex;
@@ -71,10 +71,9 @@ export class AvailableFields extends MobxLitElement {
         return acc;
       }, []);
 
-    const fields = state.form.fields.filter(({id}) => {
+    return state.form.fields.filter(({id}) => {
       return !fieldIdsWithLayout.includes(id);
     });
-    return fields;
   }
 }
 

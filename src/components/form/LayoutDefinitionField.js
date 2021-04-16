@@ -39,12 +39,13 @@ export class LayoutDefinitionField extends MobxLitElement {
       }
       .arrow {
         position: absolute;
-        color: #4CAF50;
+        color: #75a9bf;
         cursor:pointer;
         font-size: xx-large;
+        padding: 5px;
       }
       .arrow:hover{
-        color: #3e8e41
+        color: #2783b3
       }
       .top {
         top:0
@@ -77,6 +78,7 @@ export class LayoutDefinitionField extends MobxLitElement {
     this.addEventListener('drop', this.#onDrop);
     this.addEventListener('dragover', (e) => e.preventDefault());
     this.addEventListener('dragstart', this.#onDragStart.bind(this));
+    this.addEventListener('click', this.edit.bind(this));
   }
 
   onDeleteField() {
@@ -128,6 +130,10 @@ export class LayoutDefinitionField extends MobxLitElement {
     this.onAddFieldCallback(this.dataset['area']);
   }
 
+  edit() {
+    state.form.setSelectedLayoutDefinition(this.layoutDefinition);
+  }
+
   // disconnectedCallback() {
   //   super.disconnectedCallback();
   //   const {area} = this.dataset;
@@ -162,7 +168,7 @@ export class LayoutDefinitionField extends MobxLitElement {
     hoverCell.layoutDefinition = node.layoutDefinition;
     hoverCell.isMultiCell = startIndex !== lastIndex;
     this.hoverCell = hoverCell;
-    state.form.selectedLayout = this.layoutDefinition;
+    // state.form.selectedLayout = this.layoutDefinition;
   }
 
   #onDragStart(e) {
@@ -190,23 +196,24 @@ export class LayoutDefinitionField extends MobxLitElement {
 
   #getHoverCellTemplate() {
     const area = this.dataset['area'];
+    const {templateAreas} = state.form.layoutTemplate;
     return html`${this.hoverCell ? html`
             <div style="grid-area: ${area};" class="cellEditor" draggable="true">
               ${this.hoverCell?.dataType ? html`
-                <button style="margin-right: 8px;" @click="${this.onAddField}">Edit</button>
+<!--                <button style="margin-right: 8px;" @click="${this.edit}">Edit</button>-->
                 <button @click="${this.onDeleteField}">Delete</button>`:
       html`<button @click="${this.onAddField}">Add</button>`
     }
               ${this.hoverCell.isMultiCell ? html`<button style="margin-left: 8px;"
                    @click="${this.splitCell}">Split</button>`:''}
               <div class="arrow top" ?hidden=${this.hoverCell.direction.top === 0}
-                   @click="${()=>this.prepareJoinCell('up')}">🡁</div>
-              <div class="arrow bottom" ?hidden=${this.hoverCell.direction.down === state.form.layoutTemplate.templateAreas.length-1}
-                   @click="${()=>this.prepareJoinCell('down')}">🡃</div>
+                   @click="${()=>this.prepareJoinCell('up')}">+</div>
+              <div class="arrow bottom" ?hidden=${this.hoverCell.direction.down === templateAreas.length-1}
+                   @click="${()=>this.prepareJoinCell('down')}">+</div>
               <div class="arrow left" ?hidden=${this.hoverCell.direction.left === 0}
-                   @click="${()=>this.prepareJoinCell('left')}">🡀</div>
-              <div class="arrow right" ?hidden=${this.hoverCell.direction.right === state.form.layoutTemplate.templateAreas[0].length-1}
-                   @click="${()=>this.prepareJoinCell('right')}">🡂</div>
+                   @click="${()=>this.prepareJoinCell('left')}">+</div>
+              <div class="arrow right" ?hidden=${this.hoverCell.direction.right === templateAreas[0].length-1}
+                   @click="${()=>this.prepareJoinCell('right')}">+</div>
             </div>`:''}`
   }
 }
