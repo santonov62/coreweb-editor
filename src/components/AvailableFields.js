@@ -49,7 +49,7 @@ export class AvailableFields extends MobxLitElement {
 
     return html`
       <div class="availableFields">
-        <span class="header1">Unassigned fields</span>
+        <span class="header1">Detached fields</span>
         <div style="padding: 5px">
         ${fields.map((field, index) => html`
           <form-field-short .field=${field} draggable=true @dragstart="${this.onDragStart}"></form-field-short>
