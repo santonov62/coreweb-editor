@@ -36,11 +36,6 @@ export class CorewebEditor extends MobxLitElement {
         align-self: flex-start;
         margin-top: 10px;
       }
-      .isLoading {
-        margin: 10px;
-        text-align: center;
-        width: 100%;
-      }
       .container {
         margin-bottom: 40px;
         align-self: stretch;
@@ -143,10 +138,12 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   render() {
-    const {isLoading, formsList, form} = state;
+    const {formsList, form} = state;
     const {selectedLayout} = form;
+    const isLoading = state.isLoading || form.isLoading;
     return html`
-      ${isLoading ? html`<div class="isLoading">Loading...</div>` : ''}
+
+      ${isLoading ? html`<form-loader><slot>Loading...</slot></form-loader>` : ''}
 
       ${selectedLayout && selectedLayout.field ? html`
         <div class="editField">
@@ -164,8 +161,6 @@ export class CorewebEditor extends MobxLitElement {
         <input id="formName" value="" type="text" @change=${this.onFromNameChange} ?hidden=${!!form.databean} />
         <button @click="${this.saveForm}">Save</button>
       </div>
-
-      ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : nothing}
 
       ${state.form.layoutTemplate.isErrorParseAreas ? html`
         <form-message title="Warning" type="warning">
