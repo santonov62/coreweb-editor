@@ -1,5 +1,5 @@
 import {LitElement, html, css} from 'lit-element';
-import { buttonStyles } from './styles';
+import {buttonStyles, webadminButtonStyles} from './styles';
 
 /**
  * A form dialog component, collect values from dialogs elements who have 'name' attribute
@@ -17,7 +17,7 @@ class CWDialog extends LitElement {
 
   static get styles() {
     return [
-      buttonStyles,
+      webadminButtonStyles,
       css`
       dialog::backdrop {
         background-color: rgba(190,190,190,0.7) !important;

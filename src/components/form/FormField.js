@@ -4,6 +4,7 @@ import {state} from '../../state';
 import {MobxLitElement} from "@adobe/lit-mobx";
 import {Field} from "../../state/Field";
 import {nothing} from "lit-html";
+import {XWidget} from "../XWidget";
 
 export class FormField extends MobxLitElement {
 
@@ -72,6 +73,7 @@ export class FormField extends MobxLitElement {
     //   </div>
     return html`
       <h2>${dataType}</h2>
+      ${new XWidget(field)}
       <div class="component">
         ${renderFieldComponent(field)}
       </div>
