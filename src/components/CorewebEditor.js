@@ -230,17 +230,15 @@ export class CorewebEditor extends MobxLitElement {
   // }
 
   #getDialogTemplate() {
-    if (!state.form.selectedLayout)
-      return nothing;
-    const layoutDefinition = state.form.selectedLayout;
-    const {field} = layoutDefinition;
     return html`
-      <cw-dialog id="dialog" title="Add/Edit Field">
+      <cw-dialog id="dialog" title="Add/Edit Field" @close="${this.onDialogClose}">
         <slot>
-          <add-field .layoutDefinition="${layoutDefinition}"></add-field>
-          ${field ?
-            html`<edit-field .field="${field}" .layoutDefinition="${layoutDefinition}"></edit-field>` : nothing
-          }
+          <label for="dataType">Field: </label>
+          <select id="dataType" name="dataType" @change=${this.onFieldSelect}>
+            <option>???</option>
+            ${Object.values(FieldDataTypeEnum).map(value => html`
+            <option value="${value}">${value}</option>`)}
+          </select>
         </slot>
       </cw-dialog>`
   }
@@ -453,17 +451,16 @@ export class CorewebEditor extends MobxLitElement {
         <button @click="${this.saveForm}">Save</button>
       </div>
 
-      ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : html`
-        <div style="width: 100%">
-          <layout-controls></layout-controls>
-          <div class="container" @mouseover="${this.onMouseOver}" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
-            ${this.#getCellTemlates()}
-          </div>
-          <available-fields></available-fields>
+      ${form.isLoading ? html`<div class="isLoading">Loading...</div>` : nothing}
+      <div style="width: 100%">
+        <layout-controls></layout-controls>
+        <div class="container" @mouseover="${this.onMouseOver}" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
+          ${this.#getCellTemlates()}
         </div>
+        <available-fields></available-fields>
+      </div>
 
-        ${this.#getDialogTemplate()}
-      `}
+      ${this.#getDialogTemplate()}
     `;
   }
 
@@ -490,12 +487,15 @@ export class CorewebEditor extends MobxLitElement {
   //   this.update();
   // }
 
-  // onDialogClose(e) {
-  //   const dialog = e.target;
-  //   const dataType = dialog.returnValue;
-  //   state.form.addField({dataType}, dialog.area);
-  //   this.updateCellByArea(dialog.area);
-  // }
+  onDialogClose(e) {
+    const dialog = e.target;
+    const {area} = dialog;
+    const dataType = dialog.returnValue;
+    const field = state.form.newField({dataType});
+    state.form.fieldLayoutDefinitions.get(area).update({
+      field,
+    });
+  }
   //
   // updateCellByArea(area) {
   //   let formField = this.shadowRoot.querySelector(`form-field[data-area="${area}"]`);

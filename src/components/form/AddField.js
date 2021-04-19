@@ -22,9 +22,16 @@ export class AddField extends MobxLitElement {
     super();
   }
 
+  // onFieldSelect(e) {
+  //   const fieldId = parseInt(e.target.value);
+  //   const field = fieldId === -1 ? state.form.addField({}) : state.form.fields.find(({id}) => id === fieldId);
+  //   this.layoutDefinition.update({
+  //     field,
+  //   });
+  // }
   onFieldSelect(e) {
-    const fieldId = parseInt(e.target.value);
-    const field = fieldId === -1 ? state.form.addField({}) : state.form.fields.find(({id}) => id === fieldId);
+    const dataType = parseInt(e.target.value);
+    const field = state.form.newField({dataType});
     this.layoutDefinition.update({
       field,
     });
@@ -38,11 +45,9 @@ export class AddField extends MobxLitElement {
       <div class="add-field">
         <label for="field">Field: </label>
         <select @change=${this.onFieldSelect}>
-          <option></option>
-          <option value="-1">+new</option>
-          ${state.form.fields.map(({fieldName, id}) => html`
-            <option value="${id}" ?selected="${id === field?.id}">${fieldName}</option>
-          `)}
+          <option>???</option>
+          ${Object.values(FieldDataTypeEnum).map(value => html`
+            <option value="${value}">${value}</option>`)}
         </select>
 
       </div>`;

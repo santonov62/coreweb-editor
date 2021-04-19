@@ -52,7 +52,7 @@ export class Form {
   //   this.fields[area] = new Field({id, fieldName, dataType});
   // }
 
-  addField({id = Date.now(), fieldName = '', dataType = ''}, area) {
+  newField({id = Date.now(), fieldName = '', dataType = ''}, area) {
     const field = new Field({id, fieldName, dataType});
     this.fields.push(field);
     return field;
