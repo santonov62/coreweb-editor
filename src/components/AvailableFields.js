@@ -6,35 +6,6 @@ import {common} from "./styles";
 
 export class AvailableFields extends MobxLitElement {
 
-  static get styles() {
-    return [css`
-      :host {
-        // margin: 0 10px 0 10px;
-        align-self: stretch;
-      }
-      .availableFields {
-        position: sticky;
-        bottom: 0;
-        z-index: 2;
-        // background-color: #eaf3f6;
-        // padding-top: 10px;
-        opacity: 0.9;
-        // -webkit-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
-        // -moz-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
-        // box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
-      }
-      .availableFields > div {
-        display: flex;
-      }
-      form-field-short {
-        cursor: move;
-      }
-      form-field-short:hover {
-        background-color: #e9f4fe;
-      }
-    `, common];
-  }
-
   onDragStart(e) {
     const data = {fieldId: e.currentTarget.field.id};
     e.dataTransfer.setData('text/plain', JSON.stringify(data));
@@ -74,6 +45,36 @@ export class AvailableFields extends MobxLitElement {
     return state.form.fields.filter(({id}) => {
       return !fieldIdsWithLayout.includes(id);
     });
+  }
+
+  static get styles() {
+    return [css`
+      :host {
+        // margin: 0 10px 0 10px;
+        align-self: stretch;
+      }
+      .availableFields {
+        position: sticky;
+        bottom: 0;
+        z-index: 2;
+        // background-color: #eaf3f6;
+        // padding-top: 10px;
+        opacity: 0.9;
+        // -webkit-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+        // -moz-box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+        // box-shadow: 0px -5px 5px -5px rgba(34, 60, 80, 0.6);
+      }
+      .availableFields > div {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      form-field-short {
+        cursor: move;
+      }
+      form-field-short:hover {
+        background-color: #e9f4fe;
+      }
+    `, common];
   }
 }
 
