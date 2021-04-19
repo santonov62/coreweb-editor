@@ -1,4 +1,5 @@
 import {makeAutoObservable} from "mobx";
+import {css, unsafeCSS} from "lit-element";
 
 export class LayoutTemplate {
 
@@ -16,13 +17,25 @@ export class LayoutTemplate {
     this.#templateChanges = [];
   }
 
+  // parseFieldNameAreas() {
+  //   const content = this.content;
+  //   const template = document.createElement('template');
+  //   template.innerHTML = content.toString();
+  //   const container = template.content.querySelector('[data-container-id]');
+  //   const aaa = css`.eqweqweqewqwe {grid-template-columns:  1fr 1fr 1fr; grid-template-areas:'x1x1 x1x2 x1x2''x2x1 x1x2 x1x2''x3x1 x1x2 x1x2'}`;
+  //   console.log(`container: `, container);
+  //   return container.style.gridTemplateAreas.split('" "')
+  //     .map(area => area.replaceAll('"', '').split(' '));
+  // }
   parseFieldNameAreas() {
     const content = this.content;
     const template = document.createElement('template');
     template.innerHTML = content.toString();
-    const container = template.content.querySelector('[data-container-id]');
-    console.log(`container: `, container);
-    return container.style.gridTemplateAreas.split('" "')
+    const stylesString = template.content.getElementById('corewebEditor').innerText;
+    const styles = unsafeCSS(stylesString);
+    const gridTemplateAreas = styles.styleSheet.cssRules.item('corewebEditor').style.gridTemplateAreas;
+    console.log(`gridTemplateAreas: `, gridTemplateAreas);
+    return gridTemplateAreas.split('" "')
       .map(area => area.replaceAll('"', '').split(' '));
   }
 
@@ -40,8 +53,8 @@ export class LayoutTemplate {
         } else {
           areaToFieldNameMap.set(fieldName, area);
           const layout = fieldLayoutDefinitions.find(({field}) => field.fieldName === fieldName);
-          // // TODO fix area bind
-          // layout.area = area;
+          // // // TODO fix area bind
+          // // layout.area = area;
           fieldLayoutDefinitionsMap.set(area, layout);
 
         }
@@ -153,7 +166,14 @@ export class LayoutTemplate {
       areas.map(area => layoutDefinitions.get(area).field.fieldName));
     const areas = fieldAreas.reduce((res, row) => `${res}'${row.join(' ')}'`, 'grid-template-areas:');
     const content = `<!-- Generated with visual coreweb editor -->
-<div data-container-id="Fields" style="display: grid;${columns};${areas};"></div>`;
+<div class="corewebEditor" data-container-id="Fields"></div>
+<style id="corewebEditor">
+.corewebEditor {
+  display: grid;
+  ${columns};
+  ${areas};
+}
+</style>`;
     this.content = content;
     console.log('layoutTemplate -> content', content)
     return content;
