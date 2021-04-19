@@ -5,7 +5,8 @@ export class LayoutTemplate {
 
   content
   templateAreas
-  #templateChanges;
+  isErrorParseAreas
+  #templateChanges
 
   constructor(data = {}) {
     makeAutoObservable(this);
@@ -14,6 +15,7 @@ export class LayoutTemplate {
     this.content = data.content;
     this.form = data.form;
     this.templateAreas = [['x1x1']];
+    this.isErrorParseAreas = false;
     this.#templateChanges = [];
   }
 
@@ -41,27 +43,41 @@ export class LayoutTemplate {
 
   mapLayoutDefinitionsToAreas(fieldLayoutDefinitions) {
     const layoutTemplate = this;
-    const fieldAreas = layoutTemplate.parseFieldNameAreas();
-    const templateAreas = [...fieldAreas];
-    const areaToFieldNameMap = new Map();
-    const fieldLayoutDefinitionsMap = new Map();
-    fieldAreas.forEach((fieldAreas, line) => {
-      fieldAreas.forEach((fieldName, col) => {
-        let area = `x${line + 1}x${col + 1}`;
-        if (areaToFieldNameMap.has(fieldName)) {
-          area = areaToFieldNameMap.get(fieldName);
-        } else {
-          areaToFieldNameMap.set(fieldName, area);
-          const layout = fieldLayoutDefinitions.find(({field}) => field.fieldName === fieldName);
-          // // // TODO fix area bind
-          // // layout.area = area;
-          fieldLayoutDefinitionsMap.set(area, layout);
-
-        }
-        templateAreas[line][col] = area;
+    try {
+      layoutTemplate.isErrorParseAreas = false;
+      const fieldAreas = layoutTemplate.parseFieldNameAreas();
+      const templateAreas = [...fieldAreas];
+      const areaToFieldNameMap = new Map();
+      const fieldLayoutDefinitionsMap = new Map();
+      fieldAreas.forEach((fieldAreas, line) => {
+        fieldAreas.forEach((fieldName, col) => {
+          let area = `x${line + 1}x${col + 1}`;
+          if (areaToFieldNameMap.has(fieldName)) {
+            area = areaToFieldNameMap.get(fieldName);
+          } else {
+            areaToFieldNameMap.set(fieldName, area);
+            const layout = fieldLayoutDefinitions.find(({field}) => field.fieldName === fieldName);
+            fieldLayoutDefinitionsMap.set(area, layout);
+          }
+          templateAreas[line][col] = area;
+        });
       });
+      layoutTemplate.templateAreas = templateAreas;
+      return fieldLayoutDefinitionsMap;
+    } catch (e) {
+      layoutTemplate.isErrorParseAreas = true;
+    }
+  }
+
+  mapDefaultLayoutDefinitionsToAreas(fieldLayoutDefinitions) {
+    const fieldLayoutDefinitionsMap = new Map();
+    const templateAreas = [];
+    fieldLayoutDefinitions.forEach((layout, index) => {
+      const area = `x${index + 1}x1`;
+      fieldLayoutDefinitionsMap.set(area, layout);
+      templateAreas.push([area]);
     });
-    layoutTemplate.templateAreas = templateAreas;
+    this.templateAreas = templateAreas;
     return fieldLayoutDefinitionsMap;
   }
 

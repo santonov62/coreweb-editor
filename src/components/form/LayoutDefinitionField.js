@@ -78,11 +78,11 @@ export class LayoutDefinitionField extends MobxLitElement {
     this.addEventListener('drop', this.#onDrop);
     this.addEventListener('dragover', (e) => e.preventDefault());
     this.addEventListener('dragstart', this.#onDragStart.bind(this));
-    this.addEventListener('click', this.edit.bind(this));
+    // this.addEventListener('click', this.edit.bind(this));
   }
 
   onDeleteField(e) {
-    e.stopPropagation();
+    // e.stopPropagation();
     let layoutDefinition = this.layoutDefinition;
     layoutDefinition.clearField();
   }
@@ -122,14 +122,14 @@ export class LayoutDefinitionField extends MobxLitElement {
   }
 
   splitCell(e) {
-    e.stopPropagation();
+    // e.stopPropagation();
     let area = this.hoverCell.area;
     state.form.layoutTemplate.splitCell(area);
     this.hoverCell = null;
   }
 
   onAddField(e) {
-    e.stopPropagation();
+    // e.stopPropagation();
     this.onAddFieldCallback(this.dataset['area']);
   }
 
@@ -203,30 +203,30 @@ export class LayoutDefinitionField extends MobxLitElement {
     return html`${this.hoverCell ? html`
             <div style="grid-area: ${area};" class="cellEditor" draggable="true">
               ${this.hoverCell?.dataType ? html`
-<!--                <button style="margin-right: 8px;" @click="${this.edit}">Edit</button>-->
-                <button @click="${this.onDeleteField}">Delete</button>`:
+                <button style="margin-right: 8px;" @click="${this.edit}">Edit</button>
+                <button @click="${this.onDeleteField}">Detach</button>`:
       html`<button @click="${this.onAddField}">Add</button>`
     }
               ${this.hoverCell.isMultiCell ? html`<button style="margin-left: 8px;"
                    @click="${this.splitCell}">Split</button>`:''}
               <div class="arrow top" ?hidden=${this.hoverCell.direction.top === 0}
                    @click="${e=> {
-                     e.stopPropagation();
+                     // e.stopPropagation();
                      this.prepareJoinCell('up');
                    }}">+</div>
               <div class="arrow bottom" ?hidden=${this.hoverCell.direction.down === templateAreas.length-1}
                    @click="${(e)=> {
-                     e.stopPropagation();
+                     // e.stopPropagation();
                      this.prepareJoinCell('down')
                    }}">+</div>
               <div class="arrow left" ?hidden=${this.hoverCell.direction.left === 0}
                    @click="${(e)=> {
-                     e.stopPropagation();
+                     // e.stopPropagation();
                      this.prepareJoinCell('left')
                    }}">+</div>
               <div class="arrow right" ?hidden=${this.hoverCell.direction.right === templateAreas[0].length-1}
                    @click="${(e)=> {
-                     e.stopPropagation();
+                     // e.stopPropagation();
                      this.prepareJoinCell('right')
                    }}">+</div>
             </div>`:''}`
