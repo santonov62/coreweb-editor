@@ -61,6 +61,10 @@ export const xwidget = css`
   /* Preset styles */
   --color-page-background: var(--color-base-white, #ffffff);
   --color-border: #dadada;
+  --color-widget: var(--color-base-hue, #6a9931);
+  --color-widget-hover: var(--color-base-hue-light, #74a637);
+  --color-widget-hover-secondary: var(--color-base-hue-dark-1, #628c2e);
+  --color-widget-text-hover: var(--color-base-hue-dark-2, #527725);
   --color-widget-input: var(--color-page-background, #ffffff);
   --color-widget-modal-background: var(--color-page-background, #ffffff);
   --color-widget-action-icon-background: #efefef;
@@ -108,5 +112,8 @@ export const xwidget = css`
   --font-size-h1: 24px;
   --font-size-h2: 16px;
   --font-size-icon: 16px;
+}
+
+
 }
 `;

@@ -53,6 +53,9 @@ export class AvailableFields extends MobxLitElement {
         // margin: 0 10px 0 10px;
         align-self: stretch;
       }
+      .header1 {
+        margin-left: 10px;
+      }
       .availableFields {
         position: sticky;
         bottom: 0;

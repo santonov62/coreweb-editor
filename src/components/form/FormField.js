@@ -72,7 +72,7 @@ export class FormField extends MobxLitElement {
     //     <a href=${editUrl} target="_blank">Open field</a>
     //   </div>
     return html`
-      <span>${dataType}</span>
+      <span style="color: #e4e3e3; position: absolute; left: 5px; top: 5px;">${dataType}</span>
       <div class="component">
         ${renderFieldComponent({field, layoutDefinition})}
       </div>

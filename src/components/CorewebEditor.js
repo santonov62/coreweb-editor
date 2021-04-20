@@ -15,12 +15,6 @@ export class CorewebEditor extends MobxLitElement {
     };
   }
 
-  static containerStyles = css`.container {
-        display: grid;
-        gap: 10px;
-      }
-  `;
-
   constructor() {
     super();
     this.templateAreas = state.form.layoutTemplate.templateAreas;
@@ -100,9 +94,9 @@ export class CorewebEditor extends MobxLitElement {
           </slot>
         </form-message>` : nothing}
 
-      <div style="width: 100%">
+      <div class="container">
         <layout-controls></layout-controls>
-        <div class="container" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
+        <div class="layoutContainer" style="${this.#getColumnsTemplateStr()}; ${this.#getRowTemplateStr()}">
           ${this.#getCellTemlates()}
         </div>
         <available-fields></available-fields>
@@ -155,42 +149,22 @@ export class CorewebEditor extends MobxLitElement {
         color: #1a2b42;
         margin: 0px 30px 0px 0px;
       }
+      .container {
+        width: 100%;
+      }
       .form-name-container {
         align-self: flex-start;
         margin-top: 10px;
       }
-      .container {
+      .layoutContainer {
+        display: grid;
+        gap: 2px;
         margin-bottom: 40px;
         align-self: stretch;
-      }
-      .cellEditor {
-        background-color: rgba(15,15,15,0.25);
-        z-index: 999;
-        align-items: center;
-        justify-content: center;
-        display: flex;
-        position:relative;
-      }
-      .arrow {
-        position: absolute;
-        color: #4CAF50;
-        cursor:pointer;
-        font-size: xx-large;
-      }
-      .arrow:hover{
-        color: #3e8e41
-      }
-      .top {
-        top:0
-      }
-      .bottom {
-        bottom:0
-      }
-      .right {
-        right:0
-      }
-      .left {
-        left:0
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0px 5px 10px 2px rgba(34, 60, 80, 0.2);
       }
       .editField{
         position: fixed;
@@ -198,8 +172,8 @@ export class CorewebEditor extends MobxLitElement {
         background-color: #fff;
         padding: 50px 15px;
         box-shadow: 0px 5px 32px 2px rgba(34, 60, 80, 0.4);
-        border-top-right-radius: 5px;
-        border-bottom-right-radius: 5px;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
         border: solid 1px rgb(185 190 194);
         margin-left: -1px;
         z-index: 3;
@@ -210,7 +184,7 @@ export class CorewebEditor extends MobxLitElement {
         top: 15px;
         cursor: pointer;
       }
-    `, webadminButtonStyles, common, this.containerStyles];
+    `, webadminButtonStyles, common];
   }
 }
 

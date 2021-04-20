@@ -174,6 +174,11 @@ export class Form {
   }
 
   newFieldLayoutDefinition(area) {
+    //TODO Exception to test and find bug with missed layout on save
+    if (this.fieldLayoutDefinitions.has(area)) {
+      console.log(`newFieldLayoutDefinition`, this.fieldLayoutDefinitions.get(area))
+      throw new Error(`${area} already exists`)
+    }
     const fieldLayoutDefinition = new FieldLayoutDefinition();
     runInAction(() =>
       this.fieldLayoutDefinitions.set(area, fieldLayoutDefinition)

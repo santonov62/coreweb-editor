@@ -32,6 +32,7 @@ export class XWidget extends LitElement {
     const {isCorewebScriptsLoaded} = this;
     return html`
       <link rel="stylesheet" href="https://helios.mediaspectrum.net/coreweb_ui/css/main.css?ver=cui1.0.158">
+      <link rel="stylesheet" href="https://helios.mediaspectrum.net/coreweb_ui/css/theme.css?ver=cui1.0.158">
       ${isCorewebScriptsLoaded ? html`
           <div id="renderer">XWidget html</div>`
         : html`<div>Coreweb scripts waiting...</div>`}
@@ -68,7 +69,7 @@ customElements.define('x-widget', XWidget);
 
 window.config = {
   appName: '',
-  baseUrl: 'http://localhost:8080/coreweb',
+  baseUrl: '/coreweb',
   // baseUrl: 'coreweb'
 }
 function loadScript(url) {
