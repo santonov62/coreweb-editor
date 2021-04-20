@@ -1,30 +1,29 @@
-import {LitElement} from "lit-element";
+import {css, LitElement} from "lit-element";
 import {html} from "lit-html";
+import {xwidget} from "../styles";
 
 
 export class XWidget extends LitElement {
 
   static get properties() {
     return {
-      isCorewebScriptsLoaded: {type: Boolean, value: false}
+      isCorewebScriptsLoaded: {type: Boolean, value: false},
+      options: {type: Object},
+      field: {type: Object},
     }
   }
 
-  constructor(field) {
+  constructor(options) {
     super();
     window.loadCorewebScipts.then(() => this.isCorewebScriptsLoaded = true)
     this.updateComplete.then(() => {
-      if (this.isCorewebScriptsLoaded) {
-        const widgetLayoutManager = new PageLayoutManager('widget', {isNew: true});
-        widgetLayoutManager.initForm({
-          fields: [
-            {
-              name: 'textfield',
-              dataType: 'textfield',
-              ...field
-            }
-          ]
-        }, true);
+      if (this.isCorewebScriptsLoaded && options) {
+        const rendererContainer = this.shadowRoot.getElementById('renderer');
+        // if (rendererContainer) {
+          const widget = utils.createWidget({...options});
+          rendererContainer.innerHTML = '';
+          rendererContainer.append(widget[0]);
+        // }
       }
     });
   }
@@ -32,10 +31,37 @@ export class XWidget extends LitElement {
   render() {
     const {isCorewebScriptsLoaded} = this;
     return html`
+      <link rel="stylesheet" href="https://helios.mediaspectrum.net/coreweb_ui/css/main.css?ver=cui1.0.158">
       ${isCorewebScriptsLoaded ? html`
-          <div data-form-id="widget">XWidget html</div>`
+          <div id="renderer">XWidget html</div>`
         : html`<div>Coreweb scripts waiting...</div>`}
     `;
+  }
+
+  // set options(newOptions) {
+  //   const oldValue = this._options;
+  //   this._options = newOptions;
+  //   if (newOptions) {
+  //     window.loadCorewebScipts.then(() => {
+  //       const rendererContainer = this.shadowRoot.getElementById('renderer');
+  //       const widget = utils.createWidget({...this.options});
+  //       rendererContainer.innerHTML = '';
+  //       rendererContainer.append(widget[0]);
+  //     })
+  //   }
+  //   // this.requestUpdate('options', oldValue);
+  //   this.requestUpdate('options', oldValue);
+  // }
+  //
+  // get options() {
+  //   return this._options;
+  // }
+
+  static get styles() {
+    return [css`
+      #renderer > div {
+        display: block !important;
+      }`, xwidget];
   }
 }
 customElements.define('x-widget', XWidget);

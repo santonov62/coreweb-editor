@@ -8,60 +8,6 @@ import {webadminButtonStyles} from "../styles";
 
 export class LayoutDefinitionField extends MobxLitElement {
 
-  static get styles() {
-    return [
-      css`
-      :host {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-start;
-        position: relative;
-        border-radius: 5px;
-        border: 2px dashed rgb(117 169 191);
-        background: #fff;
-      }
-      form-field {
-        border: 0px;
-      }
-      .cellEditor {
-        background-color: rgb(9,154,239,0.11);
-        border-radius: 5px;
-        z-index: 1;
-        align-items: center;
-        justify-content: center;
-        display: flex;
-        position:absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-      }
-      .arrow {
-        position: absolute;
-        color: #75a9bf;
-        cursor:pointer;
-        font-size: xx-large;
-        padding: 5px;
-      }
-      .arrow:hover{
-        color: #2783b3
-      }
-      .top {
-        top:0
-      }
-      .bottom {
-        bottom:0
-      }
-      .right {
-        right:0
-      }
-      .left {
-        left:0
-      }
-      `, webadminButtonStyles]
-  }
-
   static get properties() {
     return {
       layoutDefinition: {type: Object},
@@ -230,6 +176,65 @@ export class LayoutDefinitionField extends MobxLitElement {
                      this.prepareJoinCell('right')
                    }}">+</div>
             </div>`:''}`
+  }
+
+  static get styles() {
+    return [
+      css`
+      :host {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        position: relative;
+        border-radius: 5px;
+        border: 2px dashed rgb(117 169 191);
+        background: #fff;
+      }
+      :host:hover {
+        border-color: #2683B3;
+      }
+      form-field {
+        border: 0px;
+        align-self: stretch;
+      }
+      .cellEditor {
+        // background-color: rgb(9,154,239,0.11);
+        border: 2px solid #2683B3;
+        border-radius: 5px;
+        z-index: 1;
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        position:absolute;
+        top: -2px;
+        left: -2px;
+        width: 100%;
+        height: 100%;
+      }
+      .arrow {
+        position: absolute;
+        color: #75a9bf;
+        cursor:pointer;
+        font-size: xx-large;
+        padding: 5px;
+      }
+      .arrow:hover{
+        color: #2783b3
+      }
+      .top {
+        top:0
+      }
+      .bottom {
+        bottom:0
+      }
+      .right {
+        right:0
+      }
+      .left {
+        left:0
+      }
+      `, webadminButtonStyles]
   }
 }
 

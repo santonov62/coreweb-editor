@@ -51,3 +51,62 @@ export const common = css`
     text-shadow: 0 -1px 0 #5f6d76;
   }
 `;
+
+export const xwidget = css`
+:host {
+  --color-widget: var(--color-base-hue);
+  --color-widget-hover: var(--color-base-hue-light);
+  --color-widget-hover-secondary: var(--color-base-hue-dark-1);
+  --color-widget-text-hover: var(--color-base-hue-dark-2);
+  /* Preset styles */
+  --color-page-background: var(--color-base-white, #ffffff);
+  --color-border: #dadada;
+  --color-widget-input: var(--color-page-background, #ffffff);
+  --color-widget-modal-background: var(--color-page-background, #ffffff);
+  --color-widget-action-icon-background: #efefef;
+  --color-widget-readonly-background: var(--color-access-readonly, #cccccc);
+  --color-widget-readonly-text: var(--color-access-readonly-light, #C8C8C8);
+  --color-widget-required-background: var(--color-access-required, #a57f36);
+  --color-widget-required-background-hover: var(--color-access-required-light, #af8c3c);
+  --color-widget-required-background-hover-secondary: var(--color-access-required-dark, #9d7233);
+  --color-widget-error-background: var(--color-alert-light, #fff5f5);
+  --color-widget-disabled: var(--color-base-grey, #efefef);
+  --color-widget-background-odd: var(--color-base-grey-hue-1, #fcfcfa);
+  --color-widget-selected: var(--color-base-grey-hue-2, #f7fcf0);
+  --color-text: #666666;
+  --color-text-contrast: var(--color-page-background, #ffffff);
+  --color-text-accent: var(--color-text-light, #999999);
+  --color-text-hover: var(--color-text-dark, #444444);
+  --color-text-tree-accent: var(--color-base-black, #000000);
+  --color-text-error: var(--color-alert, #f56161);
+  --color-text-error-input: var(--color-alert-input, #e0b3b3);
+  --color-text-message: var(--color-info, #5ba3c7);
+  --color-text-message-secondary: var(--color-info-light, #cfdde6);
+  --color-text-warning: var(--color-warning, #f89406);
+  --color-text-info: var(--color-info, #0094FF);
+  --color-text-grid-expanded: #ffffff;
+  --color-text-placeholder: #757575;
+  --color-tooltip: #e6e34c;
+  --color-tooltip-secondary: var(--color-tooltip-light, #fcfce3);
+  --color-overlay-dialog: rgba(50, 50, 50, 0.3);
+  --color-overlay-blocked: rgba(255, 255, 255, 0.5);
+  --border-radius: 4px;
+  --border-width: 1px;
+  --size-dialog-popup-width: 1000px;
+  /*see .responsive class*/
+  --size-dialog-alert-width: 400px;
+  --size-attachment-preview: 100px;
+  --size-input-height: 30px;
+  --size-input-checked: 20px;
+  --size-widgets-gap: 10px;
+  --size-widgets-side-gap: 20px;
+  --size-label-width: 300px;
+  --size-grid-row-height: 50px;
+  --size-button: var(--size-input-height);
+  --font-size-base: 14px;
+  --font-size-small: 12px;
+  --font-size-h1: 24px;
+  --font-size-h2: 16px;
+  --font-size-icon: 16px;
+}
+`;

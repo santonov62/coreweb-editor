@@ -4,7 +4,7 @@ import {state} from '../../state';
 import {MobxLitElement} from "@adobe/lit-mobx";
 import {Field} from "../../state/Field";
 import {nothing} from "lit-html";
-import {XWidget} from "../XWidget";
+import {XWidget} from "./XWidget";
 
 export class FormField extends MobxLitElement {
 
@@ -72,29 +72,35 @@ export class FormField extends MobxLitElement {
     //     <a href=${editUrl} target="_blank">Open field</a>
     //   </div>
     return html`
-      <h2>${dataType}</h2>
-      ${new XWidget(field)}
+      <span>${dataType}</span>
       <div class="component">
-        ${renderFieldComponent(field)}
+        ${renderFieldComponent({field, layoutDefinition})}
       </div>
-      <div style="word-break: break-all;">Field: ${JSON.stringify({dataType, label, fieldName, placeholder})}</div>
-      ${layoutDefinition ? html`
-        <div style="word-break: break-all;">FieldLayoutDefinition: ${JSON.stringify({access: layoutDefinition.access})}</div>` : ''}
     `;
   }
 }
 
-function renderFieldComponent({dataType, label, placeholder, layoutDefinition:{access}=''}) {
-  if (FieldDataTypeEnum[dataType] && customElements.get(dataType)) {
-    return html`<${dataType} label="${label}" placeholder="${placeholder}" ${access}/>`;
+// function renderFieldComponent({dataType, label, placeholder, layoutDefinition:{access}=''}) {
+//   if (FieldDataTypeEnum[dataType] && customElements.get(dataType)) {
+//     return html`<${dataType} label="${label}" placeholder="${placeholder}" ${access}/>`;
+//   }
+//   switch (dataType) {
+//     case FieldDataTypeEnum.textfield:
+//       return html`
+//         <div>xtextfield widget</div>`;
+//     default:
+//       return html`this widget can't be displayed`;
+//   }
+// }
+function renderFieldComponent({field, layoutDefinition}) {
+  const options = {...field, access: layoutDefinition.access, layoutId: layoutDefinition.id}
+  if (FieldDataTypeEnum[options.dataType]) {
+    return html`${new XWidget(options)}`;
   }
-  switch (dataType) {
-    case FieldDataTypeEnum.textfield:
-      return html`
-        <div>xtextfield widget</div>`;
-    default:
-      return html`this widget can't be displayed`;
-  }
+  return html`
+    this field can't be displayed
+    <div style="word-break: break-all;">Field: ${JSON.stringify(options)}</div>
+  `;
 }
 
 customElements.define('form-field', FormField);
