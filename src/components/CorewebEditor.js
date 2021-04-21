@@ -32,11 +32,9 @@ export class CorewebEditor extends MobxLitElement {
   }
 
   #getCellTemlates() {
-    const {templateAreas} = state.form.layoutTemplate;
-    const {fields, fieldLayoutDefinitions} = state.form;
+    const {templateAreas, fieldLayoutDefinitions} = state.form.layoutTemplate;
     return [...new Set(templateAreas.flat())].map((cell,i)=>{
-      const layoutDefinition = fieldLayoutDefinitions.get(cell) || state.form.newFieldLayoutDefinition(cell);
-
+      const layoutDefinition = fieldLayoutDefinitions.get(cell);
       return html`<layout-definition-field
                         .layoutDefinition=${layoutDefinition}
                         .onAddFieldCallback="${this.onAddField.bind(this)}"
@@ -118,7 +116,7 @@ export class CorewebEditor extends MobxLitElement {
     const dataType = dialog.returnValue;
     if (dataType) {
       const field = state.form.newField({dataType});
-      state.form.fieldLayoutDefinitions.get(area).update({
+      state.form.layoutTemplate.fieldLayoutDefinitions.get(area).update({
         field,
       });
     }

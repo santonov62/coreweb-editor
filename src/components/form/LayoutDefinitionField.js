@@ -138,7 +138,7 @@ export class LayoutDefinitionField extends MobxLitElement {
     const dragField = state.form.fields.find(({id}) => id === fieldId);
     const currentLayoutDefinition = this.layoutDefinition;
     if (fromArea) {
-      const fromLayout = state.form.fieldLayoutDefinitions.get(fromArea);
+      const fromLayout = state.form.layoutTemplate.fieldLayoutDefinitions.get(fromArea);
       fromLayout.update({field: currentLayoutDefinition.field});
     }
     currentLayoutDefinition.update({field: dragField});
@@ -209,7 +209,7 @@ export class LayoutDefinitionField extends MobxLitElement {
       }
       .cellEditor {
         background-color: rgb(234,243,246,0.25);
-        // border: 1px solid #e4e4e4;
+        border: 1px solid #e4e4e4;
         border-radius: 5px;
         z-index: 1;
         align-items: center;

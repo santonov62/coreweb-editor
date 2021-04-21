@@ -14,7 +14,7 @@ export class Form {
   layoutContainer
   layoutTemplate
   fields
-  fieldLayoutDefinitions
+  // fieldLayoutDefinitions
   name
   id
   type
@@ -22,20 +22,20 @@ export class Form {
 
   constructor(data = {}) {
     makeAutoObservable(this, {
-      deletedFields: false,
-      deletedFieldLayoutDefinitions: false,
+      // deletedFields: false,
+      // deletedFieldLayoutDefinitions: false,
       isNew: false,
       saveNew: false
     });
     this.name = data.name;
     this.id = data.id;
     this.type = data.type;
+    // this.fieldLayoutDefinitions = new Map();
     this.layoutTemplate = new LayoutTemplate({form: this});
     this.layoutContainer = new LayoutContainer({form: this});
     this.layout = new Layout({form: this});
     this.state = data.state;
     this.fields = [];
-    this.fieldLayoutDefinitions = new Map();
   }
 
   newField({id = Date.now(), fieldName = '', dataType = ''}, area) {
@@ -66,12 +66,14 @@ export class Form {
         return layout;
       });
 
-      const fieldLayoutDefinitionsMap = form.layoutTemplate.mapLayoutDefinitionsToAreas(fieldLayoutDefinitions)
-        || form.layoutTemplate.mapDefaultLayoutDefinitionsToAreas(fieldLayoutDefinitions)
+      // const fieldLayoutDefinitionsMap = form.layoutTemplate.mapLayoutDefinitionsToAreas(fieldLayoutDefinitions)
+      //   || form.layoutTemplate.mapDefaultLayoutDefinitionsToAreas(fieldLayoutDefinitions)
+      form.layoutTemplate.mapLayoutDefinitionsToAreas(fieldLayoutDefinitions)
+      || form.layoutTemplate.mapDefaultLayoutDefinitionsToAreas(fieldLayoutDefinitions)
 
       runInAction(() => {
         this.fields = fields;
-        this.fieldLayoutDefinitions = fieldLayoutDefinitionsMap;
+        // this.fieldLayoutDefinitions = fieldLayoutDefinitionsMap;
       });
     } finally {
       runInAction(() => {
@@ -125,10 +127,11 @@ export class Form {
   async saveUpdateFormFields() {
     const form = this;
     const formId = form.id;
-    const areas = [...new Set(form.layoutTemplate.templateAreas.flat())];
+    const {layoutTemplate} = form;
+    const areas = [...new Set(layoutTemplate.templateAreas.flat())];
     const fieldLayoutDefinitions = [];
     const deleteFiledLayoutDefinitions = [];
-    for (const [area, layout] of form.fieldLayoutDefinitions) {
+    for (const [area, layout] of layoutTemplate.fieldLayoutDefinitions) {
       if (areas.includes(area)) {
         fieldLayoutDefinitions.push(layout);
       } else if (layout.databean?.instanceId) {
@@ -144,7 +147,7 @@ export class Form {
     for (const field of fieldsWithLayout.concat(form.fields)) {
       fields.add(field);
     }
-    console.log(fields);
+    console.log(`Save fields: `, fields);
     await api.saveFormFields({formId, fields: [...fields]});
 
     const fieldBeans = await api.getFromFields({formId});
@@ -172,19 +175,14 @@ export class Form {
   setSelectedLayoutDefinition(layout) {
     this.selectedLayout = layout;
   }
-
-  newFieldLayoutDefinition(area) {
-    //TODO Exception to test and find bug with missed layout on save
-    if (this.fieldLayoutDefinitions.has(area)) {
-      console.log(`newFieldLayoutDefinition`, this.fieldLayoutDefinitions.get(area))
-      throw new Error(`${area} already exists`)
-    }
-    const fieldLayoutDefinition = new FieldLayoutDefinition();
-    runInAction(() =>
-      this.fieldLayoutDefinitions.set(area, fieldLayoutDefinition)
-    )
-    return fieldLayoutDefinition;
-  }
+  //
+  // newFieldLayoutDefinition(area) {
+  //   const fieldLayoutDefinition = new FieldLayoutDefinition();
+  //   runInAction(() =>
+  //     this.fieldLayoutDefinitions.set(area, fieldLayoutDefinition)
+  //   )
+  //   return fieldLayoutDefinition;
+  // }
 
   fromDatabean(databean) {
     this.name = databean.values.name;

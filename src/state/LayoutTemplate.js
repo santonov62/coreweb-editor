@@ -1,11 +1,13 @@
-import {makeAutoObservable} from "mobx";
+import {makeAutoObservable, runInAction} from "mobx";
 import {css, unsafeCSS} from "lit-element";
+import {FieldLayoutDefinition} from "./FieldLayoutDefinition";
 
 export class LayoutTemplate {
 
   content
   templateAreas
   isErrorParseAreas
+  fieldLayoutDefinitions
   #templateChanges
 
   constructor(data = {}) {
@@ -14,21 +16,13 @@ export class LayoutTemplate {
     this.template = data.template;
     this.content = data.content;
     this.form = data.form;
-    this.templateAreas = [['x1x1']];
+    this.templateAreas = [['x1x1']]
+    this.fieldLayoutDefinitions = new Map([['x1x1', new FieldLayoutDefinition()]]);
+    // this.form.newFieldLayoutDefinition(`x1x1`);
     this.isErrorParseAreas = false;
     this.#templateChanges = [];
   }
 
-  // parseFieldNameAreas() {
-  //   const content = this.content;
-  //   const template = document.createElement('template');
-  //   template.innerHTML = content.toString();
-  //   const container = template.content.querySelector('[data-container-id]');
-  //   const aaa = css`.eqweqweqewqwe {grid-template-columns:  1fr 1fr 1fr; grid-template-areas:'x1x1 x1x2 x1x2''x2x1 x1x2 x1x2''x3x1 x1x2 x1x2'}`;
-  //   console.log(`container: `, container);
-  //   return container.style.gridTemplateAreas.split('" "')
-  //     .map(area => area.replaceAll('"', '').split(' '));
-  // }
   parseFieldNameAreas() {
     const content = this.content;
     const template = document.createElement('template');
@@ -63,10 +57,19 @@ export class LayoutTemplate {
         });
       });
       layoutTemplate.templateAreas = templateAreas;
+      layoutTemplate.fieldLayoutDefinitions = fieldLayoutDefinitionsMap;
       return fieldLayoutDefinitionsMap;
     } catch (e) {
       layoutTemplate.isErrorParseAreas = true;
     }
+  }
+
+  newFieldLayoutDefinition(area) {
+    const fieldLayoutDefinition = new FieldLayoutDefinition();
+    runInAction(() =>
+      this.fieldLayoutDefinitions.set(area, fieldLayoutDefinition)
+    )
+    return fieldLayoutDefinition;
   }
 
   mapDefaultLayoutDefinitionsToAreas(fieldLayoutDefinitions) {
@@ -78,6 +81,7 @@ export class LayoutTemplate {
       templateAreas.push([area]);
     });
     this.templateAreas = templateAreas;
+    this.fieldLayoutDefinitions = fieldLayoutDefinitionsMap;
     return fieldLayoutDefinitionsMap;
   }
 
@@ -87,7 +91,9 @@ export class LayoutTemplate {
     const rows = layoutTemplate.templateAreas.length+1;
     let row = [];
     layoutTemplate.templateAreas[0].forEach((ta, i) => {
-      row[i] = `x${rows}x${i+1}`;
+      const area = `x${rows}x${i+1}`;
+      this.syncLayoutsWithAreas(area);
+      row[i] = area;
     })
     layoutTemplate.templateAreas.push(row);
   }
@@ -97,8 +103,16 @@ export class LayoutTemplate {
     const {templateAreas} = this;
     const cols = templateAreas[0].length+1;
     templateAreas.forEach((ta, i)=>{
-      ta.push(`x${i+1}x${cols}`)
+      const area = `x${i+1}x${cols}`;
+      this.syncLayoutsWithAreas(area);
+      ta.push(area);
     })
+  }
+
+  syncLayoutsWithAreas(area) {
+    if (!this.fieldLayoutDefinitions.has(area)) {
+      this.newFieldLayoutDefinition(area);
+    }
   }
 
   deleteRow() {
@@ -128,7 +142,9 @@ export class LayoutTemplate {
     layoutTemplate.templateAreas.forEach((row,i)=>{
       row.forEach((cell,j)=> {
         if (cell === area) {
-          layoutTemplate.templateAreas[i][j] = `x${i+1}x${j+1}`;
+          const area = `x${i+1}x${j+1}`;
+          layoutTemplate.templateAreas[i][j] = area;
+          this.syncLayoutsWithAreas(area);
         }
       })
     });
@@ -153,9 +169,12 @@ export class LayoutTemplate {
     })
     let points = {rowMin: Math.min(...rows), rowMax: Math.max(...rows), colMin: Math.min(...cols), colMax: Math.max(...cols)};
     const len = points.colMax-points.colMin+1;
-    let fillArray = new Array(len).fill(`x${row1}x${col1}`);
+    const area = `x${row1}x${col1}`;
+    let fillArray = new Array(len).fill(area);
     for (let i=0; i<=points.rowMax-points.rowMin; i++)
       templateAreas[points.rowMin-1+i].splice(points.colMin-1, len, ...fillArray);
+    this.syncLayoutsWithAreas(area);
+
     //this.getSelection().classList.remove('selected');
     // this.hoverCell = null;
     // this.#mergeLayoutsWithAreas();
@@ -175,11 +194,10 @@ export class LayoutTemplate {
   }
 
   makeTemplateContent() {
-    const {templateAreas} = this;
+    const {templateAreas, fieldLayoutDefinitions} = this;
     const columns = templateAreas[0].reduce((res) => res + ' 1fr', 'grid-template-columns: ');
-    const layoutDefinitions = this.form.fieldLayoutDefinitions;
     const fieldAreas = templateAreas.map(areas =>
-      areas.map(area => layoutDefinitions.get(area).field.fieldName));
+      areas.map(area => fieldLayoutDefinitions.get(area).field.fieldName));
     const areas = fieldAreas.reduce((res, row) => `${res}\n\t'${row.join(' ')}'`, 'grid-template-areas:');
     const content = `<!-- Generated by visual coreweb editor -->
 <div class="corewebEditor" data-container-id="Fields"></div>

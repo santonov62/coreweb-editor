@@ -31,10 +31,9 @@ export class AvailableFields extends MobxLitElement {
   }
 
   #getUnassignedFields() {
-    const layoutDefinitions = state.form.fieldLayoutDefinitions;
-    const {templateAreas} = state.form.layoutTemplate;
+    const {templateAreas, fieldLayoutDefinitions} = state.form.layoutTemplate;
     const areas = [...new Set(templateAreas.flat())];
-    const fieldIdsWithLayout = [...layoutDefinitions.entries()]
+    const fieldIdsWithLayout = [...fieldLayoutDefinitions.entries()]
       .reduce((acc, [area, {field}]) => {
         if (field?.id && areas.includes(area)) {
           acc.push(field.id);
