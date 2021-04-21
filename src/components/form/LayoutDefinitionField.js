@@ -149,7 +149,9 @@ export class LayoutDefinitionField extends MobxLitElement {
     const {templateAreas} = state.form.layoutTemplate;
     return html`${this.hoverCell ? html`
             <div style="grid-area: ${area};" class="cellEditor" draggable="true">
+
               ${this.hoverCell?.dataType ? html`
+                <span style="color: #e4e3e3; position: absolute; left: 5px; top: 5px;">${this.hoverCell?.dataType}</span>
                 <button style="margin-right: 8px;" @click="${this.edit}">Edit</button>
                 <button @click="${this.onDeleteField}">Detach</button>`:
       html`<button @click="${this.onAddField}">Add</button>`
@@ -206,19 +208,19 @@ export class LayoutDefinitionField extends MobxLitElement {
         height: 100%;
       }
       .cellEditor {
-        // background-color: rgb(234,243,246,0.25);
-        // border: 1px solid #2683B3;
+        background-color: rgb(234,243,246,0.25);
+        // border: 1px solid #e4e4e4;
         border-radius: 5px;
         z-index: 1;
         align-items: center;
         justify-content: center;
         display: flex;
         position:absolute;
-        // top: -1px;
-        // left: -1px;
+        top: -1px;
+        left: -1px;
         width: 100%;
         height: 100%;
-        box-shadow: 0px 0px 9px 0px rgba(34, 60, 80, 0.2);
+        // box-shadow: 0px 0px 3px 0px rgba(34, 60, 80, 0.2);
       }
       .arrow {
         position: absolute;
