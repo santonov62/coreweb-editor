@@ -14,6 +14,7 @@ export class LayoutDefinitionField extends MobxLitElement {
       layoutDefinition: {type: Object},
       hoverCell: {type: Object},
       onAddFieldCallback: {type: Function},
+      isEdit: {type: Boolean, attribute: false},
     }
   }
 
@@ -75,26 +76,30 @@ export class LayoutDefinitionField extends MobxLitElement {
     this.hoverCell = null;
   }
 
+  showEditFieldDialog() {
+    const dialog = document.getElementById('cweditor').shadowRoot.getElementById('editFieldDialog');
+    dialog.layoutDefinition = this.layoutDefinition;
+    dialog.showModal();
+  }
+
   onAddField(e) {
     // e.stopPropagation();
-    this.onAddFieldCallback(this.dataset['area']);
+    // this.onAddFieldCallback(this.layoutDefinition);
+
+    this.showEditFieldDialog();
   }
 
   edit() {
-    state.form.setSelectedLayoutDefinition(this.layoutDefinition);
+    // this.onAddFieldCallback(this.layoutDefinition);
+    // state.form.setSelectedLayoutDefinition(this.layoutDefinition);
+    this.showEditFieldDialog();
   }
 
-  // disconnectedCallback() {
-  //   super.disconnectedCallback();
-  //   const {area} = this.dataset;
-  //   state.form.deleteFieldLayoutDefinition(area);
-  // }
-
   render() {
-    const {layoutDefinition} = this;
+    const {layoutDefinition, isEdit} = this;
     const {order, field} = layoutDefinition;
     return html`
-      <form-field class="${classMap({'without-field': !field})}" tabindex=${order} .field=${field} .layoutDefinition=${layoutDefinition}></form-field>
+      <form-field class="${classMap({'empty-field': !field})}" tabindex=${order} .field=${field} .layoutDefinition=${layoutDefinition}></form-field>
       ${this.#getHoverCellTemplate()}
     `;
   }
@@ -199,7 +204,7 @@ export class LayoutDefinitionField extends MobxLitElement {
       :host:hover {
         border-color: #2683B3;
       }
-      .without-field {
+      .empty-field {
         border: 2px dashed rgb(204, 204, 204, 0.36);
       }
       form-field {

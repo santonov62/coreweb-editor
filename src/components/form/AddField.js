@@ -11,10 +11,7 @@ export class AddField extends MobxLitElement {
 
   static get properties() {
     return {
-      id: {type: Number},
-      field: {attribute: false},
       layoutDefinition: {attribute: false},
-      isNewField: {type: Boolean},
     }
   }
 

@@ -21,15 +21,15 @@ export class Field {
     this.id = data.id || '';
     this.dataType = data.dataType || '';
     this.fieldName = data.fieldName || `fieldName${data.id}`;
-    this.placeholder = data.placeholder || this.fieldName;
-    this.description = data.description || this.fieldName;
-    this.label = data.label || this.fieldName;
+    this.placeholder = data.placeholder;
+    this.description = data.description;
+    this.label = data.label;
     // this.layoutDefinition.fieldId = data.id;
   }
 
   update(props = {}) {
     for (const [key, value] of Object.entries(props)) {
-      if (!!value)
+      // if (!!value)
         this[key] = value;
     }
   }

@@ -37,27 +37,12 @@ export class CorewebEditor extends MobxLitElement {
       const layoutDefinition = fieldLayoutDefinitions.get(cell);
       return html`<layout-definition-field
                         .layoutDefinition=${layoutDefinition}
-                        .onAddFieldCallback="${this.onAddField.bind(this)}"
                         class="item"
                         tabindex="0"
                         data-area="${cell}"
                         style="grid-area: ${cell}">${i+1}>
         </layout-definition-field>`
     })
-  }
-
-  #getDialogTemplate() {
-    return html`
-      <cw-dialog id="dialog" title="Add/Edit Field" @close="${this.onDialogClose}">
-        <slot>
-          <label for="dataType">Field: </label>
-          <select id="dataType" name="dataType" @change=${this.onFieldSelect}>
-            <option>???</option>
-            ${Object.values(FieldDataTypeEnum).map(value => html`
-            <option value="${value}">${value}</option>`)}
-          </select>
-        </slot>
-      </cw-dialog>`
   }
 
   render() {
@@ -100,26 +85,8 @@ export class CorewebEditor extends MobxLitElement {
         <available-fields></available-fields>
       </div>
 
-      ${this.#getDialogTemplate()}
+      <edit-field-dialog id="editFieldDialog"></edit-field-dialog>
     `;
-  }
-
-  onAddField(area) {
-    let dialog = this.shadowRoot.getElementById('dialog');
-    dialog.area = area;
-    dialog.showModal();
-  }
-
-  onDialogClose(e) {
-    const dialog = e.target;
-    const {area} = dialog;
-    const dataType = dialog.returnValue;
-    if (dataType) {
-      const field = state.form.newField({dataType});
-      state.form.layoutTemplate.fieldLayoutDefinitions.get(area).update({
-        field,
-      });
-    }
   }
 
   saveForm() {
