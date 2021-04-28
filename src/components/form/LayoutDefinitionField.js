@@ -77,20 +77,17 @@ export class LayoutDefinitionField extends MobxLitElement {
   }
 
   showEditFieldDialog() {
-    const dialog = document.getElementById('cweditor').shadowRoot.getElementById('editFieldDialog');
+    const dialog = document.querySelector('coreweb-editor').shadowRoot.getElementById('editFieldDialog');
     dialog.layoutDefinition = this.layoutDefinition;
     dialog.showModal();
   }
 
   onAddField(e) {
     // e.stopPropagation();
-    // this.onAddFieldCallback(this.layoutDefinition);
-
     this.showEditFieldDialog();
   }
 
   edit() {
-    // this.onAddFieldCallback(this.layoutDefinition);
     // state.form.setSelectedLayoutDefinition(this.layoutDefinition);
     this.showEditFieldDialog();
   }

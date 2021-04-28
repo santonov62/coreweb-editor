@@ -30,24 +30,24 @@ class AddEditFieldDialog extends LitElement {
         <slot>
           <div style="display: grid; grid-template-columns: 100px 1fr; gap: 10px;">
           <label for="field">dataType: </label>
-          <select name="dataType" @change=${this.onFieldSelect}>
-            <option>???</option>
+          <select .value="${dataType}" name="dataType" @change=${this.onFieldSelect}>
+            <option value="">???</option>
             ${Object.values(FieldDataTypeEnum).map(value => html`
-            <option value="${value}" ?selected="${dataType === value}">${value}</option>`)}
+            <option value="${value}">${value}</option>`)}
           </select>
 
           ${dataType ? html`
             <label for="fieldName">fieldName: </label>
-            <input name="fieldName" value=${fieldName} required/>
-
-            <label for="placeholder">placeholder: </label>
-            <input name="placeholder" value=${placeholder} />
+            <input name="fieldName" .value=${fieldName} required/>
 
             <label for="label">label: </label>
-            <input name="label" value=${label} />
+            <input name="label" .value=${label} />
+
+            <label for="placeholder">placeholder: </label>
+            <input name="placeholder" .value=${placeholder} />
 
             <label for="description">description: </label>
-            <input name="description" value=${description} />
+            <input name="description" .value=${description} />
 
             ${access ? html`
               <label for="access">access: </label>
